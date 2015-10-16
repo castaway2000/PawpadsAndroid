@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-//gets layout info abd passes text data in.
+//gets layout info and passes text data in.
 
 class CustomAdapter extends ArrayAdapter<String> {
     final int[] pics;
