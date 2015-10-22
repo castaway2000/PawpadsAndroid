@@ -45,6 +45,22 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Login"
+            android:label="PawPads" >
+            <intent-filter>
+                <action android:name="android.intent.action.Login" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Register"
+            android:label="PawPads" >
+            <intent-filter>
+                <action android:name="android.intent.action.Register" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".profileEditPage"
             android:label="PawPads" >
             <intent-filter>
