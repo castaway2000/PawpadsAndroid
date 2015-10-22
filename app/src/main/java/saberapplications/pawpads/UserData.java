@@ -8,7 +8,6 @@ import android.content.Context;
  */
 public class UserData extends Activity {
     Context mContext;
-
     public UserData(Context context) {
         this.mContext = context;
     }

@@ -37,6 +37,7 @@ public class ChatActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        setTitle("PawPads | Chat");
 
         editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);

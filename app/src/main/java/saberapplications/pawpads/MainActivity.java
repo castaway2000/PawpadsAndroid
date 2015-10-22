@@ -15,25 +15,16 @@ import android.widget.ListView;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
+    UserLocalStore userLocalStore;
 
-    int i =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        setUserData();
-        i=1;
+        userLocalStore = new UserLocalStore(this);
 
-        listView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        performClickAction(position);
-                    }
-                }
-        );
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -49,15 +40,44 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 Intent i = new Intent(MainActivity.this, profileEditPage.class);
                 startActivity(i);
                 return true;
+
+            case R.id.action_logout:
+                //TODO: set logout functionality
+                userLocalStore = new UserLocalStore(this);
+                userLocalStore.clearUserData();
+                userLocalStore.setUserLoggedIn(false);
+                startActivity(new Intent(this, Login.class));
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(authenticate() == true){
+            //TODO: run main event
+            setUserData();
+            listView.setOnItemClickListener(
+                    new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            performClickAction(position);
+                        }
+                    }
+            );
+        }
+        else {
+            startActivity(new Intent(MainActivity.this, Login.class));
+        }
+    }
+
+    private boolean authenticate(){
+        return userLocalStore.getUserLoggedIn();
+    }
 
     public void setUserData() {
-
-        i=2;
         UserData ud = new UserData(this);
         ud.getUserData();
         final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
@@ -68,14 +88,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
-
-
     public void performClickAction(int position) {
-
-        i=3;
         UserData u = new UserData(this);
-
-
         u.getUserData();
         final CustomAdapter ca = new CustomAdapter(this, u.user, u.upics, u.descr, u.geol);
 
@@ -86,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         i.putExtra("location", ca.geoloc[position]);
         startActivity(i);
     }
+
     @Override
     public void onRefresh() {
         setUserData();
