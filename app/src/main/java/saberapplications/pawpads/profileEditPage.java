@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -13,21 +16,39 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import android.util.Base64;
+import android.widget.Toast;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 
 /**
  * Created by blaze on 10/17/2015.
  */
-public class profileEditPage extends AppCompatActivity {
+public class profileEditPage extends AppCompatActivity implements View.OnClickListener{
     //TODO: save button
     //TODO: image handling
     //TODO: text handling
     private final static int SELECT_IMAGE = 1;
-    private String selectedImagePath;
-    private ImageView img;
-    private EditText proDescr;
-    private EditText textOut;
+    String selectedImagePath;
+    ImageView img;
+    EditText textOut, proDescr;
+    Button saveBtn, getimgbtn;
+    Uri path;
+
 
 
     @Override
@@ -35,41 +56,42 @@ public class profileEditPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_editpage);
         setTitle("PawPads | Edit Profile");
+
         img = (ImageView) findViewById(R.id.editImageView);
+
+        getimgbtn = (Button) findViewById(R.id.newPicButton);
+        saveBtn = (Button) findViewById(R.id.profileSave);
         proDescr = (EditText) findViewById(R.id.editProfileText);
         textOut = (EditText) findViewById(R.id.editProfileText);
-        imageHandler();
 
-        Button saveBtn = (Button) findViewById(R.id.profileSave);
-        View.OnClickListener clickHandler = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        getimgbtn.setOnClickListener(this);
+        saveBtn.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch(v.getId()){
+            case R.id.newPicButton:
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent, SELECT_IMAGE);
+                break;
+
+            case R.id.profileSave:
                 //saved image state passed to database
-
+                Bitmap image = ((BitmapDrawable)img.getDrawable()).getBitmap();
+                new UploadImage(image, proDescr.getText().toString());
                 //saved description updated to database
                 String test = proDescr.getText().toString();
                 textOut.setText(test);
                 //back to main activity
                 Intent i = new Intent(profileEditPage.this, MainActivity.class);
                 startActivity(i);
-            }
-        };
-        saveBtn.setOnClickListener(clickHandler);
-    }
 
-    private void imageHandler() {
-        Button getimgbtn = (Button) findViewById(R.id.newPicButton);
-        View.OnClickListener clickHandler = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);//
-                startActivityForResult(intent, SELECT_IMAGE);
-
-            }
-        };
-        getimgbtn.setOnClickListener(clickHandler);
+                break;
+        }
     }
 
     @Override
@@ -78,9 +100,10 @@ public class profileEditPage extends AppCompatActivity {
             if (requestCode == SELECT_IMAGE) {
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
+                path = selectedImageUri;
                 System.out.println("Image Path : " + selectedImagePath);
                 try {
-                    img.setImageBitmap(decodeUri(getApplicationContext(), selectedImageUri,80));
+                    img.setImageBitmap(decodeUri(getApplicationContext(), selectedImageUri, 80));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -119,4 +142,56 @@ public class profileEditPage extends AppCompatActivity {
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
     }
+
+    public class UploadImage extends AsyncTask<Void,Void,Void>{
+        Bitmap image;
+        String name;
+
+        public UploadImage(Bitmap image, String name){
+            this.image = image;
+            this.name = name;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+            String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+            dataToSend.add(new BasicNameValuePair("image", encodedImage));
+            dataToSend.add(new BasicNameValuePair("name", name));
+
+            HttpParams httpRequestParams = getHttprequestParams();
+
+            HttpClient client = new DefaultHttpClient(httpRequestParams);
+            HttpPost post = new HttpPost(ServerRequests.SERVER_ADDRESS + "SavePicture.php");
+
+            try{
+                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                client.execute(post);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            super.onPostExecute(aVoid);
+            Toast.makeText(getApplicationContext(),"Profile has been updated!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private HttpParams getHttprequestParams(){
+        HttpParams httpRequestParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpRequestParams, 1000 * 30);
+        HttpConnectionParams.setSoTimeout(httpRequestParams, 1000*30);
+        return httpRequestParams;
+
+    }
+
+
 }

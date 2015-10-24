@@ -140,7 +140,6 @@ public class ChatActivity extends Activity {
 
         HttpURLConnection connection;
         connection = tempClient.open(url);
-
         connection.setConnectTimeout(40000);
         InputStream in = null;
         try {

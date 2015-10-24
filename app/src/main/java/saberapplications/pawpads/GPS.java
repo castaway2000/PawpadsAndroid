@@ -153,8 +153,8 @@ public class GPS extends Activity {
     public float[] geolocation() {
 
         Location loc = getLastBestLocation();
-        double lat = 47.469823; //loc.getLatitude();
-        double lon = -122.1627899;//loc.getLongitude();
+        double lat = loc.getLatitude();
+        double lon = loc.getLongitude();
         float[] res = new float[3];
 
         Location.distanceBetween(lat, lon, 47.469521, -122.162746, res);

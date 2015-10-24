@@ -134,7 +134,6 @@ public class ServerRequests {
                     int age = jObject.getInt("age");
                     returnedUser = new User(name, age, user.username, user.password);
                 }
-
             }catch(Exception e){
                 e.printStackTrace();
             }
