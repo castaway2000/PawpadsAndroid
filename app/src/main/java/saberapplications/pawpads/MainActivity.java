@@ -12,20 +12,25 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 
+
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
+    UserData ud = new UserData(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        android.util.Log.i(this.toString(), "onCreate() called -- I am " + this.toString());
         setContentView(R.layout.activity_main);
+        listView = (ListView) findViewById(R.id.listView);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         userLocalStore = new UserLocalStore(this);
-
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -56,9 +61,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onStart() {
         super.onStart();
+        setUserData();
         if(authenticate() == true){
             //TODO: run main event
-            setUserData();
             listView.setOnItemClickListener(
                     new AdapterView.OnItemClickListener() {
                         @Override
@@ -78,25 +83,27 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void setUserData() {
-        UserData ud = new UserData(this);
         ud.getUserData();
+    }
+
+    public void setListView(UserList userList){
+android.util.Log.i(this.toString(), "trying to construct CustomAdapter with context " + this.toString());
         final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
-        listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
+
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
     public void performClickAction(int position) {
-        UserData u = new UserData(this);
-        u.getUserData();
-        final CustomAdapter ca = new CustomAdapter(this, u.user, u.upics, u.descr, u.geol);
+        ud.getUserData();
+        final CustomAdapter ca = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
 
         Intent i = new Intent(MainActivity.this, profilepage.class);
         i.putExtra("value", ca.descrip[position]);
         i.putExtra("image", ca.pics[position]);
-        i.putExtra("username", ca.profile[position]);
+        i.putExtra("username", ca.user[position]);
         i.putExtra("location", ca.geoloc[position]);
         startActivity(i);
     }

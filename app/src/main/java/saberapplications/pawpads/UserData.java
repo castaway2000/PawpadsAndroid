@@ -3,6 +3,8 @@ package saberapplications.pawpads;
 import android.app.Activity;
 import android.content.Context;
 
+import java.util.ArrayList;
+
 /**
  * Created by blaze on 9/9/2015.
  */
@@ -12,39 +14,45 @@ public class UserData extends Activity {
         this.mContext = context;
     }
 
-    private String getuserdataURL = "localhost:8080/getdata.php";
     public String[] user;
     public String[] descr;
     public String[] geol;
     public int[] upics;
 
     public void getUserData() {
-
 //        DatabaseCall dc = new DatabaseCall();
-//
-//        //TODO: INTEGRATE CHAT HTTP REQUEST FOR JSON TASKS.
+        //TODO: INTEGRATE CHAT HTTP REQUEST FOR JSON TASKS.
+        //TODO: get data from database
+
 //        dc.JsonArrayRequest(getuserdataURL);
 
         final GPS gps = new GPS(mContext);
         float[] dat = gps.geolocation();
-        String[] geoloc = {String.valueOf(dat[0]), String.valueOf(dat[0]), String.valueOf(dat[0]), String.valueOf(dat[0])};
-
-        //TODO: get data from database
-        final String[] username = {"Maria", "Steve", "Kristy", "Helen"};
-
-        final String[] descrip = { /*getString(R.string.profile)*/ "garble" +
-                "My parents dog is named Parmesan he is awesome! love him lots! if you want a " +
-                "coffee let me know im always around.", "Im the man the legend!" +
-                " hit me up if your in Sodo and want to get a nice beer.",
-                "hot teacher incoming! im awesome i know it cause i teach it! read books! " +
-                        "Travel the world! im new to this city trying to make some friends near me! chat me up!",
-                "Life is short eat desert first! Dance and never let a moment slip by!"};
-
-        user = username;
-        descr = descrip;
+        String[] geoloc = {String.valueOf(dat[0]), String.valueOf(dat[0]), String.valueOf(dat[0]),
+                String.valueOf(dat[0]), String.valueOf(dat[0])};
         geol = geoloc;
 
-        final int[] pics = {R.drawable.pic_11, R.drawable.pic_22, R.drawable.pic_33, R.drawable.pic_44};
+        final int[] pics = {R.drawable.pic_11, R.drawable.pic_22, R.drawable.pic_33,
+                R.drawable.pic_44, R.drawable.pic_44};
         upics = pics;
+
+        getList();
+    }
+
+
+    public void getList(){
+        ServerRequests serverRequests = new ServerRequests(this.mContext);
+        serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
+            @Override
+            public void done(UserList returnedUser) {
+                //UserData.this.geo = returnedUser.geo;
+                //Userdata.this.pics = returnedUser.pics;
+                UserData.this.user = returnedUser.name;
+                UserData.this.descr = returnedUser.age;
+
+                ((MainActivity) UserData.this.mContext).setListView(returnedUser);
+                //TODO: constrct list adapter to update list
+            }
+        });
     }
 }
