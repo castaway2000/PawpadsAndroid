@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:background="#59d8ff">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.04">
+
+        <ImageView
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:id="@+id/editImageView"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="5dp"
+            android:src="@android:drawable/btn_star_big_on" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New profile pic"
+            android:id="@+id/newPicButton"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.27">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="About you:"
+            android:id="@+id/aboutYou"
+            android:layout_gravity="left|top"
+            android:layout_margin="5dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="163dp"
+            android:id="@+id/editProfileText"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="#ffffff"
+            android:layout_margin="5dp" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.39">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:id="@+id/profileSave"
+            android:layout_gravity="center_horizontal|top" />
+    </FrameLayout>
+</LinearLayout>
