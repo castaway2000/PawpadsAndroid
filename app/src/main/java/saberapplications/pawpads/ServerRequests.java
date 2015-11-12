@@ -29,7 +29,7 @@ public class ServerRequests {
 
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
-    public static final String SERVER_ADDRESS = "http://pawpads.byethost8.com/";
+    public static final String SERVER_ADDRESS = "pawpadstest.comuv.com/";
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
@@ -54,14 +54,14 @@ public class ServerRequests {
     }
 
 
-
+//REGISTRATION ASYNC TASK
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, Void>{
         User user;
         GetUserCallback userCallback;
 
         public StoreUserDataAsyncTask(User user, GetUserCallback userCallback){
-            this.user = user;
-            this.userCallback = userCallback;
+            ServerRequests.StoreUserDataAsyncTask.this.user = user;
+            ServerRequests.StoreUserDataAsyncTask.this.userCallback = userCallback;
         }
 
         @Override
@@ -98,14 +98,14 @@ public class ServerRequests {
     }
 
 
-
+//LOGIN ASYNC TASK
     public class FetchUserDataAsyncTask extends AsyncTask<Void, Void, User> {
         User user;
         GetUserCallback userCallback;
 
-        public FetchUserDataAsyncTask(User user, GetUserCallback userCallback) {
-            this.user = user;
-            this.userCallback = userCallback;
+        public FetchUserDataAsyncTask(User usr, GetUserCallback userCB) {
+            ServerRequests.FetchUserDataAsyncTask.this.user = usr;
+            ServerRequests.FetchUserDataAsyncTask.this.userCallback = userCB;
         }
 
         @Override
@@ -155,10 +155,7 @@ public class ServerRequests {
     }
 
 
-
-
-    //FETCH ALL DATA
-
+//FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
         UserList user;
         GetUserListCallback userCallback;
@@ -167,8 +164,8 @@ public class ServerRequests {
         public String[] aName = {};
 
         public FetchListDataAsyncTask(UserList user, GetUserListCallback userCallback) {
-            this.user = user;
-            this.userCallback = userCallback;
+            FetchListDataAsyncTask.this.user = user;
+            FetchListDataAsyncTask.this.userCallback = userCallback;
         }
 
         @Override
@@ -189,7 +186,6 @@ public class ServerRequests {
 //                String result = EntityUtils.toString(entity);
 //                JSONObject jObject = new JSONObject(result);
 //                JSONArray jsonArray = new JSONArray(jObject);
-
 
                 ArrayList<String> lName = new ArrayList<>();
                 ArrayList<String> lAge = new ArrayList<>();
