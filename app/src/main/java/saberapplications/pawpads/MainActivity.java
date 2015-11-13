@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        android.util.Log.i(this.toString(), "onCreate() called -- I am " + this.toString());
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listView);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
@@ -87,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void setListView(UserList userList){
-android.util.Log.i(this.toString(), "trying to construct CustomAdapter with context " + this.toString());
         final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
         listView.setAdapter(listAdapter);
 

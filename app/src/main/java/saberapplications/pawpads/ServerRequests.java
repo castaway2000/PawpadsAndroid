@@ -29,7 +29,7 @@ public class ServerRequests {
 
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
-    public static final String SERVER_ADDRESS = "pawpadstest.comuv.com/";
+    public static final String SERVER_ADDRESS = "http://pawpadstest.comuv.com/";
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
