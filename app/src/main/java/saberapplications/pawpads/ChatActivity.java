@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.UrlQuerySanitizer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class ChatActivity extends Activity {
 
-    EditText editText_mail_id;
+    //EditText editText_mail_id;
     EditText editText_chat_message;
     ListView listView_chat_messages;
     Button button_send_chat;
@@ -39,7 +40,10 @@ public class ChatActivity extends Activity {
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
 
-        editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
+        //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
+        //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
+        final String recipient = getIntent().getExtras().getString("user", null);
+        ((android.widget.TextView)findViewById(R.id.chat_header_recipient_name)).setText(recipient);
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
@@ -49,7 +53,7 @@ public class ChatActivity extends Activity {
                 // send chat message to server
                 String message = editText_chat_message.getText().toString();
                 showChat("sent", message);
-                new SendMessage().execute();
+                new SendMessage(recipient, message).execute();
                 editText_chat_message.setText("");
             }
         });
@@ -64,7 +68,7 @@ public class ChatActivity extends Activity {
             }
         };
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(recieve_chat, new IntentFilter("message_recieved"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(recieve_chat, new IntentFilter("message_received"));
     }
 
     private void showChat(String type, String message) {
@@ -88,6 +92,15 @@ public class ChatActivity extends Activity {
 
     private class SendMessage extends AsyncTask<String, Void, String> {
 
+        private String mRecipient;
+        private String mMessage;
+
+        public SendMessage(String recipient, String message) {
+            UrlQuerySanitizer.ValueSanitizer encoder = UrlQuerySanitizer.getUrlLegal();
+            mRecipient = encoder.sanitize(recipient);
+            mMessage = encoder.sanitize(message);
+        }
+
         @Override
         protected void onPreExecute() {
             // TODO Auto-generated method stub
@@ -97,7 +110,7 @@ public class ChatActivity extends Activity {
         @Override
         protected String doInBackground(String... params) {
             // TODO Auto-generated method stub
-            String url = Util.send_chat_url + "?email_id=" + editText_mail_id.getText().toString() + "&message=" + editText_chat_message.getText().toString();
+            String url = Util.send_chat_url + "?email_id=" + mRecipient + "&message=" + mMessage;
             Log.i("pavan", "url" + url);
             OkHttpClient client_for_getMyFriends = new OkHttpClient();
 
