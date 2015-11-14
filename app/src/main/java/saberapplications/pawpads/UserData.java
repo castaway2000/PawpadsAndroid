@@ -20,20 +20,19 @@ public class UserData extends Activity {
     public int[] upics;
 
     public void getUserData() {
-//        DatabaseCall dc = new DatabaseCall();
         //TODO: INTEGRATE CHAT HTTP REQUEST FOR JSON TASKS.
-        //TODO: get data from database
-
-//        dc.JsonArrayRequest(getuserdataURL);
+        //TODO: get photo, distance, description data from database
 
         final GPS gps = new GPS(mContext);
         float[] dat = gps.geolocation();
         String[] geoloc = {String.valueOf(dat[0]), String.valueOf(dat[0]), String.valueOf(dat[0]),
-                String.valueOf(dat[0]), String.valueOf(dat[0])};
+                           String.valueOf(dat[0]), String.valueOf(dat[0]), String.valueOf(dat[0]),
+                           String.valueOf(dat[0]), String.valueOf(dat[0])};
         geol = geoloc;
 
         final int[] pics = {R.drawable.pic_11, R.drawable.pic_22, R.drawable.pic_33,
-                R.drawable.pic_44, R.drawable.pic_44};
+                            R.drawable.pic_11, R.drawable.pic_22, R.drawable.pic_33,
+                            R.drawable.pic_44, R.drawable.pic_44};
         upics = pics;
 
         getList();
@@ -45,13 +44,20 @@ public class UserData extends Activity {
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
+
+                //TODO: set geo returned relative to current location
                 //UserData.this.geo = returnedUser.geo;
+
+                //TODO: null photo handeling
                 //Userdata.this.pics = returnedUser.pics;
+
+                //TODO: make username, not actual name.
                 UserData.this.user = returnedUser.name;
+
+                //TODO: make description, not age
                 UserData.this.descr = returnedUser.age;
 
                 ((MainActivity) UserData.this.mContext).setListView(returnedUser);
-                //TODO: constrct list adapter to update list
             }
         });
     }

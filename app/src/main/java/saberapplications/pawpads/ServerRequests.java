@@ -30,6 +30,7 @@ public class ServerRequests {
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
     public static final String SERVER_ADDRESS = "http://pawpadstest.comuv.com/";
+    //public static final String SERVER_ADDRESS = "http://pawpads.byethost8.com/";
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
@@ -56,6 +57,7 @@ public class ServerRequests {
 
 //REGISTRATION ASYNC TASK
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, Void>{
+    //TODO: password hashing
         User user;
         GetUserCallback userCallback;
 
@@ -100,7 +102,8 @@ public class ServerRequests {
 
 //LOGIN ASYNC TASK
     public class FetchUserDataAsyncTask extends AsyncTask<Void, Void, User> {
-        User user;
+    //TODO: password hashing
+    User user;
         GetUserCallback userCallback;
 
         public FetchUserDataAsyncTask(User usr, GetUserCallback userCB) {
@@ -157,6 +160,8 @@ public class ServerRequests {
 
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
+    //TODO: photo handling, null photo returns.
+    //TODO:lat long handeling
         UserList user;
         GetUserListCallback userCallback;
         public String[] aAge = {};
@@ -180,60 +185,34 @@ public class ServerRequests {
 
             UserList returnedUser = null;
             try{
-//                HttpResponse httpResponse = client.execute(get);
-//                HttpEntity entity = httpResponse.getEntity();
-//
-//                String result = EntityUtils.toString(entity);
-//                JSONObject jObject = new JSONObject(result);
-//                JSONArray jsonArray = new JSONArray(jObject);
+                HttpResponse httpResponse = client.execute(get);
+                HttpEntity entity = httpResponse.getEntity();
+
+                String result = EntityUtils.toString(entity);
+                JSONArray jArray =  new JSONArray(result);
+                JSONObject jObject = new JSONObject();
 
                 ArrayList<String> lName = new ArrayList<>();
                 ArrayList<String> lAge = new ArrayList<>();
                 ArrayList<String> lUsername = new ArrayList<>();
 
-                lName.add("blart0");
-                lName.add("blart1");
-                lName.add("blart2");
-                lName.add("blart3");
-                lName.add("blart4");
-
-                lAge.add("0");
-                lAge.add("1");
-                lAge.add("2");
-                lAge.add("3");
-                lAge.add("4");
-
-                lUsername.add("wewt0");
-                lUsername.add("wewt1");
-                lUsername.add("wewt2");
-                lUsername.add("wewt3");
-                lUsername.add("wewt4");
-
-//                if(jObject.length() == 0){
-//                    returnedUser = null;
-//                }
-//                else
-//                {
-//                    for(int i = 0; i < jObject.length(); i++){
-//
-//                         //= jsonArray.getJSONObject(i);
-//
-//                        String name = jObject.getString("name");
-//                        lName.add(i,name);
-//
-//                        int age = jObject.getInt("age");
-//                        lAge.add(i, Integer.toString(age));
-//
-//                        String username = jObject.getString("username");
-//                        lUsername.add(i, username);
-//                }
-
+                if(jArray.length() == 0){
+                    returnedUser = null;
+                }
+                else
+                {
+                    for(int i = 0; i < jArray.length(); i++){
+                        jObject = jArray.getJSONObject(i);
+                        lName.add(i,jObject.getString("name"));
+                        lAge.add(i, Integer.toString(jObject.getInt("age")));
+                        lUsername.add(i, jObject.getString("username"));
+                }
                     aAge = lAge.toArray(new String[lAge.size()]);
                     aName = lName.toArray(new String[lName.size()]);
                     aUsername = lUsername.toArray(new String[lUsername.size()]);
 
                     returnedUser = new UserList(aName, aAge, aUsername);
-//                }
+                }
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -246,6 +225,5 @@ public class ServerRequests {
             userCallback.done(returnedUser);
             super.onPostExecute(returnedUser);
         }
-
     }
 }

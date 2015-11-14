@@ -39,9 +39,8 @@ import java.util.ArrayList;
  * Created by blaze on 10/17/2015.
  */
 public class profileEditPage extends AppCompatActivity implements View.OnClickListener{
-    //TODO: save button
-    //TODO: image handling
-    //TODO: text handling
+    //TODO: send profile info to the database.
+
     private final static int SELECT_IMAGE = 1;
     String selectedImagePath;
     ImageView img;
@@ -173,7 +172,6 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             }catch (Exception e){
                 e.printStackTrace();
             }
-
             return null;
         }
 
@@ -182,7 +180,6 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             super.onPostExecute(aVoid);
             Toast.makeText(getApplicationContext(),"Profile has been updated!", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private HttpParams getHttprequestParams(){
@@ -190,8 +187,5 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         HttpConnectionParams.setConnectionTimeout(httpRequestParams, 1000 * 30);
         HttpConnectionParams.setSoTimeout(httpRequestParams, 1000*30);
         return httpRequestParams;
-
     }
-
-
 }
