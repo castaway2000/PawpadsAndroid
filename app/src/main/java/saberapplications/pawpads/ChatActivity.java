@@ -59,7 +59,7 @@ public class ChatActivity extends Activity {
             public void onReceive(Context context, Intent intent) {
 
                 String message = intent.getStringExtra("message");
-                showChat("recieve", message);
+                showChat("receive", message);
 
             }
         };

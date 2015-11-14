@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 userLocalStore.clearUserData();
                 userLocalStore.setUserLoggedIn(false);
                 startActivity(new Intent(this, Login.class));
+                finish();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onStart() {
         super.onStart();
         setUserData();
-        if(authenticate() == true){
+        if(authenticate()) {
             //TODO: run main event
             listView.setOnItemClickListener(
                     new AdapterView.OnItemClickListener() {
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         else {
             startActivity(new Intent(MainActivity.this, Login.class));
+            finish();
         }
     }
 

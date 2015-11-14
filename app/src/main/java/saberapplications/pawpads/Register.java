@@ -53,7 +53,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         serverRequests.storeUserDataInBackground(user, new GetUserCallback() {
             @Override
             public void done(User returnedUser) {
-                startActivity(new Intent(Register.this, Login.class));
+                finish();
             }
         });
     }

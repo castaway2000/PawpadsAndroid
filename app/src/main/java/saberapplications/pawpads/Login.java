@@ -77,6 +77,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
         userLocalStore.setUserLoggedIn(true);
 
         startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
 }
