@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Xml;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.HashMap;
 
 /**
  * Created by blaze on 10/21/2015.
@@ -40,6 +43,8 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
             case R.id.bLogin:
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
+
+                //TODO: hash password
                 User user = new User(username, password);
                 authenticate(user);
                 break;
@@ -78,5 +83,4 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
 
         startActivity(new Intent(this, MainActivity.class));
     }
-
 }

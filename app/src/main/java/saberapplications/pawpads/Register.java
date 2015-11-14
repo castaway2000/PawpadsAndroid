@@ -38,7 +38,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 int age = Integer.parseInt(etAge.getText().toString());
-
+                //TODO: hash password
                 User user = new User(name, age, username, password);
 
 
