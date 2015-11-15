@@ -88,7 +88,6 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 //back to main activity
                 Intent i = new Intent(profileEditPage.this, MainActivity.class);
                 startActivity(i);
-
                 break;
         }
     }
