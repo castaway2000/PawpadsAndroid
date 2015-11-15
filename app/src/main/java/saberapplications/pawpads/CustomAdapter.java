@@ -5,6 +5,7 @@ package saberapplications.pawpads;
  */
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 //gets layout info and passes text data in.
-
 class CustomAdapter extends ArrayAdapter<String> {
-    final int[] pics;
+    final String[] pics;
     final String[] user;
     final String[] geoloc;
     final String[] descrip;
 
-    public CustomAdapter(Context context, String[] user, int[] pics, String[] descrip, String[] geoloc) {
+    public CustomAdapter(Context context, String[] user, String[] pics, String[] descrip, String[] geoloc) {
         super(context, R.layout.custom_row, user);
         this.pics = pics;
         this.geoloc = geoloc;
@@ -40,9 +38,9 @@ class CustomAdapter extends ArrayAdapter<String> {
         TextView blazetext = (TextView) customView.findViewById(R.id.blazeText);
         blazetext.setText(username);
 
-        //profile info
-        TextView profile = (TextView) customView.findViewById(R.id.info);
-        profile.setText(descrip[position]);
+//        //profile info
+//        TextView profile = (TextView) customView.findViewById(R.id.info);
+//        profile.setText(descrip[position]);
 
         //gps coordinates
         TextView gps = (TextView) customView.findViewById(R.id.geoloc);
@@ -50,7 +48,7 @@ class CustomAdapter extends ArrayAdapter<String> {
 
         //set image sequence;
         ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
-        blazeImage.setImageResource(pics[position]);
+        blazeImage.setImageURI(Uri.parse(pics[position]));
 
         return customView;
     }

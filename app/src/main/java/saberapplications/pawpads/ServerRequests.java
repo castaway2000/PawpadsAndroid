@@ -3,7 +3,6 @@ package saberapplications.pawpads;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,7 +29,6 @@ public class ServerRequests {
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
     public static final String SERVER_ADDRESS = "http://pawpadstest.comuv.com/";
-    //public static final String SERVER_ADDRESS = "http://pawpads.byethost8.com/";
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
@@ -161,12 +159,13 @@ public class ServerRequests {
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
     //TODO: photo handling, null photo returns.
-    //TODO:lat long handeling
+    //TODO: lat long handeling.
         UserList user;
         GetUserListCallback userCallback;
-        public String[] aAge = {};
         public String[] aUsername = {};
-        public String[] aName = {};
+        public String[] aProfile = {};
+        public String[] aPic = {};
+        public String[] aDistance = {};
 
         public FetchListDataAsyncTask(UserList user, GetUserListCallback userCallback) {
             FetchListDataAsyncTask.this.user = user;
@@ -192,9 +191,11 @@ public class ServerRequests {
                 JSONArray jArray =  new JSONArray(result);
                 JSONObject jObject = new JSONObject();
 
-                ArrayList<String> lName = new ArrayList<>();
-                ArrayList<String> lAge = new ArrayList<>();
+
                 ArrayList<String> lUsername = new ArrayList<>();
+                ArrayList<String> lProfile = new ArrayList<>();
+                ArrayList<String> lPic = new ArrayList<>();
+                ArrayList<String> lDistance = new ArrayList<>();
 
                 if(jArray.length() == 0){
                     returnedUser = null;
@@ -203,15 +204,28 @@ public class ServerRequests {
                 {
                     for(int i = 0; i < jArray.length(); i++){
                         jObject = jArray.getJSONObject(i);
-                        lName.add(i,jObject.getString("name"));
-                        lAge.add(i, Integer.toString(jObject.getInt("age")));
-                        lUsername.add(i, jObject.getString("username"));
-                }
-                    aAge = lAge.toArray(new String[lAge.size()]);
-                    aName = lName.toArray(new String[lName.size()]);
-                    aUsername = lUsername.toArray(new String[lUsername.size()]);
 
-                    returnedUser = new UserList(aName, aAge, aUsername);
+                        lUsername.add(i, jObject.getString("username"));
+
+                        if(jObject.getString("profile") != null){
+                            lProfile.add(i,jObject.getString("profile"));
+                        }else{lProfile.add(i, "this user has not set up a description yet");}
+
+                        if(jObject.getString("pic") != null) {
+                            lPic.add(i, jObject.getString("pic"));
+                        }
+                        else{lPic.add(i,"http://pawpadstest.comuv.com/pictures/btn_star_big_on.png");}
+
+                        if (jObject.getString("distance") != null) {
+                            lDistance.add(i, jObject.getString("distance"));
+                        }else{lDistance.add(i,Integer.toString(i));}
+                }
+                    aUsername = lUsername.toArray(new String[lUsername.size()]);
+                    aProfile = lProfile.toArray(new String[lProfile.size()]);
+                    aPic = lPic.toArray(new String[lPic.size()]);
+                    aDistance = lDistance.toArray(new String[lDistance.size()]);
+
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);
                 }
             }catch(Exception e){
                 e.printStackTrace();

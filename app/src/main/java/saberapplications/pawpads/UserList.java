@@ -1,17 +1,17 @@
 package saberapplications.pawpads;
 
-import java.util.ArrayList;
 
 /**
  * Created by blaze on 10/31/2015.
  */
 public class UserList{
 
-    public String[] name, username, age;
+    public String[] username, profile, pic, distance;
 
-        public UserList (String[] name, String[] age, String[] username){
-            this.name = name;
-            this.age = age;
+        public UserList (String[] username, String[] profile, String[] pic, String[] distance){
             this.username = username;
+            this.profile = profile;
+            this.pic = pic;
+            this.distance = distance;
         }
 }
