@@ -82,9 +82,11 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 //saved image state passed to database
                 Bitmap image = ((BitmapDrawable)img.getDrawable()).getBitmap();
                 new UploadImage(image, proDescr.getText().toString());
+
                 //saved description updated to database
-                String test = proDescr.getText().toString();
-                textOut.setText(test);
+                String descr = proDescr.getText().toString();
+                textOut.setText(descr);
+
                 //back to main activity
                 Intent i = new Intent(profileEditPage.this, MainActivity.class);
                 startActivity(i);

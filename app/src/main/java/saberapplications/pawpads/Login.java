@@ -44,7 +44,6 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
 
-                //TODO: hash password
                 User user = new User(username, password);
                 authenticate(user);
                 break;
@@ -60,6 +59,8 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
         serverRequests.fetchUserDataInBackground(user, new GetUserCallback() {
             @Override
             public void done(User returnedUser) {
+                logUserIn(returnedUser);
+
                 if(returnedUser == null) {
                     showErrorMessage();
                 }
@@ -78,9 +79,8 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
     }
 
     private void logUserIn(User returnedUser){
-        userLocalStore.storeUserData(returnedUser);
+        //userLocalStore.storeUserData(returnedUser);
         userLocalStore.setUserLoggedIn(true);
-
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

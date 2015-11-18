@@ -46,11 +46,8 @@ public class UserData extends Activity {
                 //TODO: set geo returned relative to current location
 
                 UserData.this.upics = returnedUser.pic;
-
                 UserData.this.geol = returnedUser.distance;
-
                 UserData.this.user = returnedUser.username;
-
                 UserData.this.descr = returnedUser.profile;
 
                 ((MainActivity) UserData.this.mContext).setListView(returnedUser);

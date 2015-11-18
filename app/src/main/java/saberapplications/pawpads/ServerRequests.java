@@ -2,6 +2,7 @@ package saberapplications.pawpads;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 
 import org.apache.http.HttpEntity;
@@ -55,7 +56,6 @@ public class ServerRequests {
 
 //REGISTRATION ASYNC TASK
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, Void>{
-    //TODO: password hashing
         User user;
         GetUserCallback userCallback;
 
@@ -67,10 +67,15 @@ public class ServerRequests {
         @Override
         protected Void doInBackground(Void... params) {
             ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-            dataToSend.add(new BasicNameValuePair("name",user.name));
-            dataToSend.add(new BasicNameValuePair("age",user.age+""));
+//            GPS gps = new GPS();
+//            Location loc = gps.getLastBestLocation();
+//            String lat = Double.toString(loc.getLatitude());
+//            String lng = Double.toString(loc.getLongitude());
+
             dataToSend.add(new BasicNameValuePair("username",user.username));
             dataToSend.add(new BasicNameValuePair("password", user.password));
+//            dataToSend.add(new BasicNameValuePair("lat", lat));
+//            dataToSend.add(new BasicNameValuePair("lat", lng));
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
@@ -100,7 +105,6 @@ public class ServerRequests {
 
 //LOGIN ASYNC TASK
     public class FetchUserDataAsyncTask extends AsyncTask<Void, Void, User> {
-    //TODO: password hashing
     User user;
         GetUserCallback userCallback;
 
@@ -129,16 +133,21 @@ public class ServerRequests {
 
                 HttpEntity entity = httpResponse.getEntity();
                 String result = EntityUtils.toString(entity);
-                JSONObject jObject = new JSONObject(result);
+                JSONArray jArray = new JSONArray(result);
 
-                if(jObject.length() == 0){
-                    returnedUser = null;
+                String bool = "";
+                for(int i=0; i <= jArray.length(); i++){
+                    if("true".equals(jArray.get(i))){
+                        bool = "true";
+                    }
                 }
-                else
+
+                if(bool == "true"){
+                    returnedUser = new User(user.username, user.password);
+                }
+                else;
                 {
-                    String name = jObject.getString("name");
-                    int age = jObject.getInt("age");
-                    returnedUser = new User(name, age, user.username, user.password);
+                    returnedUser = null;
                 }
             }catch(Exception e){
                 e.printStackTrace();
@@ -211,12 +220,12 @@ public class ServerRequests {
                             lProfile.add(i,jObject.getString("profile"));
                         }else{lProfile.add(i, "this user has not set up a description yet");}
 
-                        if(jObject.getString("pic") != null) {
-                            lPic.add(i, jObject.getString("pic"));
+                        if(jObject.getString("image_url") != null || jObject.getString("image_url") != "null") {
+                            lPic.add(i, jObject.getString("image_url"));
                         }
                         else{lPic.add(i,"http://pawpadstest.comuv.com/pictures/btn_star_big_on.png");}
 
-                        if (jObject.getString("distance") != null) {
+                       if (jObject.getString("distance") != null) {
                             lDistance.add(i, jObject.getString("distance"));
                         }else{lDistance.add(i,Integer.toString(i));}
                 }
