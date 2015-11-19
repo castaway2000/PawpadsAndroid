@@ -204,6 +204,7 @@ public class ServerRequests {
                 ArrayList<String> lUsername = new ArrayList<>();
                 ArrayList<String> lProfile = new ArrayList<>();
                 ArrayList<String> lPic = new ArrayList<>();
+                //ArrayList<Integer> lPic = new ArrayList<>();
                 ArrayList<String> lDistance = new ArrayList<>();
 
                 if(jArray.length() == 0){
@@ -220,10 +221,12 @@ public class ServerRequests {
                             lProfile.add(i,jObject.getString("profile"));
                         }else{lProfile.add(i, "this user has not set up a description yet");}
 
-                        if(jObject.getString("image_url") != null || jObject.getString("image_url") != "null") {
+                        if(jObject.isNull("image_url")) {
+                            lPic.add(i,"http://pawpadstest.comuv.com/pictures/btn_star_big_on.png");
+                        }
+                        else{
                             lPic.add(i, jObject.getString("image_url"));
                         }
-                        else{lPic.add(i,"http://pawpadstest.comuv.com/pictures/btn_star_big_on.png");}
 
                        if (jObject.getString("distance") != null) {
                             lDistance.add(i, jObject.getString("distance"));

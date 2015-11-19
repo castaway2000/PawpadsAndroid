@@ -5,6 +5,8 @@ package saberapplications.pawpads;
  */
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
 
 //gets layout info and passes text data in.
 class CustomAdapter extends ArrayAdapter<String> {
@@ -47,9 +53,17 @@ class CustomAdapter extends ArrayAdapter<String> {
         gps.setText(geoloc[position]);
 
         //set image sequence;
-        ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
-        blazeImage.setImageURI(Uri.parse(pics[position]));
+        ImageLoader imageloader = ImageLoader.getInstance();
+        imageloader.init(ImageLoaderConfiguration.createDefault(getContext()));
 
+        final ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
+        imageloader.displayImage(String.valueOf(Uri.parse(pics[position])), blazeImage);
+        imageloader.loadImage(String.valueOf(Uri.parse(pics[position])), new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    blazeImage.setImageBitmap(loadedImage);
+                }
+        });
         return customView;
     }
 }

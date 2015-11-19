@@ -2,6 +2,7 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class profilepage extends AppCompatActivity {
 
@@ -22,14 +25,19 @@ public class profilepage extends AppCompatActivity {
         Bundle Data = getIntent().getExtras();
         final String user = Data.getString("username");
         String userInfo = Data.getString("value");
-        Integer imgVal = Data.getInt("image");
+        final String imgVal = Data.getString("image");
         String loc = Data.getString("location");
 
         //setting new data into profile
         String newTitle = "PawPads | " + user;
         ImageView iv = (ImageView) findViewById(R.id.profilepic);
         TextView tv = (TextView) findViewById(R.id.profileinfo);
-        iv.setImageResource(imgVal);
+
+        //this is getting an async task that is setting the image.
+        //TODO: make this from local stored variable.
+        ImageLoader imageloader = ImageLoader.getInstance();
+        imageloader.displayImage(imgVal, iv);
+
         tv.setText(userInfo);
         setTitle(newTitle);
 
@@ -40,6 +48,7 @@ public class profilepage extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(profilepage.this, ChatActivity.class);
                 i.putExtra("user", user);
+                i.putExtra("image",imgVal);
                 startActivity(i);
             }
         };

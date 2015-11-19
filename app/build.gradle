@@ -23,13 +23,16 @@ android {
     }
 }
 
+
+
+
 dependencies {
     //compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
     compile files('libs/volley.jar')
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services:8.1.0'
-    compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
     compile files('libs/volley.jar')
     //compile files('libs/android.jar')
+    compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
+    compile files('libs/universal-image-loader-1.9.4.jar')
 }

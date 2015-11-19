@@ -13,7 +13,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.okhttp.OkHttpClient;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,10 +43,15 @@ public class ChatActivity extends Activity {
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
 
+
         //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
         //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
         final String recipient = getIntent().getExtras().getString("user", null);
+        final String displayPic = getIntent().getExtras().getString("image", null);
         ((android.widget.TextView)findViewById(R.id.chat_header_recipient_name)).setText(recipient);
+        ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
+        ImageLoader il = ImageLoader.getInstance();
+        il.displayImage(displayPic, iv);
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
@@ -146,8 +154,6 @@ public class ChatActivity extends Activity {
     // Http request using OkHttpClient
     String callOkHttpRequest(URL url, OkHttpClient tempClient)
             throws IOException {
-
-        //HttpURLConnection connection = tempClient.open(url);
 
         //HttpURLConnection connection = tempClient.open(url);
 
