@@ -82,7 +82,6 @@ public class ChatActivity extends Activity {
     private void showChat(String type, String message) {
 
         if (chat_list == null || chat_list.size() == 0) {
-
             chat_list = new ArrayList<ChatObject>();
         }
 

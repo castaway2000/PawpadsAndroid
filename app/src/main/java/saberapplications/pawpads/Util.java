@@ -16,19 +16,9 @@ public class Util {
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "903183948435";
 
-    public static String base_url = "http://localhost:8080/gcm_demo/";
+    public static String base_url = "http://www.szablya.com/saberapps/gcm_demo/";
 
     public final static String register_url = base_url + "register.php";
     public final static String send_chat_url = base_url + "sendChatmessage.php";
 
-
-    /*fortesting onclick events use these two lines:
-      Utils u = new Utils();
-      u.toast(getApplicationContext(), "string goes here");
-    */
-    public void toast(Context context, CharSequence ch) {
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, ch, duration);
-        toast.show();
-    }
 }

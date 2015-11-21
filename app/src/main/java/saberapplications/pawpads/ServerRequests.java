@@ -29,7 +29,7 @@ public class ServerRequests {
 
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
-    public static final String SERVER_ADDRESS = "http://pawpadstest.comuv.com/";
+    public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
@@ -67,15 +67,10 @@ public class ServerRequests {
         @Override
         protected Void doInBackground(Void... params) {
             ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-//            GPS gps = new GPS();
-//            Location loc = gps.getLastBestLocation();
-//            String lat = Double.toString(loc.getLatitude());
-//            String lng = Double.toString(loc.getLongitude());
 
             dataToSend.add(new BasicNameValuePair("username",user.username));
             dataToSend.add(new BasicNameValuePair("password", user.password));
-//            dataToSend.add(new BasicNameValuePair("lat", lat));
-//            dataToSend.add(new BasicNameValuePair("lat", lng));
+
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
@@ -167,7 +162,6 @@ public class ServerRequests {
 
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
-    //TODO: photo handling, null photo returns.
     //TODO: lat long handeling.
         UserList user;
         GetUserListCallback userCallback;
@@ -204,7 +198,6 @@ public class ServerRequests {
                 ArrayList<String> lUsername = new ArrayList<>();
                 ArrayList<String> lProfile = new ArrayList<>();
                 ArrayList<String> lPic = new ArrayList<>();
-                //ArrayList<Integer> lPic = new ArrayList<>();
                 ArrayList<String> lDistance = new ArrayList<>();
 
                 if(jArray.length() == 0){

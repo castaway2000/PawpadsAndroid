@@ -43,7 +43,6 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
             case R.id.bLogin:
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
-
                 User user = new User(username, password);
                 authenticate(user);
                 break;
@@ -59,7 +58,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
         serverRequests.fetchUserDataInBackground(user, new GetUserCallback() {
             @Override
             public void done(User returnedUser) {
-                logUserIn(returnedUser);
+              //  logUserIn(returnedUser);
 
                 if(returnedUser == null) {
                     showErrorMessage();

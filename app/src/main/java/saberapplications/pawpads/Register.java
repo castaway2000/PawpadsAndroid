@@ -21,8 +21,6 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         setContentView(R.layout.activity_register);
         setTitle("PawPads | Register");
 
-        etName = (EditText) findViewById(R.id.etRegName);
-        etAge = (EditText) findViewById(R.id.etRegAge);
         etUsername = (EditText) findViewById(R.id.etRegUsername);
         etPassword = (EditText) findViewById(R.id.etRegPassword);
         bRegister = ( Button ) findViewById(R.id.bRegister);
@@ -34,14 +32,11 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
     public void onClick(View v){
         switch (v.getId()){
             case R.id.bRegister:
-                String name = etName.getText().toString();
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
-                int age = Integer.parseInt(etAge.getText().toString());
-                //TODO: hash password
-                User user = new User(name, age, username, password);
 
-
+                //TODO: implement ssl encryption
+                User user = new User(username, password);
                 registerUser(user);
                 break;
         }
