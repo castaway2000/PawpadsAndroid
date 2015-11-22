@@ -2,18 +2,12 @@ package saberapplications.pawpads;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Location;
 import android.os.AsyncTask;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -22,14 +16,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
+
 /**
  * Created by blaze on 10/22/2015.
  */
-public class ServerRequests {
-
+public class ServerRequests{
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
     public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
+
 
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
@@ -66,10 +61,9 @@ public class ServerRequests {
 
         @Override
         protected Void doInBackground(Void... params) {
-            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-
-            dataToSend.add(new BasicNameValuePair("username",user.username));
-            dataToSend.add(new BasicNameValuePair("password", user.password));
+//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+//            dataToSend.add(new BasicNameValuePair("username",user.username));
+//            dataToSend.add(new BasicNameValuePair("password", user.password));
 
 
             HttpParams httpRequestParams = new BasicHttpParams();
@@ -77,11 +71,11 @@ public class ServerRequests {
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpPost post = new HttpPost(SERVER_ADDRESS + "Register.php");
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+"&password="+user.password);
 
             try{
-                post.setEntity(new UrlEncodedFormEntity(dataToSend));
-                client.execute(post);
+//                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                client.execute(get);
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -110,39 +104,30 @@ public class ServerRequests {
 
         @Override
         protected User doInBackground(Void... params) {
-            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-            dataToSend.add(new BasicNameValuePair("username",user.username));
-            dataToSend.add(new BasicNameValuePair("password", user.password));
+//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+//            dataToSend.add(new BasicNameValuePair("username",user.username));
+//            dataToSend.add(new BasicNameValuePair("password", user.password));
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpPost post = new HttpPost(SERVER_ADDRESS + "FetchUserData.php");
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "FetchUserData.php?username="+user.username+"&password="+user.password);
 
             User returnedUser = null;
             try{
-                post.setEntity(new UrlEncodedFormEntity(dataToSend));
-                HttpResponse httpResponse = client.execute(post);
+//                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                HttpResponse httpResponse = client.execute(get);
 
                 HttpEntity entity = httpResponse.getEntity();
                 String result = EntityUtils.toString(entity);
                 JSONArray jArray = new JSONArray(result);
 
-                String bool = "";
-                for(int i=0; i <= jArray.length(); i++){
+                for(int i=0; i < jArray.length(); i++){
                     if("true".equals(jArray.get(i))){
-                        bool = "true";
+                        returnedUser = new User(user.username, user.password);
                     }
-                }
-
-                if(bool == "true"){
-                    returnedUser = new User(user.username, user.password);
-                }
-                else;
-                {
-                    returnedUser = null;
                 }
             }catch(Exception e){
                 e.printStackTrace();
@@ -163,6 +148,7 @@ public class ServerRequests {
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
     //TODO: lat long handeling.
+        Double lat,lng;
         UserList user;
         GetUserListCallback userCallback;
         public String[] aUsername = {};
@@ -170,24 +156,33 @@ public class ServerRequests {
         public String[] aPic = {};
         public String[] aDistance = {};
 
-        public FetchListDataAsyncTask(UserList user, GetUserListCallback userCallback) {
+
+
+    public FetchListDataAsyncTask(UserList user, GetUserListCallback userCallback) {
             FetchListDataAsyncTask.this.user = user;
             FetchListDataAsyncTask.this.userCallback = userCallback;
         }
 
         @Override
         protected UserList doInBackground(Void... params) {
+//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+//            dataToSend.add(new BasicNameValuePair("lat", "121.111"));
+//            dataToSend.add(new BasicNameValuePair("lng", "141.111"));
+
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php");
+            //TODO:get this data working with gps information. web server is set up fine.
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php?lat="+121.1234+"&lng="+141.2314);
 
             UserList returnedUser = null;
             try{
+
                 HttpResponse httpResponse = client.execute(get);
+//                get. .setEntity(new UrlEncodedFormEntity(dataToSend));
                 HttpEntity entity = httpResponse.getEntity();
 
                 String result = EntityUtils.toString(entity);
@@ -215,7 +210,7 @@ public class ServerRequests {
                         }else{lProfile.add(i, "this user has not set up a description yet");}
 
                         if(jObject.isNull("image_url")) {
-                            lPic.add(i,"http://pawpadstest.comuv.com/pictures/btn_star_big_on.png");
+                            lPic.add(i, SERVER_ADDRESS+"pictures/btn_star_big_on.png");
                         }
                         else{
                             lPic.add(i, jObject.getString("image_url"));

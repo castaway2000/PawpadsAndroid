@@ -148,16 +148,4 @@ public class GPS extends Activity {
         }
         return provider1.equals(provider2);
     }
-
-    //no need for this if php works out.
-    public float[] geolocation() {
-
-        Location loc = getLastBestLocation();
-        double lat = loc.getLatitude();
-        double lon = loc.getLongitude();
-        float[] res = new float[3];
-
-        Location.distanceBetween(lat, lon, 47.469521, -122.162746, res);
-        return res;
-    }
 }

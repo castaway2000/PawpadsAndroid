@@ -40,7 +40,6 @@ import java.util.ArrayList;
  */
 public class profileEditPage extends AppCompatActivity implements View.OnClickListener{
     //TODO: send profile info to the database.
-
     private final static int SELECT_IMAGE = 1;
     String selectedImagePath;
     ImageView img;

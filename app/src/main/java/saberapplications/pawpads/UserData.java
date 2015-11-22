@@ -2,6 +2,8 @@ package saberapplications.pawpads;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
 
 import java.util.ArrayList;
 
@@ -19,13 +21,17 @@ public class UserData extends Activity {
     public String[] geol;
     public String[] upics;
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+
+    }
+
     public void getUserData(){
         //TODO: get photo, distance, description data from database
         ServerRequests serverRequests = new ServerRequests(this.mContext);
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
-
                 //TODO: set geo returned relative to current location
                 UserData.this.upics = returnedUser.pic;
                 UserData.this.geol = returnedUser.distance;

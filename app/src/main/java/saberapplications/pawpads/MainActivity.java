@@ -1,6 +1,7 @@
 package saberapplications.pawpads;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listView);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         userLocalStore = new UserLocalStore(this);
@@ -48,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 return true;
 
             case R.id.action_logout:
-                //TODO: set logout functionality
                 userLocalStore = new UserLocalStore(this);
                 userLocalStore.clearUserData();
                 userLocalStore.setUserLoggedIn(false);
@@ -63,9 +64,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onStart() {
         super.onStart();
-        setUserData();
+        ud.getUserData();
         if(authenticate()) {
-            //TODO: run main event
             listView.setOnItemClickListener(
                     new AdapterView.OnItemClickListener() {
                         @Override
@@ -85,9 +85,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         return userLocalStore.getUserLoggedIn();
     }
 
-    public void setUserData() {
-        ud.getUserData();
-    }
 
     public void setListView(UserList userList){
         final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        setUserData();
+        ud.getUserData();
     }
 }
 
