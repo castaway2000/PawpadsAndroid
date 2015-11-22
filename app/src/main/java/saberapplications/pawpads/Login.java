@@ -58,8 +58,6 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
         serverRequests.fetchUserDataInBackground(user, new GetUserCallback() {
             @Override
             public void done(User returnedUser) {
-              //  logUserIn(returnedUser);
-
                 if(returnedUser == null) {
                     showErrorMessage();
                 }
@@ -78,7 +76,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
     }
 
     private void logUserIn(User returnedUser){
-        //userLocalStore.storeUserData(returnedUser);
+        userLocalStore.storeUserData(returnedUser);
         userLocalStore.setUserLoggedIn(true);
         startActivity(new Intent(this, MainActivity.class));
         finish();

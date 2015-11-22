@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 
-import java.util.ArrayList;
-
 /**
  * Created by blaze on 9/9/2015.
  */
@@ -27,12 +25,14 @@ public class UserData extends Activity {
     }
 
     public void getUserData(){
-        //TODO: get photo, distance, description data from database
-        ServerRequests serverRequests = new ServerRequests(this.mContext);
+        GPS gps = new GPS(this.mContext);
+        Location loc = new Location(gps.getLastBestLocation());
+        Double lat = loc.getLatitude();
+        Double lng = loc.getLongitude();
+        ServerRequests serverRequests = new ServerRequests(this.mContext, lat, lng);
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
-                //TODO: set geo returned relative to current location
                 UserData.this.upics = returnedUser.pic;
                 UserData.this.geol = returnedUser.distance;
                 UserData.this.user = returnedUser.username;

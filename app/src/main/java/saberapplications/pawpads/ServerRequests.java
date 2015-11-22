@@ -24,15 +24,24 @@ public class ServerRequests{
     ProgressDialog progressDialog;
     public static final int CONNECTION_TIME = 1000 * 15;
     public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
+    Double LAT;
+    Double LNG;
 
 
+    public ServerRequests(Context context, Double lat, Double lng){
+        this.LAT = lat;
+        this.LNG = Double.valueOf(lng);
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Processing");
+        progressDialog.setMessage("Please wait...");
+    }
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Please wait...");
     }
-
     public void storeUserDataInBackground(User user, GetUserCallback userCallback){
         progressDialog.show();
         new StoreUserDataAsyncTask(user, userCallback).execute();
@@ -147,8 +156,6 @@ public class ServerRequests{
 
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
-    //TODO: lat long handeling.
-        Double lat,lng;
         UserList user;
         GetUserListCallback userCallback;
         public String[] aUsername = {};
@@ -175,8 +182,8 @@ public class ServerRequests{
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            //TODO:get this data working with gps information. web server is set up fine.
-            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php?lat="+121.1234+"&lng="+141.2314);
+            //TODO:fix LAT LNG placement later
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php?lat="+LNG+"&lng="+LAT);
 
             UserList returnedUser = null;
             try{
