@@ -26,22 +26,27 @@ public class ServerRequests{
     public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
     Double LAT;
     Double LNG;
+    String USER;
 
 
-    public ServerRequests(Context context, Double lat, Double lng){
+    public ServerRequests(Context context, Double lat, Double lng, String username){
         this.LAT = lat;
         this.LNG = Double.valueOf(lng);
+        this.USER = username;
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Please wait...");
     }
+
     public ServerRequests(Context context){
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Please wait...");
     }
+
+
     public void storeUserDataInBackground(User user, GetUserCallback userCallback){
         progressDialog.show();
         new StoreUserDataAsyncTask(user, userCallback).execute();
@@ -80,7 +85,8 @@ public class ServerRequests{
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+"&password="+user.password);
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+
+                    "&password="+user.password+"&lat="+LAT+"&lng="+LNG);
 
             try{
 //                post.setEntity(new UrlEncodedFormEntity(dataToSend));
@@ -157,6 +163,7 @@ public class ServerRequests{
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
         UserList user;
+        UserData userData;
         GetUserListCallback userCallback;
         public String[] aUsername = {};
         public String[] aProfile = {};
@@ -182,8 +189,7 @@ public class ServerRequests{
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            //TODO:fix LAT LNG placement later
-            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php?lat="+LNG+"&lng="+LAT);
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "test.php?lat="+LAT+"&lng="+LNG+"&username="+USER);
 
             UserList returnedUser = null;
             try{

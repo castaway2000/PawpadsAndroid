@@ -37,6 +37,7 @@ public class UserLocalStore {
     }
 
     public boolean getUserLoggedIn(){
+
         if(userLocalDatabase.getBoolean("loggedIn", false) == true){
             return true;
         }else{

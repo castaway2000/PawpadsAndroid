@@ -29,7 +29,10 @@ public class UserData extends Activity {
         Location loc = new Location(gps.getLastBestLocation());
         Double lat = loc.getLatitude();
         Double lng = loc.getLongitude();
-        ServerRequests serverRequests = new ServerRequests(this.mContext, lat, lng);
+        UserLocalStore uls = new UserLocalStore(mContext);
+        String username = uls.getLoggedInUser().username;
+
+        ServerRequests serverRequests = new ServerRequests(this.mContext, lat, lng, username);
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {

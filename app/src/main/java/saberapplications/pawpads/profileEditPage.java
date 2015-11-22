@@ -47,8 +47,6 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     Button saveBtn, getimgbtn;
     Uri path;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

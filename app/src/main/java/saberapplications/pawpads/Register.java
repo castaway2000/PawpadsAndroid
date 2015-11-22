@@ -1,6 +1,7 @@
 package saberapplications.pawpads;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,7 +14,7 @@ import android.widget.EditText;
 public class Register extends AppCompatActivity implements View.OnClickListener {
 
     Button bRegister;
-    EditText etName, etAge, etUsername, etPassword;
+    EditText etUsername, etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +41,14 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                 registerUser(user);
                 break;
         }
-
     }
 
     private void registerUser(User user){
-        ServerRequests serverRequests = new ServerRequests(this);
+        GPS gps = new GPS(this);
+        Location loc = new Location(gps.getLastBestLocation());
+        Double lat = loc.getLatitude();
+        Double lng = loc.getLongitude();
+        ServerRequests serverRequests = new ServerRequests(this, lat, lng, null);
         serverRequests.storeUserDataInBackground(user, new GetUserCallback() {
             @Override
             public void done(User returnedUser) {
@@ -52,5 +56,4 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
             }
         });
     }
-
 }
