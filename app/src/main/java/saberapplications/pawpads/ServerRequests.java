@@ -31,7 +31,7 @@ public class ServerRequests{
 
     public ServerRequests(Context context, Double lat, Double lng, String username){
         this.LAT = lat;
-        this.LNG = Double.valueOf(lng);
+        this.LNG = lng;
         this.USER = username;
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
@@ -86,7 +86,7 @@ public class ServerRequests{
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
             HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+
-                    "&password="+user.password+"&lat="+LAT+"&lng="+LNG);
+                    "&password="+user.password+"&lat="+LAT+"&lng="+LNG+"&email="+user.email);
 
             try{
 //                post.setEntity(new UrlEncodedFormEntity(dataToSend));
@@ -163,7 +163,6 @@ public class ServerRequests{
 //FETCH ALL DATA FOR LISTS
     public class FetchListDataAsyncTask extends AsyncTask<Void, Void, UserList> {
         UserList user;
-        UserData userData;
         GetUserListCallback userCallback;
         public String[] aUsername = {};
         public String[] aProfile = {};

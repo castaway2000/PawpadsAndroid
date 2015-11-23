@@ -40,7 +40,6 @@ public class UserData extends Activity {
                 UserData.this.geol = returnedUser.distance;
                 UserData.this.user = returnedUser.username;
                 UserData.this.descr = returnedUser.profile;
-
                 ((MainActivity) UserData.this.mContext).setListView(returnedUser);
             }
         });
