@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 'Google Inc.:Google APIs:22'
     buildToolsVersion '22.0.1'
 
     defaultConfig {
@@ -12,9 +12,6 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        debug {
-            debuggable true
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -26,16 +23,11 @@ android {
     }
 }
 
-
-
-
 dependencies {
-    //compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/volley.jar')
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'com.google.android.gms:play-services:8.3.0'
     compile files('libs/volley.jar')
-    //compile files('libs/android.jar')
     compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
     compile files('libs/universal-image-loader-1.9.4.jar')
 }

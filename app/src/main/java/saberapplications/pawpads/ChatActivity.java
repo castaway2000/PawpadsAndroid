@@ -75,7 +75,6 @@ public class ChatActivity extends Activity {
 
             }
         };
-
         LocalBroadcastManager.getInstance(this).registerReceiver(recieve_chat, new IntentFilter("message_received"));
     }
 
@@ -123,7 +122,7 @@ public class ChatActivity extends Activity {
 
 
             String response = null;
-            // String response=Utility.callhttpRequest(url);
+            //String response=Utility.callhttpRequest(url);
             try {
                 url = url.replace(" ", "%20");
                 response = callOkHttpRequest(new URL(url),
@@ -179,5 +178,9 @@ public class ChatActivity extends Activity {
         }
         return out.toByteArray();
     }
+
+
+
+
 
 }

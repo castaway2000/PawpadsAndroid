@@ -1,19 +1,20 @@
 package saberapplications.pawpads;
 
-import android.content.Intent;
+
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 /**
  * Created by blaze on 10/21/2015.
  */
 public class Register extends AppCompatActivity implements View.OnClickListener {
+
 
     Button bRegister;
     EditText etUsername, etPassword, etPasswordChk, etEmail;
@@ -23,10 +24,10 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         setTitle("PawPads | Register");
-
-
         etUsername = (EditText) findViewById(R.id.etRegUsername);
         etPassword = (EditText) findViewById(R.id.etRegPassword);
+        etPasswordChk = (EditText) findViewById(R.id.etRegPasswordChk);
+        etEmail = (EditText) findViewById(R.id.etEmail);
         bRegister = ( Button ) findViewById(R.id.bRegister);
         bRegister.setOnClickListener(this);
     }
@@ -41,8 +42,9 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                 String passwordCHK = etPasswordChk.getText().toString();
 
                 //TODO: implement ssl encryption
-                if(password == passwordCHK && email.contains("@") && username.length() != 0 && password.length() != 0) {
-                    User user = new User(username, password, email);
+                if(password.equals(passwordCHK) && email.contains("@") && username.length() != 0 && password.length() != 0) {
+
+                    User user = new User(username, password, email, Util.GCMREGID);
                     registerUser(user);
                     break;
                 }
@@ -54,7 +56,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                     Toast toast = Toast.makeText(this, "Please enter a password",Toast.LENGTH_SHORT);
                     toast.show();
                 }
-                else if (password != passwordCHK){
+                else if (!password.equals(passwordCHK)){
                     Toast toast = Toast.makeText(this, "Passwords do not match",Toast.LENGTH_SHORT);
                     toast.show();
                 }
@@ -79,4 +81,5 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
             }
         });
     }
+
 }

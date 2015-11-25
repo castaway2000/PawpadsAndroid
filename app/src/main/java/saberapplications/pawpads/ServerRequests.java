@@ -3,6 +3,7 @@ package saberapplications.pawpads;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,6 +15,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 
@@ -75,21 +77,17 @@ public class ServerRequests{
 
         @Override
         protected Void doInBackground(Void... params) {
-//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-//            dataToSend.add(new BasicNameValuePair("username",user.username));
-//            dataToSend.add(new BasicNameValuePair("password", user.password));
-
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
+
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
             HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+
                     "&password="+user.password+"&lat="+LAT+"&lng="+LNG+"&email="+user.email);
 
             try{
-//                post.setEntity(new UrlEncodedFormEntity(dataToSend));
                 client.execute(get);
             }catch(Exception e){
                 e.printStackTrace();
@@ -119,9 +117,6 @@ public class ServerRequests{
 
         @Override
         protected User doInBackground(Void... params) {
-//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-//            dataToSend.add(new BasicNameValuePair("username",user.username));
-//            dataToSend.add(new BasicNameValuePair("password", user.password));
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
@@ -132,7 +127,6 @@ public class ServerRequests{
 
             User returnedUser = null;
             try{
-//                post.setEntity(new UrlEncodedFormEntity(dataToSend));
                 HttpResponse httpResponse = client.execute(get);
 
                 HttpEntity entity = httpResponse.getEntity();
@@ -178,11 +172,6 @@ public class ServerRequests{
 
         @Override
         protected UserList doInBackground(Void... params) {
-//            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-//            dataToSend.add(new BasicNameValuePair("lat", "121.111"));
-//            dataToSend.add(new BasicNameValuePair("lng", "141.111"));
-
-
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
             HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
@@ -194,7 +183,6 @@ public class ServerRequests{
             try{
 
                 HttpResponse httpResponse = client.execute(get);
-//                get. .setEntity(new UrlEncodedFormEntity(dataToSend));
                 HttpEntity entity = httpResponse.getEntity();
 
                 String result = EntityUtils.toString(entity);
@@ -208,7 +196,7 @@ public class ServerRequests{
                 ArrayList<String> lDistance = new ArrayList<>();
 
                 if(jArray.length() == 0){
-                    returnedUser = null;
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);;
                 }
                 else
                 {

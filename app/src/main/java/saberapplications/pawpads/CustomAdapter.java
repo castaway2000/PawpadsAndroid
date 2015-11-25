@@ -44,10 +44,6 @@ class CustomAdapter extends ArrayAdapter<String> {
         TextView blazetext = (TextView) customView.findViewById(R.id.blazeText);
         blazetext.setText(username);
 
-//        //profile info
-//        TextView profile = (TextView) customView.findViewById(R.id.info);
-//        profile.setText(descrip[position]);
-
         //gps coordinates
         TextView gps = (TextView) customView.findViewById(R.id.geoloc);
         gps.setText(geoloc[position]);

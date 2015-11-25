@@ -18,6 +18,7 @@ public class UserData extends Activity {
     public String[] descr;
     public String[] geol;
     public String[] upics;
+    public String regToken;
 
     @Override
     protected void onNewIntent(Intent intent) {

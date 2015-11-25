@@ -4,13 +4,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Xml;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.util.HashMap;
 
 /**
  * Created by blaze on 10/21/2015.
@@ -78,6 +75,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
     private void logUserIn(User returnedUser){
         userLocalStore.storeUserData(returnedUser);
         userLocalStore.setUserLoggedIn(true);
+        String test = userLocalStore.getLoggedInUser().username;
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
