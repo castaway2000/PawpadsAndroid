@@ -2,7 +2,6 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -27,6 +26,7 @@ public class profilepage extends AppCompatActivity {
         String userInfo = Data.getString("value");
         final String imgVal = Data.getString("image");
         String loc = Data.getString("location");
+        final String email = Data.getString("email");
 
         //setting new data into profile
         String newTitle = "PawPads | " + user;
@@ -49,6 +49,7 @@ public class profilepage extends AppCompatActivity {
                 Intent i = new Intent(profilepage.this, ChatActivity.class);
                 i.putExtra("user", user);
                 i.putExtra("image",imgVal);
+                i.putExtra("email", email);
                 startActivity(i);
             }
         };

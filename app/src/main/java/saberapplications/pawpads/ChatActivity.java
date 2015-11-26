@@ -44,10 +44,9 @@ public class ChatActivity extends Activity {
         setTitle("PawPads | Chat");
 
 
-        //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
-        //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
         final String recipient = getIntent().getExtras().getString("user", null);
         final String displayPic = getIntent().getExtras().getString("image", null);
+        final String email = getIntent().getExtras().getString("email", null);
         ((android.widget.TextView)findViewById(R.id.chat_header_recipient_name)).setText(recipient);
         ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
         ImageLoader il = ImageLoader.getInstance();
@@ -61,7 +60,7 @@ public class ChatActivity extends Activity {
                 // send chat message to server
                 String message = editText_chat_message.getText().toString();
                 showChat("sent", message);
-                new SendMessage(recipient, message).execute();
+                new SendMessage(email, message).execute();
                 editText_chat_message.setText("");
             }
         });

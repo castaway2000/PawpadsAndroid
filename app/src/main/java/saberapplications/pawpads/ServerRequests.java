@@ -162,6 +162,7 @@ public class ServerRequests{
         public String[] aProfile = {};
         public String[] aPic = {};
         public String[] aDistance = {};
+        public String[] aEmail = {};
 
 
 
@@ -194,9 +195,10 @@ public class ServerRequests{
                 ArrayList<String> lProfile = new ArrayList<>();
                 ArrayList<String> lPic = new ArrayList<>();
                 ArrayList<String> lDistance = new ArrayList<>();
+                ArrayList<String> lEmail = new ArrayList<>();
 
                 if(jArray.length() == 0){
-                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);;
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance, aEmail);;
                 }
                 else
                 {
@@ -204,6 +206,7 @@ public class ServerRequests{
                         jObject = jArray.getJSONObject(i);
 
                         lUsername.add(i, jObject.getString("username"));
+                        lEmail.add(i,jObject.getString("email"));
 
                         if(jObject.getString("profile") != null){
                             lProfile.add(i,jObject.getString("profile"));
@@ -224,8 +227,9 @@ public class ServerRequests{
                     aProfile = lProfile.toArray(new String[lProfile.size()]);
                     aPic = lPic.toArray(new String[lPic.size()]);
                     aDistance = lDistance.toArray(new String[lDistance.size()]);
+                    aEmail = lEmail.toArray(new String[lEmail.size()]);
 
-                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance, aEmail);
                 }
             }catch(Exception e){
                 e.printStackTrace();

@@ -142,18 +142,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             String username = userLocalStore.getLoggedInUser().username;
             this.USERNAME = username;
 
-
             if (!isUserRegistered(context)) {
                 sendRegistrationIdToBackend();
 
                 if (checkPlayServices()) {
                     gcm = GoogleCloudMessaging.getInstance(this);
-                    regid = getRegistrationId(context);
+                    this.regid = getRegistrationId(context);
 
                     if (regid.isEmpty()) {
                         registerInBackground();
                     }
-
 
                 } else {
                     Log.i("MAIN", "No valid Google Play Services APK found.");
@@ -180,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
 
     public void setListView(UserList userList) {
-        final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
+        final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol, ud.email);
         listView.setAdapter(listAdapter);
 
         if (mSwipeRefreshLayout.isRefreshing()) {
@@ -190,13 +188,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     public void performClickAction(int position) {
         ud.getUserData();
-        final CustomAdapter ca = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
+        final CustomAdapter ca = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol, ud.email);
 
         Intent i = new Intent(MainActivity.this, profilepage.class);
         i.putExtra("value", ca.descrip[position]);
         i.putExtra("image", ca.pics[position]);
         i.putExtra("username", ca.user[position]);
         i.putExtra("location", ca.geoloc[position]);
+        i.putExtra("email", ca.email[position]);
         startActivity(i);
     }
 
@@ -314,11 +313,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         protected void onPreExecute() {
             // TODO Auto-generated method stub
             super.onPreExecute();
+
         }
 
         @Override
         protected String doInBackground(String... params) {
-            // TODO Auto-generated method stub
+            // TODO: update user info on login
 
             String url = Util.pawpadsURL + "updateGcmUser.php?username=" + USERNAME + "&regid=" + regid;
             Log.i("pavan", "url" + url);
