@@ -136,6 +136,7 @@
     <orderEntry type="library" exported="" name="play-services-cast-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appinvite-8.3.0" level="project" />
+    <orderEntry type="library" exported="" name="asmack-android-18-0.8.9" level="project" />
     <orderEntry type="library" exported="" name="play-services-appstate-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="okhttp-1.2.1-jar-with-dependencies" level="project" />

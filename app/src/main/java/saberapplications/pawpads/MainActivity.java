@@ -294,19 +294,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-    //  private RequestQueue mRequestQueue;
+    private RequestQueue mRequestQueue;
     private void sendRegistrationIdToBackend() {
         // Your implementation here.
-
-
         new SendGcmToServer().execute();
-
+        new smppLogin().execute();
 // Access the RequestQueue through your singleton class.
         // AppController.getInstance().addToRequestQueue(jsObjRequest, "jsonRequest");
 
     }
 
-//TODO: fix this async task!!!! ASAP!
     private class SendGcmToServer extends AsyncTask<String, Void, String> {
 
         @Override
@@ -318,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         @Override
         protected String doInBackground(String... params) {
-            // TODO: update user info on login
 
             String url = Util.pawpadsURL + "updateGcmUser.php?username=" + USERNAME + "&regid=" + regid;
             Log.i("pavan", "url" + url);
@@ -404,6 +400,86 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         return out.toByteArray();
     }
+
+
+
+    private String getUserName(Context context) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        String User_name = prefs.getString(Util.USER_NAME, "");
+        Log.d("pavan","username in main "+User_name);
+        return User_name;
+
+    }
+
+
+    private class smppLogin extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... arg0) {
+
+            //TODO: make this work appropriately
+            String VerifyUserURL = Util.SERVER+"/plugins/userService/userservice?type=add&secret="+Util.XMPP_SECREAT_KEY+"&"
+                    + "username="
+                    +ud.user
+                    + "&password="+Util.XMPP_PASSWORD+"&name="
+                    + ud.user
+                    + "&email="
+                    + ud.email;
+            VerifyUserURL = VerifyUserURL.replace(" ", "%20");
+            Log.i("pavan", "BEFORE CONVERTING URL::::  " + VerifyUserURL);
+
+            OkHttpClient client_send_code = new OkHttpClient();
+            String response = null;
+            try {
+                response = callOkHttpRequest(new URL(VerifyUserURL),
+                        client_send_code);
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            if (response != null) {
+                return response;
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d("pavan", "server said: " + result);
+
+            if (result != null) {
+                storeUserDetails(context);
+                Intent chatActivity=new Intent(MainActivity.this,ChatActivity.class);
+                chatActivity.putExtra("user_id",ud.user);
+                startActivity(chatActivity);
+            } else {
+                Toast.makeText(MainActivity.this,"error",Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+    }
+
+
+
 }
 
 

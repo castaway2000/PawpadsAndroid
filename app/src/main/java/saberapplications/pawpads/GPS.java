@@ -25,13 +25,17 @@ public class GPS extends Activity {
 
     public Location getLastBestLocation() {
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        LocationListener ll = new LocationListener() {
+        final LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 makeUseOfNewLocation(location);
                 if (currentBestLocation == null) {
                     currentBestLocation = location;
+//                    mLocationManager.removeUpdates(locationListener);
+//                    mLocationManager = null;
                 }
+//                mLocationManager.removeUpdates(locationListener);
+//                mLocationManager = null;
             }
 
             @Override
@@ -46,8 +50,10 @@ public class GPS extends Activity {
             public void onProviderDisabled(String provider) {
             }
         };
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ll);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
+
+
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -66,7 +72,9 @@ public class GPS extends Activity {
         } else {
             return locationNet;
         }
+
     }
+
 
     public String updateWithNewLocation(Location location) {
         String latLongString;

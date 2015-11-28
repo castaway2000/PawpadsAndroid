@@ -18,8 +18,20 @@ public class Util {
     public static String GCMREGID = "nothing yet";
 
     public static String base_url = "http://www.szablya.com/saberapps/gcm_demo/";
-
     public final static String pawpadsURL = "http://www.szablya.com/saberapps/pawpads/";
     public final static String register_url = base_url + "register.php";
     public final static String send_chat_url = base_url + "sendChatmessage.php";
+
+
+
+    // xmpp variables
+    //TODO: update this to my own server
+    public static final String SERVER ="http://52.33.238.201:9090";
+    public static final String DOMAIN = "52.33.238.201";
+    public static final String XMPP_PASSWORD = "Password";
+    public static final String XMPP_SECREAT_KEY = "DpIDyV2L";
+
+    public static final String SUFFIX_CHAT = "@" + DOMAIN;
+    public static final String SUFFIX_CHAT_GROUP = "@conference." + DOMAIN;
+
 }

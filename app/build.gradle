@@ -23,6 +23,9 @@ android {
     }
 }
 
+
+
+
 dependencies {
     compile files('libs/volley.jar')
     compile 'com.android.support:appcompat-v7:22.2.1'
@@ -30,4 +33,5 @@ dependencies {
     compile files('libs/volley.jar')
     compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
     compile files('libs/universal-image-loader-1.9.4.jar')
+    compile files('libs/asmack-android-18-0.8.9.jar')
 }

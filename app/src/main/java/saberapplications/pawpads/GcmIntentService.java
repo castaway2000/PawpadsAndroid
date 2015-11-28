@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class GcmIntentService extends IntentService {
@@ -50,7 +51,8 @@ public class GcmIntentService extends IntentService {
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
                 String recieved_message = intent.getStringExtra("text_message");
-                sendNotification("message recieved :" + recieved_message);
+
+                sendNotification("message recieved: " + recieved_message);
 
                 Intent sendIntent = new Intent("message_recieved");
                 sendIntent.putExtra("message", recieved_message);
@@ -67,13 +69,16 @@ public class GcmIntentService extends IntentService {
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //TODO:// on click handeling to direct to the appropriate chat
+        //TODO: make Intent for user who sent the chat message.
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.common_google_signin_btn_text_dark_disabled)
-                        .setContentTitle("GCM Notification")
+                        .setSmallIcon(R.drawable.pplogo)
+                        .setContentTitle("PawPads")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);
