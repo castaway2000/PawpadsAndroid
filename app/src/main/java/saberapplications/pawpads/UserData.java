@@ -9,7 +9,7 @@ import android.widget.Toast;
 /**
  * Created by blaze on 9/9/2015.
  */
-public class UserData extends Activity {
+public class UserData {
     Context mContext;
     public UserData(Context context) {
         this.mContext = context;
@@ -20,11 +20,6 @@ public class UserData extends Activity {
     public String[] geol;
     public String[] upics;
     public String regToken;
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-
-    }
 
     public void getUserData(){
         GPS gps = new GPS(this.mContext);
