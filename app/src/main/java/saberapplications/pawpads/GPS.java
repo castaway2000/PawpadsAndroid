@@ -20,6 +20,8 @@ public class GPS extends Activity {
     Context mContext;
 
     public final static int PermissionRequestId = 0x5abe0001;
+    public final static long UpdateInterval = 1 * 60 * 1000; // 1 minute in milliseconds
+    public final static float UpdateDistanceThreshold = 5.0f; // meters
 
     public GPS(Context context) {
         this.mContext = context;
@@ -69,8 +71,8 @@ public class GPS extends Activity {
             public void onProviderDisabled(String provider) {
             }
         };
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ll);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, ll);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, ll);
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
