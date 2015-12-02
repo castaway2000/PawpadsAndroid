@@ -1,12 +1,16 @@
 package saberapplications.pawpads;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -102,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             Log.i(TAG, "Registration not found.");
             return false;
         }
-
         return true;
     }
 
@@ -137,10 +140,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onStart() {
         super.onStart();
+
         if (authenticate()) {
             ud.getUserData();
             String username = userLocalStore.getLoggedInUser().username;
-            this.USERNAME = username;
+            Util.DEVICE_USER = username;
 
             if (!isUserRegistered(context)) {
                 sendRegistrationIdToBackend();
@@ -166,16 +170,64 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                         }
                     }
             );
+
+            //start the messaging service from sinch
+            final Intent serviceIntent = new Intent(this, MessageService.class);
+            startService(serviceIntent);
+
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Loading");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+
+            Intent broadcastIntent = new Intent(serviceIntent);
+            LocalBroadcastManager broadcaster;
+
+            //TODO: Handle these appropriately
+            //onStartCommand
+            broadcaster = LocalBroadcastManager.getInstance(this);
+            //onClientStarted
+            broadcastIntent.putExtra("success", true);
+            broadcaster.sendBroadcast(broadcastIntent);
+            //onClientFailed
+            broadcastIntent.putExtra("success", false);
+            broadcaster.sendBroadcast(broadcastIntent);
+
+            //broadcast receiver to listen for the broadcast
+            //from MessageService
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Boolean success = intent.getBooleanExtra("success", false);
+                    progressDialog.dismiss();
+                    //show a toast message if the Sinch
+
+                    //service failed to start
+                    if (!success) {
+                        Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            //TODO: CHANGE THE INTENT FILTER
+            LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.sinch.messagingtutorial.app.MainActivity"));
+
+
+
+
         } else {
             startActivity(new Intent(MainActivity.this, Login.class));
             finish();
         }
     }
+    @Override
+    public void onDestroy() {
+        stopService(new Intent(this, MessageService.class));
+        super.onDestroy();
+    }
 
     private boolean authenticate() {
         return userLocalStore.getUserLoggedIn();
     }
-
 
     public void setListView(UserList userList) {
         final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol, ud.email);
@@ -198,17 +250,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         i.putExtra("email", ca.email[position]);
         startActivity(i);
     }
-
     @Override
     public void onRefresh() {
         ud.getUserData();
     }
-
-
-    /**
-     * Substitute you own sender ID here. This is the project number you got
-     * from the API Console, as described in "Getting Started."
-     */
 
 
     private void registerInBackground() {
@@ -281,8 +326,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         int appVersion = getAppVersion(context);
         Log.i(TAG, "Saving regId on app version " + appVersion);
         SharedPreferences.Editor editor = prefs.edit();
-        // editor.putString(Util.EMAIL, editText_email.getText().toString());
-        // editor.putString(Util.USER_NAME, editText_user_name.getText().toString());
+         editor.putString(Util.EMAIL, userLocalStore.getLoggedInUser().email);
+         editor.putString(Util.USER_NAME, userLocalStore.getLoggedInUser().username);
         editor.commit();
     }
 
@@ -298,10 +343,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void sendRegistrationIdToBackend() {
         // Your implementation here.
         new SendGcmToServer().execute();
-        new smppLogin().execute();
-// Access the RequestQueue through your singleton class.
         // AppController.getInstance().addToRequestQueue(jsObjRequest, "jsonRequest");
-
     }
 
     private class SendGcmToServer extends AsyncTask<String, Void, String> {
@@ -310,20 +352,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         protected void onPreExecute() {
             // TODO Auto-generated method stub
             super.onPreExecute();
-
         }
 
         @Override
         protected String doInBackground(String... params) {
 
             String url = Util.pawpadsURL + "updateGcmUser.php?username=" + USERNAME + "&regid=" + regid;
-            Log.i("pavan", "url" + url);
-
             OkHttpClient client_for_getMyFriends = new OkHttpClient();
 
             String response = null;
             // String response=Utility.callhttpRequest(url);
-
             try {
                 url = url.replace(" ", "%20");
                 response = callOkHttpRequest(new URL(url),
@@ -339,14 +377,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
-
             return response;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            // TODO Auto-generated method stub
+            // TODO Verify if needed, fix if needed, remove if not.
             super.onPostExecute(result);
             //Toast.makeText(context,"response "+result,Toast.LENGTH_LONG).show();
 
@@ -358,18 +394,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     finish();
 
                 } else {
-
-                    Toast.makeText(context, "Try Again" + result, Toast.LENGTH_LONG).show();
+                   // Toast.makeText(context, "Try Again" + result, Toast.LENGTH_LONG).show();
                 }
 
-
             } else {
-
                 Toast.makeText(context, "Check net connection ", Toast.LENGTH_LONG).show();
             }
-
         }
-
     }
 
 
@@ -378,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             throws IOException {
 
         HttpURLConnection connection = tempClient.open(url);
-
         connection.setConnectTimeout(40000);
         InputStream in = null;
         try {
@@ -408,77 +438,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         String User_name = prefs.getString(Util.USER_NAME, "");
         Log.d("pavan","username in main "+User_name);
         return User_name;
-
     }
-
-
-    private class smppLogin extends AsyncTask<String, String, String> {
-
-        @Override
-        protected void onPreExecute() {
-            // TODO Auto-generated method stub
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... arg0) {
-
-            //TODO: make this work appropriately
-            String VerifyUserURL = Util.SERVER+"/plugins/userService/userservice?type=add&secret="+Util.XMPP_SECREAT_KEY+"&"
-                    + "username="
-                    +ud.user
-                    + "&password="+Util.XMPP_PASSWORD+"&name="
-                    + ud.user
-                    + "&email="
-                    + ud.email;
-            VerifyUserURL = VerifyUserURL.replace(" ", "%20");
-            Log.i("pavan", "BEFORE CONVERTING URL::::  " + VerifyUserURL);
-
-            OkHttpClient client_send_code = new OkHttpClient();
-            String response = null;
-            try {
-                response = callOkHttpRequest(new URL(VerifyUserURL),
-                        client_send_code);
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            if (response != null) {
-                return response;
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-
-                });
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d("pavan", "server said: " + result);
-
-            if (result != null) {
-                storeUserDetails(context);
-                Intent chatActivity=new Intent(MainActivity.this,ChatActivity.class);
-                chatActivity.putExtra("user_id",ud.user);
-                startActivity(chatActivity);
-            } else {
-                Toast.makeText(MainActivity.this,"error",Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-    }
-
-
 
 }
 

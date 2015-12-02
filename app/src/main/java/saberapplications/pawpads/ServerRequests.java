@@ -84,7 +84,7 @@ public class ServerRequests{
 
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+
+            HttpGet get = new HttpGet(Util.register_url+"?username="+user.username+
                     "&password="+user.password+"&lat="+LAT+"&lng="+LNG+"&email="+user.email);
 
             try{
@@ -150,7 +150,6 @@ public class ServerRequests{
             userCallback.done(returnedUser);
             super.onPostExecute(returnedUser);
         }
-
     }
 
 

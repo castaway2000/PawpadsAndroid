@@ -17,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.sinch.android.rtc.messaging.MessageClient;
+import com.sinch.android.rtc.messaging.WritableMessage;
 import com.squareup.okhttp.OkHttpClient;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +46,6 @@ public class ChatActivity extends Activity {
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
 
-
         final String recipient = getIntent().getExtras().getString("user", null);
         final String displayPic = getIntent().getExtras().getString("image", null);
         final String email = getIntent().getExtras().getString("email", null);
@@ -54,6 +56,9 @@ public class ChatActivity extends Activity {
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
+
+
+
         button_send_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,12 +104,22 @@ public class ChatActivity extends Activity {
 
         private String mRecipient;
         private String mMessage;
+        MessageClient messageClient;
 
         public SendMessage(String recipient, String message) {
             UrlQuerySanitizer.ValueSanitizer encoder = UrlQuerySanitizer.getUrlLegal();
             mRecipient = encoder.sanitize(recipient);
             mMessage = encoder.sanitize(message);
+
+            WritableMessage writableMessage = new WritableMessage(mRecipient, mMessage);
+            messageClient.send(writableMessage);
         }
+
+//        @Override
+//        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {
+//            Log.d("CHAT_ACTIVITY", "The message with id " + deliveryInfo.getMessageId()
+//                    + " was delivered to the recipient with id" + deliveryInfo.getRecipientId());
+//        }
 
         @Override
         protected void onPreExecute() {
@@ -121,7 +136,6 @@ public class ChatActivity extends Activity {
 
 
             String response = null;
-            //String response=Utility.callhttpRequest(url);
             try {
                 url = url.replace(" ", "%20");
                 response = callOkHttpRequest(new URL(url),
@@ -152,8 +166,6 @@ public class ChatActivity extends Activity {
     String callOkHttpRequest(URL url, OkHttpClient tempClient)
             throws IOException {
 
-        //HttpURLConnection connection = tempClient.open(url);
-
         HttpURLConnection connection;
         connection = tempClient.open(url);
         connection.setConnectTimeout(40000);
@@ -177,9 +189,4 @@ public class ChatActivity extends Activity {
         }
         return out.toByteArray();
     }
-
-
-
-
-
 }

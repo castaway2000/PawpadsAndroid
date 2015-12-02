@@ -47,6 +47,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //TODO: retrieve and set all user info for the user in propper spots.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_editpage);
         setTitle("PawPads | Edit Profile");
@@ -64,7 +65,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-
+        //TODO:// on click send username, image, and profile description to UpdateUser.php
         switch(v.getId()){
             case R.id.newPicButton:
                 Intent intent = new Intent();
@@ -81,6 +82,8 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 //saved description updated to database
                 String descr = proDescr.getText().toString();
                 textOut.setText(descr);
+
+
 
                 //back to main activity
                 Intent i = new Intent(profileEditPage.this, MainActivity.class);
