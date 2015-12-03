@@ -203,22 +203,33 @@ public class ServerRequests{
                     for(int i = 0; i < jArray.length(); i++){
                         jObject = jArray.getJSONObject(i);
 
-                        lUsername.add(i, jObject.getString("username"));
+                        String username = jObject.getString("username");
+                        if(username.equals(USER)) {
+                            continue;
+                        }
 
-                        if(jObject.getString("profile") != null){
-                            lProfile.add(i,jObject.getString("profile"));
-                        }else{lProfile.add(i, "this user has not set up a description yet");}
+                        lUsername.add(username);
+
+                        if(jObject.getString("profile") != null) {
+                            lProfile.add(jObject.getString("profile"));
+                        }
+                        else {
+                            lProfile.add("this user has not set up a description yet");
+                        }
 
                         if(jObject.isNull("image_url")) {
-                            lPic.add(i, SERVER_ADDRESS+"pictures/btn_star_big_on.png");
+                            lPic.add(SERVER_ADDRESS+"pictures/btn_star_big_on.png");
                         }
-                        else{
-                            lPic.add(i, jObject.getString("image_url"));
+                        else {
+                            lPic.add(jObject.getString("image_url"));
                         }
 
-                       if (jObject.getString("distance") != null) {
-                            lDistance.add(i, jObject.getString("distance"));
-                        }else{lDistance.add(i,Integer.toString(i));}
+                        if (jObject.getString("distance") != null) {
+                            lDistance.add(jObject.getString("distance"));
+                        }
+                        else {
+                            lDistance.add(Integer.toString(i));
+                        }
                 }
                     aUsername = lUsername.toArray(new String[lUsername.size()]);
                     aProfile = lProfile.toArray(new String[lProfile.size()]);
