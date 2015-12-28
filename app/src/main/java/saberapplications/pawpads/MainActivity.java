@@ -432,8 +432,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         return out.toByteArray();
     }
 
-
-
     private String getUserName(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String User_name = prefs.getString(Util.USER_NAME, "");
@@ -441,6 +439,35 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         return User_name;
     }
 
+    /**
+     * Handle the result of a request for permissions.
+     *
+     * Watches for the result of a request for permission to use fine location (GPS) data.
+     * If the request was granted, continue processing.
+     * If the request was denied, stop; the application needs location data to work and cannot be
+     * used without permission to use location data.
+     *
+     * @param requestCode The ID of the permissions request.
+     * @param permissions The permissions that were requested.
+     * @param grantResults The grant or denial for each requested permission.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch(requestCode) {
+            case GPS.PermissionRequestId:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // TODO continue processing
+                    android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
+                }
+                else {
+                    // TODO stop login
+                    android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 

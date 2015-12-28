@@ -18,7 +18,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-
 //gets layout info and passes text data in.
 class CustomAdapter extends ArrayAdapter<String> {
     final String[] pics;

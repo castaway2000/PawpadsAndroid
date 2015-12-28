@@ -207,28 +207,38 @@ public class ServerRequests{
                 {
                     for(int i = 0; i < jArray.length(); i++){
                         jObject = jArray.getJSONObject(i);
-
                         lUsername.add(i, jObject.getString("username"));
-                        lEmail.add(i,jObject.getString("email"));
+                        lEmail.add(i, jObject.getString("email"));
+//                        String username = jObject.getString("username");
+//
+//                        if(username.equals(USER)) {
+//                            continue;
+//                        }
+//                        lUsername.add(username);
 
-                        if(jObject.getString("profile") != null){
+                        if(jObject.getString("profile") != null) {
                             lProfile.add(i,jObject.getString("profile"));
-                        }else{lProfile.add(i, "this user has not set up a description yet");}
+                        }
+                        else {
+                            lProfile.add(i,"this user has not set up a description yet");
+                        }
 
                         if(jObject.isNull("image_url")) {
-
                             //TODO: set this from preloaded image not asynctask.
                             //lPic.add(i,R.drawable.abc_btn_rating_star_on_mtrl_alpha);
-                            lPic.add(i, SERVER_ADDRESS+"pictures/btn_star_big_on.png");
+                            lPic.add(i,SERVER_ADDRESS+"pictures/btn_star_big_on.png");
                         }
-                        else{
-                            lPic.add(i, jObject.getString("image_url"));
+                        else {
+                            lPic.add(i,jObject.getString("image_url"));
                         }
 
-                       if (jObject.getString("distance") != null) {
-                            lDistance.add(i, jObject.getString("distance"));
-                        }else{lDistance.add(i,Integer.toString(i));}
-                }
+                        if (jObject.getString("distance") != null) {
+                            lDistance.add(i,jObject.getString("distance"));
+                        }
+                        else {
+                            lDistance.add(i,Integer.toString(i));
+                        }
+                    }
                     aUsername = lUsername.toArray(new String[lUsername.size()]);
                     aProfile = lProfile.toArray(new String[lProfile.size()]);
                     aPic = lPic.toArray(new String[lPic.size()]);
@@ -240,6 +250,7 @@ public class ServerRequests{
             }catch(Exception e){
                 e.printStackTrace();
             }
+
             return returnedUser;
         }
 

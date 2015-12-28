@@ -1,6 +1,7 @@
 package saberapplications.pawpads;
 
 
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -69,7 +70,21 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
     private void registerUser(User user){
         GPS gps = new GPS(this);
-        Location loc = new Location(gps.getLastBestLocation());
+        Location loc = null;
+        try {
+            loc = new Location(gps.getLastBestLocation());
+        }
+        catch(NullPointerException e) {
+            android.util.Log.w(this.toString(),
+                    "GPS.getLastBestLocation() failed -- location services may be turned off");
+            // TODO Better way to tell the user that something went wrong
+            Toast.makeText(
+                    this,
+                    "Couldn't register. Turn on location services and try again.",
+                    Toast.LENGTH_LONG
+            ).show();
+            return;
+        }
         Double lat = loc.getLatitude();
         Double lng = loc.getLongitude();
         ServerRequests serverRequests = new ServerRequests(this, lat, lng, null);
@@ -82,4 +97,22 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch(requestCode) {
+            case GPS.PermissionRequestId:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // TODO continue processing
+                    android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
+                }
+                else {
+                    // Do nothing. User has denied the request for location data, so registration
+                    // cannot continue.
+                    android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
