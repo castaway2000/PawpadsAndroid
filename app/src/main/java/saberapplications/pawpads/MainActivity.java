@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             //broadcast receiver to listen for the broadcast
             //from MessageService
+            progressDialog.dismiss();
             BroadcastReceiver receiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {

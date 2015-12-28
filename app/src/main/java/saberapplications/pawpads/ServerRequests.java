@@ -61,7 +61,11 @@ public class ServerRequests{
     public void fetchListDataInBackground(UserList user, GetUserListCallback userCallback){
         progressDialog.show();
         new FetchListDataAsyncTask(user, userCallback).execute();
+    }
 
+    public void updateUserDataInBackground(User user, GetUserCallback userCallback){
+        progressDialog.show();
+        new updateUserDataAsyncTask(user, userCallback).execute();
     }
 
 
@@ -212,6 +216,9 @@ public class ServerRequests{
                         }else{lProfile.add(i, "this user has not set up a description yet");}
 
                         if(jObject.isNull("image_url")) {
+
+                            //TODO: set this from preloaded image not asynctask.
+                            //lPic.add(i,R.drawable.abc_btn_rating_star_on_mtrl_alpha);
                             lPic.add(i, SERVER_ADDRESS+"pictures/btn_star_big_on.png");
                         }
                         else{
@@ -241,6 +248,45 @@ public class ServerRequests{
             progressDialog.dismiss();
             userCallback.done(returnedUser);
             super.onPostExecute(returnedUser);
+        }
+    }
+
+
+    //UPDATE PROFILE ASYNC TASK
+    public class updateUserDataAsyncTask extends AsyncTask<Void, Void, Void>{
+        User user;
+        GetUserCallback userCallback;
+
+        public updateUserDataAsyncTask(User user, GetUserCallback userCallback){
+            ServerRequests.updateUserDataAsyncTask.this.user = user;
+            ServerRequests.updateUserDataAsyncTask.this.userCallback = userCallback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            //START NETWORK GET REQUEST
+            HttpParams httpRequestParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
+            HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
+
+
+            HttpClient client = new DefaultHttpClient(httpRequestParams);
+            HttpGet get = new HttpGet(Util.register_url+"?username="+user.username+"&profile="+user.userInfo+"&image="+user.image);
+
+            try{
+                client.execute(get);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            progressDialog.dismiss();
+            userCallback.done(null);
+            super.onPostExecute(aVoid);
         }
     }
 }

@@ -23,9 +23,6 @@ android {
     }
 }
 
-
-
-
 dependencies {
     compile files('libs/volley.jar')
     compile 'com.android.support:appcompat-v7:22.2.1'

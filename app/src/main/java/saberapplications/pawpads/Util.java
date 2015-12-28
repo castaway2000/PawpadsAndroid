@@ -23,6 +23,8 @@ public class Util {
     public final static String pawpadsURL = "http://www.szablya.com/saberapps/pawpads/";
     public final static String register_url = base_url + "register.php";
     public final static String send_chat_url = base_url + "sendChatmessage.php";
+    //TODO: verify php url
+    public final static String update_user_url = base_url + "UpdateUserProfile.php";
     public static String DEVICE_USER = "";
     public static Intent SERVICE_INTENT = null;
 

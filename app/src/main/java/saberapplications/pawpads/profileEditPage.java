@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -16,21 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 
 
 /**
@@ -44,6 +31,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     EditText textOut, proDescr;
     Button saveBtn, getimgbtn;
     Uri path;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +45,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
         proDescr = (EditText) findViewById(R.id.editProfileText);
-        textOut = (EditText) findViewById(R.id.editProfileText);
+        //proDescr.setText(user.userInfo);
 
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
@@ -77,19 +65,32 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             case R.id.profileSave:
                 //saved image state passed to database
                 Bitmap image = ((BitmapDrawable)img.getDrawable()).getBitmap();
-                new UploadImage(image, proDescr.getText().toString());
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+                String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
+                user.image = encodedImage;
                 //saved description updated to database
-                String descr = proDescr.getText().toString();
-                textOut.setText(descr);
+                user.userInfo = proDescr.getText().toString();
 
-
+                UpdateUser();
 
                 //back to main activity
                 Intent i = new Intent(profileEditPage.this, MainActivity.class);
                 startActivity(i);
                 break;
         }
+    }
+
+
+    public void UpdateUser(){
+        ServerRequests serverRequests = new ServerRequests(this, user.lat, user.lng, user.username);
+        serverRequests.updateUserDataInBackground(user, new GetUserCallback() {
+            @Override
+            public void done(User returnedUser) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -139,52 +140,5 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
-    }
-
-    public class UploadImage extends AsyncTask<Void,Void,Void>{
-        Bitmap image;
-        String name;
-
-        public UploadImage(Bitmap image, String name){
-            this.image = image;
-            this.name = name;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-            String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-
-            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-            dataToSend.add(new BasicNameValuePair("image", encodedImage));
-            dataToSend.add(new BasicNameValuePair("name", name));
-
-            HttpParams httpRequestParams = getHttprequestParams();
-
-            HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpPost post = new HttpPost(ServerRequests.SERVER_ADDRESS + "SavePicture.php");
-
-            try{
-                post.setEntity(new UrlEncodedFormEntity(dataToSend));
-                client.execute(post);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid){
-            super.onPostExecute(aVoid);
-            Toast.makeText(getApplicationContext(),"Profile has been updated!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private HttpParams getHttprequestParams(){
-        HttpParams httpRequestParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpRequestParams, 1000 * 30);
-        HttpConnectionParams.setSoTimeout(httpRequestParams, 1000*30);
-        return httpRequestParams;
     }
 }
