@@ -7,12 +7,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <permission
-        android:name="saberapplications.recyclerviewtutorial.permission.C2D_MESSAGE"
+        android:name="saberapplications.pawpads.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="saberapplications.recyclerviewtutorial.permission.C2D_MESSAGE" />
+    <uses-permission android:name="saberapplications.pawpads.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!--
@@ -25,13 +26,13 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:debuggable="true"
+        android:name=".PawPadsApplication"
         android:allowBackup="true"
         android:icon="@drawable/pplogo"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.home.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -62,6 +63,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.chat.ChatActivity"
+            android:label="Chat" >
+        </activity>
+
         <activity
             android:name=".profileEditPage"
             android:label="PawPads" >
@@ -84,13 +91,14 @@
 
         <service android:name=".GcmIntentService" />
 
-        <activity
-            android:name=".ChatActivity"
-            android:label="@string/title_activity_chat" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <provider
+            android:name="vc908.stickerfactory.provider.StickersProvider"
+            android:authorities="saberapplications.pawpads.stickersProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

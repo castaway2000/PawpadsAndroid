@@ -1,10 +1,10 @@
 package saberapplications.pawpads;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.widget.Toast;
+
+import saberapplications.pawpads.ui.home.MainActivity;
 
 /**
  * Created by blaze on 9/9/2015.

@@ -1,6 +1,7 @@
 package saberapplications.pawpads;
 
 
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -9,6 +10,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBSession;
+import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
+
+import java.util.List;
 
 
 /**
@@ -43,7 +52,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                 String passwordCHK = etPasswordChk.getText().toString();
 
                 //TODO: implement ssl encryption
-                if(password.equals(passwordCHK) && email.contains("@") && username.length() != 0 && password.length() != 0) {
+                if(password.equals(passwordCHK) && email.contains("@") && username.length() != 0 && password.length() != 0 && password.length()>=8) {
 
                     User user = new User(username, password, email, Util.GCMREGID);
                     registerUser(user);
@@ -57,6 +66,10 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                     Toast toast = Toast.makeText(this, "Please enter a password",Toast.LENGTH_SHORT);
                     toast.show();
                 }
+                else if (password.length() < 8){
+                    Toast toast = Toast.makeText(this, "Password is to short ( minimum 8 characters)",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 else if (!password.equals(passwordCHK)){
                     Toast toast = Toast.makeText(this, "Passwords do not match",Toast.LENGTH_SHORT);
                     toast.show();
@@ -68,11 +81,12 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         }
     }
 
-    private void registerUser(User user){
+    private void registerUser(final User user){
         GPS gps = new GPS(this);
         Location loc = null;
         try {
             loc = new Location(gps.getLastBestLocation());
+
         }
         catch(NullPointerException e) {
             android.util.Log.w(this.toString(),
@@ -88,11 +102,42 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         Double lat = loc.getLatitude();
         Double lng = loc.getLongitude();
         ServerRequests serverRequests = new ServerRequests(this, lat, lng, null);
+
         serverRequests.storeUserDataInBackground(user, new GetUserCallback() {
             @Override
-            public void done(User returnedUser) {
-                //TODO: start edit profile intent
-                finish();
+            public void done(final User returnedUser) {
+
+                QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
+
+                    @Override
+                    public void onSuccess(QBSession session, Bundle params) {
+                        final QBUser qbUser = new QBUser(user.username, user.password);
+                        //qbUser.setExternalId(returnedUser.regid);
+                        qbUser.setEmail(user.email);
+
+                        QBUsers.signUp(qbUser, new QBEntityCallbackImpl<QBUser>() {
+                            @Override
+                            public void onSuccess(QBUser user, Bundle args) {
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(List<String> errors) {
+                                Util.onError(errors,Register.this);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onError(List<String> errors) {
+                        Util.onError(errors,Register.this);
+                    }
+                });
+
+
+
+
             }
         });
     }

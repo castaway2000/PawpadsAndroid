@@ -11,6 +11,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import saberapplications.pawpads.ui.home.MainActivity;
+
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
@@ -49,7 +51,7 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
-                String recieved_message = intent.getStringExtra("text_message");
+                String recieved_message = intent.getStringExtra("message");
                 sendNotification("message recieved :" + recieved_message);
 
                 Intent sendIntent = new Intent("message_recieved");

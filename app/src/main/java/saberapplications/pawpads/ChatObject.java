@@ -12,6 +12,8 @@ public class ChatObject {
     }
 
     String type;
+    public static final String SENT="sent";
+    public static final String RECEIVED="received";
 
     public ChatObject(String message, String type) {
         this.message = message;

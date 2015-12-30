@@ -1,4 +1,4 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui.chat;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+
+import saberapplications.pawpads.ChatObject;
+import saberapplications.pawpads.R;
 
 /**
  * Created by Dell on 3/19/2015.

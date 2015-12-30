@@ -2,7 +2,6 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -13,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import saberapplications.pawpads.ui.chat.ChatActivity;
 
 public class profilepage extends AppCompatActivity {
 
