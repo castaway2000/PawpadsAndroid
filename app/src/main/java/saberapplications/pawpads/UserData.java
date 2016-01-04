@@ -19,6 +19,7 @@ public class UserData {
     public String[] descr;
     public String[] geol;
     public String[] upics;
+    public String[] email;
     public String regToken;
 
     public void getUserData(){
@@ -47,11 +48,12 @@ public class UserData {
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
+                UserData.this.descr = returnedUser.profile;
+                UserData.this.email = returnedUser.email;
                 UserData.this.upics = returnedUser.pic;
                 UserData.this.geol = returnedUser.distance;
                 UserData.this.user = returnedUser.username;
-                UserData.this.descr = returnedUser.profile;
-                ((MainActivity) UserData.this.mContext).setListView(returnedUser);
+                        ((MainActivity) UserData.this.mContext).setListView(returnedUser);
             }
         });
     }

@@ -1,6 +1,5 @@
 package saberapplications.pawpads;
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -50,13 +49,17 @@ public class GPS extends Activity {
 
     public Location getLastBestLocation() {
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        LocationListener ll = new LocationListener() {
+        final LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 makeUseOfNewLocation(location);
                 if (currentBestLocation == null) {
                     currentBestLocation = location;
+//                    mLocationManager.removeUpdates(locationListener);
+//                    mLocationManager = null;
                 }
+//                mLocationManager.removeUpdates(locationListener);
+//                mLocationManager = null;
             }
 
             @Override
@@ -71,8 +74,9 @@ public class GPS extends Activity {
             public void onProviderDisabled(String provider) {
             }
         };
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, ll);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, ll);
+
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS.UpdateInterval, GPS.UpdateDistanceThreshold, locationListener);
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -92,7 +96,6 @@ public class GPS extends Activity {
             return locationNet;
         }
     }
-
     public String updateWithNewLocation(Location location) {
         String latLongString;
         if (location != null) {
