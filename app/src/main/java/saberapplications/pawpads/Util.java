@@ -15,6 +15,9 @@ public class Util {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String EMAIL = "email";
     public static final String USER_NAME = "user_name";
+    public static final String USER_LOCATION= "user_location";
+    public static final String USER_INFO= "user_info";
+    public static final String USER_AVATAR_PATH= "user_avatar_path";
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
 

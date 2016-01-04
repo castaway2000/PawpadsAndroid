@@ -2,7 +2,9 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.home.MainActivity;
 
 public class profilepage extends AppCompatActivity {
 
@@ -22,22 +25,24 @@ public class profilepage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profilepage);
 
-        //receiving data from listview
-        Bundle Data = getIntent().getExtras();
-        final String user = Data.getString("username");
-        String userInfo = Data.getString("value");
-        final String imgVal = Data.getString("image");
-        String loc = Data.getString("location");
+//        //receiving data from listview
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profilepage.this);
+        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
+        String userInfo = defaultSharedPreferences.getString(Util.USER_INFO, "");
+        final String imgVal = defaultSharedPreferences.getString(Util.USER_AVATAR_PATH, "");
+        String loc = defaultSharedPreferences.getString(Util.USER_LOCATION, "");
 
-        //setting new data into profile
-        String newTitle = "PawPads | " + user;
+//        //setting new data into profile
+        String newTitle = "PawPads | " + userName;
         ImageView iv = (ImageView) findViewById(R.id.profilepic);
         TextView tv = (TextView) findViewById(R.id.profileinfo);
-
-        //this is getting an async task that is setting the image.
-        //TODO: make this from local stored variable.
-        ImageLoader imageloader = ImageLoader.getInstance();
-        imageloader.displayImage(imgVal, iv);
+//
+//        //this is getting an async task that is setting the image.
+//        //TODO: make this from local stored variable.
+        if(!imgVal.isEmpty()) {
+            ImageLoader imageloader = ImageLoader.getInstance();
+            imageloader.displayImage(imgVal, iv);
+        }
 
         tv.setText(userInfo);
         setTitle(newTitle);
@@ -47,10 +52,9 @@ public class profilepage extends AppCompatActivity {
         View.OnClickListener clickHandler = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(profilepage.this, ChatActivity.class);
-                i.putExtra("user", user);
-                i.putExtra("image",imgVal);
+                Intent i = new Intent(profilepage.this, MainActivity.class);
                 startActivity(i);
+                finish();
             }
         };
         button.setOnClickListener(clickHandler);

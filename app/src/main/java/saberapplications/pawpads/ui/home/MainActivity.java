@@ -135,7 +135,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         userLocalStore = new UserLocalStore(this);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
 
+        setTitle("PawPads | " + userName);
 
     }
 
@@ -198,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             case R.id.action_profileID:
                 Intent i = new Intent(MainActivity.this, profileEditPage.class);
                 startActivity(i);
+                finish();
                 return true;
 
             case R.id.action_logout:

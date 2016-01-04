@@ -2,6 +2,7 @@ package saberapplications.pawpads;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,7 +20,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import android.util.Base64;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -30,7 +36,13 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import saberapplications.pawpads.ui.home.MainActivity;
@@ -63,6 +75,13 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this);
+        final String imgVal = defaultSharedPreferences.getString(Util.USER_AVATAR_PATH, "");
+
+        if(!imgVal.isEmpty()) {
+            ImageLoader imageloader = ImageLoader.getInstance();
+            imageloader.displayImage(imgVal, img);
+        }
     }
 
     @Override
@@ -86,8 +105,13 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 textOut.setText(descr);
 
                 //back to main activity
-                Intent i = new Intent(profileEditPage.this, MainActivity.class);
+                Intent i = new Intent(profileEditPage.this, profilepage.class);
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this).edit();
+                editor.putString(Util.USER_INFO, textOut.getText().toString());
+                editor.putString(Util.USER_AVATAR_PATH, selectedImagePath);
+                editor.apply();
                 startActivity(i);
+                finish();
                 break;
         }
     }
@@ -99,6 +123,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
                 path = selectedImageUri;
+
                 System.out.println("Image Path : " + selectedImagePath);
                 try {
                     img.setImageBitmap(decodeUri(getApplicationContext(), selectedImageUri, 80));
@@ -110,11 +135,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     }
 
     public String getPath(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+        return  uri.getPath();
     }
 
 

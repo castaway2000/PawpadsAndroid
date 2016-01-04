@@ -69,10 +69,12 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
                             public void onSuccess(QBUser user, Bundle params) {
                                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Login.this).edit();
                                 editor.putString(Util.QB_USER, username);
+                                editor.putString(Util.USER_NAME, username);
                                 editor.putString(Util.QB_PASSWORD, password);
                                 editor.putInt(Util.QB_USERID, user.getId());
-                                editor.commit();
-                                startActivity(new Intent(Login.this, MainActivity.class));
+                                editor.apply();
+                                Intent intent = new Intent(Login.this, profilepage.class);
+                                startActivity(intent);
 
                                 finish();
                             }
