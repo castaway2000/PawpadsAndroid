@@ -49,19 +49,24 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
 
             convertView.setTag(holder);
         } else {
+
             holder = (ViewHolder) convertView.getTag();
+
         }
 
 
         if (chat_data.get(position).getType().equals("sent")) {
+
             holder.textView_left_chat.setText(chat_data.get(position).getMessage());
             holder.textView_right_chat.setVisibility(View.GONE);
             holder.textView_left_chat.setVisibility(View.VISIBLE);
         } else {
+
             holder.textView_right_chat.setText(chat_data.get(position).getMessage());
             holder.textView_left_chat.setVisibility(View.GONE);
             holder.textView_right_chat.setVisibility(View.VISIBLE);
         }
+
 
         return convertView;
     }

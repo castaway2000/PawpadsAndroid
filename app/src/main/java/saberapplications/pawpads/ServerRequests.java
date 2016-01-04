@@ -61,11 +61,7 @@ public class ServerRequests{
     public void fetchListDataInBackground(UserList user, GetUserListCallback userCallback){
         progressDialog.show();
         new FetchListDataAsyncTask(user, userCallback).execute();
-    }
 
-    public void updateUserDataInBackground(User user, GetUserCallback userCallback){
-        progressDialog.show();
-        new updateUserDataAsyncTask(user, userCallback).execute();
     }
 
 
@@ -88,7 +84,7 @@ public class ServerRequests{
 
 
             HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpGet get = new HttpGet(Util.register_url+"?username="+user.username+
+            HttpGet get = new HttpGet(SERVER_ADDRESS + "Register.php?username="+user.username+
                     "&password="+user.password+"&lat="+LAT+"&lng="+LNG+"&email="+user.email);
 
             try{
@@ -154,6 +150,7 @@ public class ServerRequests{
             userCallback.done(returnedUser);
             super.onPostExecute(returnedUser);
         }
+
     }
 
 
@@ -165,7 +162,6 @@ public class ServerRequests{
         public String[] aProfile = {};
         public String[] aPic = {};
         public String[] aDistance = {};
-        public String[] aEmail = {};
 
 
 
@@ -198,59 +194,53 @@ public class ServerRequests{
                 ArrayList<String> lProfile = new ArrayList<>();
                 ArrayList<String> lPic = new ArrayList<>();
                 ArrayList<String> lDistance = new ArrayList<>();
-                ArrayList<String> lEmail = new ArrayList<>();
 
                 if(jArray.length() == 0){
-                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance, aEmail);;
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);;
                 }
                 else
                 {
                     for(int i = 0; i < jArray.length(); i++){
                         jObject = jArray.getJSONObject(i);
-                        lUsername.add(i, jObject.getString("username"));
-                        lEmail.add(i, jObject.getString("email"));
-//                        String username = jObject.getString("username");
-//
-//                        if(username.equals(USER)) {
-//                            continue;
-//                        }
-//                        lUsername.add(username);
+
+                        String username = jObject.getString("username");
+                        if(username.equals(USER)) {
+                            continue;
+                        }
+
+                        lUsername.add(username);
 
                         if(jObject.getString("profile") != null) {
-                            lProfile.add(i,jObject.getString("profile"));
+                            lProfile.add(jObject.getString("profile"));
                         }
                         else {
-                            lProfile.add(i,"this user has not set up a description yet");
+                            lProfile.add("this user has not set up a description yet");
                         }
 
                         if(jObject.isNull("image_url")) {
-                            //TODO: set this from preloaded image not asynctask.
-                            //lPic.add(i,R.drawable.abc_btn_rating_star_on_mtrl_alpha);
-                            lPic.add(i,SERVER_ADDRESS+"pictures/btn_star_big_on.png");
+                            lPic.add(SERVER_ADDRESS+"pictures/btn_star_big_on.png");
                         }
                         else {
-                            lPic.add(i,jObject.getString("image_url"));
+                            lPic.add(jObject.getString("image_url"));
                         }
 
                         if (jObject.getString("distance") != null) {
-                            lDistance.add(i,jObject.getString("distance"));
+                            lDistance.add(jObject.getString("distance"));
                         }
                         else {
-                            lDistance.add(i,Integer.toString(i));
+                            lDistance.add(Integer.toString(i));
                         }
-                    }
+                }
                     aUsername = lUsername.toArray(new String[lUsername.size()]);
                     aProfile = lProfile.toArray(new String[lProfile.size()]);
                     aPic = lPic.toArray(new String[lPic.size()]);
                     aDistance = lDistance.toArray(new String[lDistance.size()]);
-                    aEmail = lEmail.toArray(new String[lEmail.size()]);
 
-                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance, aEmail);
+                    returnedUser = new UserList(aUsername, aProfile, aPic, aDistance);
                 }
             }catch(Exception e){
                 e.printStackTrace();
             }
-
             return returnedUser;
         }
 
@@ -259,45 +249,6 @@ public class ServerRequests{
             progressDialog.dismiss();
             userCallback.done(returnedUser);
             super.onPostExecute(returnedUser);
-        }
-    }
-
-
-    //UPDATE PROFILE ASYNC TASK
-    public class updateUserDataAsyncTask extends AsyncTask<Void, Void, Void>{
-        User user;
-        GetUserCallback userCallback;
-
-        public updateUserDataAsyncTask(User user, GetUserCallback userCallback){
-            ServerRequests.updateUserDataAsyncTask.this.user = user;
-            ServerRequests.updateUserDataAsyncTask.this.userCallback = userCallback;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            //START NETWORK GET REQUEST
-            HttpParams httpRequestParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
-            HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIME);
-
-
-            HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpGet get = new HttpGet(Util.register_url+"?username="+user.username+"&profile="+user.userInfo+"&image="+user.image);
-
-            try{
-                client.execute(get);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid){
-            progressDialog.dismiss();
-            userCallback.done(null);
-            super.onPostExecute(aVoid);
         }
     }
 }
