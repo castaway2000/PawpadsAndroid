@@ -14,11 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.model.QBDialog;
 
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 
 public class profilepage extends AppCompatActivity {
+    private QBDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +28,11 @@ public class profilepage extends AppCompatActivity {
         setContentView(R.layout.activity_profilepage);
 
 //        //receiving data from listview
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profilepage.this);
-        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
-        String userInfo = defaultSharedPreferences.getString(Util.USER_INFO, "");
-        final String imgVal = defaultSharedPreferences.getString(Util.USER_AVATAR_PATH, "");
-        String loc = defaultSharedPreferences.getString(Util.USER_LOCATION, "");
-
+        String userName = getIntent().getExtras().getString(Util.USER_NAME, "");
+        String userInfo = getIntent().getExtras().getString(Util.USER_INFO, "");
+        final String imgVal = getIntent().getExtras().getString(Util.USER_AVATAR_PATH, "");
+        String loc = getIntent().getExtras().getString(Util.USER_LOCATION, "");
+        dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.EXTRA_DIALOG);
 //        //setting new data into profile
         String newTitle = "PawPads | " + userName;
         ImageView iv = (ImageView) findViewById(R.id.profilepic);
@@ -39,7 +40,7 @@ public class profilepage extends AppCompatActivity {
 //
 //        //this is getting an async task that is setting the image.
 //        //TODO: make this from local stored variable.
-        if(!imgVal.isEmpty()) {
+        if (!imgVal.isEmpty()) {
             ImageLoader imageloader = ImageLoader.getInstance();
             imageloader.displayImage(imgVal, iv);
         }
@@ -52,7 +53,8 @@ public class profilepage extends AppCompatActivity {
         View.OnClickListener clickHandler = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(profilepage.this, MainActivity.class);
+                Intent i = new Intent(profilepage.this, ChatActivity.class);
+                i.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
                 startActivity(i);
                 finish();
             }

@@ -73,7 +73,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
                                 editor.putString(Util.QB_PASSWORD, password);
                                 editor.putInt(Util.QB_USERID, user.getId());
                                 editor.apply();
-                                Intent intent = new Intent(Login.this, profilepage.class);
+                                Intent intent = new Intent(Login.this, MainActivity.class);
                                 startActivity(intent);
 
                                 finish();
