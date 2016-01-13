@@ -2,7 +2,9 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,31 +14,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.model.QBDialog;
+
+import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.home.MainActivity;
 
 public class profilepage extends AppCompatActivity {
+    private QBDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profilepage);
 
-        //receiving data from listview
-        Bundle Data = getIntent().getExtras();
-        final String user = Data.getString("username");
-        String userInfo = Data.getString("value");
-        final String imgVal = Data.getString("image");
-        String loc = Data.getString("location");
-        final String email = Data.getString("email");
-
-        //setting new data into profile
-        String newTitle = "PawPads | " + user;
+//        //receiving data from listview
+        String userName = getIntent().getExtras().getString(Util.USER_NAME, "");
+        String userInfo = getIntent().getExtras().getString(Util.USER_INFO, "");
+        final String imgVal = getIntent().getExtras().getString(Util.USER_AVATAR_PATH, "");
+        String loc = getIntent().getExtras().getString(Util.USER_LOCATION, "");
+        dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.EXTRA_DIALOG);
+//        //setting new data into profile
+        String newTitle = "PawPads | " + userName;
         ImageView iv = (ImageView) findViewById(R.id.profilepic);
         TextView tv = (TextView) findViewById(R.id.profileinfo);
-
-        //this is getting an async task that is setting the image.
-        //TODO: make this from local stored variable.
-        ImageLoader imageloader = ImageLoader.getInstance();
-        imageloader.displayImage(imgVal, iv);
+//
+//        //this is getting an async task that is setting the image.
+//        //TODO: make this from local stored variable.
+        if (!imgVal.isEmpty()) {
+            ImageLoader imageloader = ImageLoader.getInstance();
+            imageloader.displayImage(imgVal, iv);
+        }
 
         tv.setText(userInfo);
         setTitle(newTitle);
@@ -47,10 +54,9 @@ public class profilepage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(profilepage.this, ChatActivity.class);
-                i.putExtra("user", user);
-                i.putExtra("image",imgVal);
-                i.putExtra("email", email);
+                i.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
                 startActivity(i);
+                finish();
             }
         };
         button.setOnClickListener(clickHandler);

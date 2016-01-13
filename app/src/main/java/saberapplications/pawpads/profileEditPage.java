@@ -2,22 +2,50 @@ package saberapplications.pawpads;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import android.util.Base64;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+
+import saberapplications.pawpads.ui.home.MainActivity;
 
 
 /**
@@ -31,11 +59,9 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     EditText textOut, proDescr;
     Button saveBtn, getimgbtn;
     Uri path;
-    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //TODO: retrieve and set all user info for the user in propper spots.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_editpage);
         setTitle("PawPads | Edit Profile");
@@ -45,15 +71,22 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
         proDescr = (EditText) findViewById(R.id.editProfileText);
-        //proDescr.setText(user.userInfo);
+        textOut = (EditText) findViewById(R.id.editProfileText);
 
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this);
+        final String imgVal = defaultSharedPreferences.getString(Util.USER_AVATAR_PATH, "");
+
+        if(!imgVal.isEmpty()) {
+            ImageLoader imageloader = ImageLoader.getInstance();
+            imageloader.displayImage(imgVal, img);
+        }
     }
 
     @Override
     public void onClick(View v) {
-        //TODO:// on click send username, image, and profile description to UpdateUser.php
+
         switch(v.getId()){
             case R.id.newPicButton:
                 Intent intent = new Intent();
@@ -65,32 +98,22 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             case R.id.profileSave:
                 //saved image state passed to database
                 Bitmap image = ((BitmapDrawable)img.getDrawable()).getBitmap();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-                String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                new UploadImage(image, proDescr.getText().toString());
 
-                user.image = encodedImage;
                 //saved description updated to database
-                user.userInfo = proDescr.getText().toString();
-
-                UpdateUser();
+                String descr = proDescr.getText().toString();
+                textOut.setText(descr);
 
                 //back to main activity
-                Intent i = new Intent(profileEditPage.this, MainActivity.class);
+                Intent i = new Intent(profileEditPage.this, profilepage.class);
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this).edit();
+                editor.putString(Util.USER_INFO, textOut.getText().toString());
+                editor.putString(Util.USER_AVATAR_PATH, selectedImagePath);
+                editor.apply();
                 startActivity(i);
+                finish();
                 break;
         }
-    }
-
-
-    public void UpdateUser(){
-        ServerRequests serverRequests = new ServerRequests(this, user.lat, user.lng, user.username);
-        serverRequests.updateUserDataInBackground(user, new GetUserCallback() {
-            @Override
-            public void done(User returnedUser) {
-                finish();
-            }
-        });
     }
 
     @Override
@@ -100,6 +123,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
                 path = selectedImageUri;
+
                 System.out.println("Image Path : " + selectedImagePath);
                 try {
                     img.setImageBitmap(decodeUri(getApplicationContext(), selectedImageUri, 80));
@@ -111,11 +135,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     }
 
     public String getPath(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+        return  uri.getPath();
     }
 
 
@@ -140,5 +160,52 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
+    }
+
+    public class UploadImage extends AsyncTask<Void,Void,Void>{
+        Bitmap image;
+        String name;
+
+        public UploadImage(Bitmap image, String name){
+            this.image = image;
+            this.name = name;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+            String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+            dataToSend.add(new BasicNameValuePair("image", encodedImage));
+            dataToSend.add(new BasicNameValuePair("name", name));
+
+            HttpParams httpRequestParams = getHttprequestParams();
+
+            HttpClient client = new DefaultHttpClient(httpRequestParams);
+            HttpPost post = new HttpPost(ServerRequests.SERVER_ADDRESS + "SavePicture.php");
+
+            try{
+                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                client.execute(post);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            super.onPostExecute(aVoid);
+            Toast.makeText(getApplicationContext(),"Profile has been updated!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private HttpParams getHttprequestParams(){
+        HttpParams httpRequestParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpRequestParams, 1000 * 30);
+        HttpConnectionParams.setSoTimeout(httpRequestParams, 1000*30);
+        return httpRequestParams;
     }
 }

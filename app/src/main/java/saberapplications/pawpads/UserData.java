@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.widget.Toast;
 
+import saberapplications.pawpads.ui.home.MainActivity;
+
 /**
  * Created by blaze on 9/9/2015.
  */
@@ -17,7 +19,6 @@ public class UserData {
     public String[] descr;
     public String[] geol;
     public String[] upics;
-    public String[] email;
     public String regToken;
 
     public void getUserData(){
@@ -46,12 +47,11 @@ public class UserData {
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
-                UserData.this.descr = returnedUser.profile;
-                UserData.this.email = returnedUser.email;
                 UserData.this.upics = returnedUser.pic;
                 UserData.this.geol = returnedUser.distance;
                 UserData.this.user = returnedUser.username;
-                        ((MainActivity) UserData.this.mContext).setListView(returnedUser);
+                UserData.this.descr = returnedUser.profile;
+                ((MainActivity) UserData.this.mContext).setListView(returnedUser);
             }
         });
     }

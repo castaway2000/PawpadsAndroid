@@ -5,11 +5,15 @@ package saberapplications.pawpads;
  */
 public class ChatObject {
 
-    String message, type;
+    String message;
 
     public String getType() {
         return type;
     }
+
+    String type;
+    public static final String SENT="sent";
+    public static final String RECEIVED="received";
 
     public ChatObject(String message, String type) {
         this.message = message;
@@ -17,6 +21,7 @@ public class ChatObject {
     }
 
     public String getMessage() {
+
         return message;
     }
 

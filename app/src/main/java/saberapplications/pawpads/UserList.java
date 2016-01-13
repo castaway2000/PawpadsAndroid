@@ -6,13 +6,12 @@ package saberapplications.pawpads;
  */
 public class UserList{
 
-    public String[] username, profile, pic, distance, email;
+    public String[] username, profile, pic, distance;
 
-        public UserList (String[] username, String[] profile, String[] pic, String[] distance, String[] email){
+        public UserList (String[] username, String[] profile, String[] pic, String[] distance){
             this.username = username;
             this.profile = profile;
             this.pic = pic;
             this.distance = distance;
-            this.email = email;
         }
 }

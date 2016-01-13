@@ -6,6 +6,7 @@ package saberapplications.pawpads;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
 
 //gets layout info and passes text data in.
 class CustomAdapter extends ArrayAdapter<String> {
@@ -24,15 +25,13 @@ class CustomAdapter extends ArrayAdapter<String> {
     final String[] user;
     final String[] geoloc;
     final String[] descrip;
-    final String[] email;
 
-    public CustomAdapter(Context context, String[] user, String[] pics, String[] descrip, String[] geoloc, String[] email) {
+    public CustomAdapter(Context context, String[] user, String[] pics, String[] descrip, String[] geoloc) {
         super(context, R.layout.custom_row, user);
         this.pics = pics;
         this.geoloc = geoloc;
         this.descrip = descrip;
         this.user = user;
-        this.email = email;
     }
 
     @Override
