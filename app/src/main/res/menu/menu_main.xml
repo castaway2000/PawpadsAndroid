@@ -11,6 +11,11 @@
     <item
         android:id="@+id/action_logout"
         android:title="Logout"
+        android:orderInCategory="120"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_dialogs_activity"
+        android:title="@string/show_dialogs"
         android:orderInCategory="110"
         app:showAsAction="never" />
 

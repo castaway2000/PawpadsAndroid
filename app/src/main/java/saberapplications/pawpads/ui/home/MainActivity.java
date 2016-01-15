@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import saberapplications.pawpads.profilepage;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.Login;
@@ -59,6 +60,7 @@ import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.profileEditPage;
+import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -99,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                                                 QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
                                                     @Override
                                                     public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
-                                                        if (result.size()==0) return;
-                                                        openChat(result.get(0));
+//                                                        if (result.size()==0) return;
+//                                                        openChat(result.get(0),);
                                                     }
                                                 });
 
@@ -201,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             case R.id.action_profileID:
                 Intent i = new Intent(MainActivity.this, profileEditPage.class);
                 startActivity(i);
-                finish();
                 return true;
 
             case R.id.action_logout:
@@ -210,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 userLocalStore.setUserLoggedIn(false);
                 startActivity(new Intent(this, Login.class));
                 finish();
+            case R.id.action_dialogs_activity:
+                startActivity(new Intent(this, DialogsListActivity.class));
+
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -356,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                         @Override
                         public void onSuccess(QBDialog result, Bundle params) {
-                            openChat(result);
+                            openChat(result,user);
                         }
 
                         @Override
@@ -366,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     });
 
                 } else {
-                    openChat(result.get(0));
+                    openChat(result.get(0),user );
                 }
             }
 
@@ -377,9 +381,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         });
 
     }
-    private void openChat(QBDialog dialog){
-        Intent intent=new Intent(MainActivity.this,ChatActivity.class);
+    private void openChat(QBDialog dialog,QBUser user ){
+//        Intent intent=new Intent(MainActivity.this,ChatActivity.class);
+//        intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+//        startActivity(intent);
+        Intent intent=new Intent(MainActivity.this,profilepage.class);
         intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+        intent.putExtra(Util.USER_NAME,user.getFullName());
+        intent.putExtra(Util.USER_INFO,user.getCustomData());
+        intent.putExtra(Util.USER_AVATAR_PATH,"");
+        intent.putExtra(Util.USER_LOCATION,"");
         startActivity(intent);
     }
 

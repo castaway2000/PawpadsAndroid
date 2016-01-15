@@ -68,6 +68,10 @@
             android:name=".ui.chat.ChatActivity"
             android:label="Chat" >
         </activity>
+        <activity
+            android:name=".ui.dialogs.DialogsListActivity"
+            android:label="DialogsList" >
+        </activity>
 
         <activity
             android:name=".profileEditPage"
