@@ -2,9 +2,7 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +15,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 
 import saberapplications.pawpads.ui.chat.ChatActivity;
-import saberapplications.pawpads.ui.home.MainActivity;
 
 public class profilepage extends AppCompatActivity {
     private QBDialog dialog;
@@ -26,7 +23,6 @@ public class profilepage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profilepage);
-
 //        //receiving data from listview
         String userName = getIntent().getExtras().getString(Util.USER_NAME, "");
         String userInfo = getIntent().getExtras().getString(Util.USER_INFO, "");
