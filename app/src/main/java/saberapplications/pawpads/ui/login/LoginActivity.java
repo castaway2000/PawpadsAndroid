@@ -1,4 +1,4 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui.login;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -17,15 +17,19 @@ import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import java.util.Calendar;
 import java.util.List;
 
+import saberapplications.pawpads.R;
+import saberapplications.pawpads.Register;
+import saberapplications.pawpads.User;
+import saberapplications.pawpads.UserLocalStore;
+import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.home.MainActivity;
 
 /**
  * Created by blaze on 10/21/2015.
  */
-public class Login  extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     UserLocalStore userLocalStore;
     Button bLogin;
     EditText etUsername, etPassword;
@@ -67,27 +71,27 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
                         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
                             @Override
                             public void onSuccess(QBUser user, Bundle params) {
-                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Login.this).edit();
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
                                 editor.putString(Util.QB_USER, username);
                                 editor.putString(Util.USER_NAME, username);
                                 editor.putString(Util.QB_PASSWORD, password);
                                 editor.putInt(Util.QB_USERID, user.getId());
                                 editor.apply();
-                                Intent intent = new Intent(Login.this, MainActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
 
                                 finish();
                             }
                             @Override
                             public void onError(List<String> errors) {
-                                Util.onError(errors, Login.this);
+                                Util.onError(errors, LoginActivity.this);
                             }
                         });
                     }
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,Login.this);
+                        Util.onError(errors,LoginActivity.this);
                     }
                 });
 
@@ -102,7 +106,7 @@ public class Login  extends AppCompatActivity implements View.OnClickListener{
 
 
     private void showErrorMessage(){
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Login.this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
         dialogBuilder.setMessage("Incorrect username or Password");
         dialogBuilder.setPositiveButton("Ok", null);
         dialogBuilder.show();

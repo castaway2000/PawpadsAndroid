@@ -37,6 +37,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.messages.QBMessages;
@@ -52,9 +53,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import saberapplications.pawpads.profilepage;
+import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.GPS;
-import saberapplications.pawpads.Login;
+import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
@@ -63,7 +65,7 @@ import saberapplications.pawpads.profileEditPage;
 import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     String TAG = "MAIN";
     GoogleCloudMessaging gcm;
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        prefs=PreferenceManager.getDefaultSharedPreferences(this);
         context = getApplicationContext();
         listView = (ListView) findViewById(R.id.listView);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 userLocalStore = new UserLocalStore(this);
                 userLocalStore.clearUserData();
                 userLocalStore.setUserLoggedIn(false);
-                startActivity(new Intent(this, Login.class));
+                startActivity(new Intent(this, LoginActivity.class));
                 finish();
             case R.id.action_dialogs_activity:
                 startActivity(new Intent(this, DialogsListActivity.class));
@@ -220,116 +222,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        try {
-            if (QBAuth.getBaseService().getToken()!=null){
-                init();
-            }else{
-                prefs=PreferenceManager.getDefaultSharedPreferences(this);
-                QBAuth.createSession(prefs.getString(Util.QB_USER,""),prefs.getString(Util.QB_PASSWORD,""),
-                        new QBEntityCallbackImpl<QBSession>(){
-                            @Override
-                            public void onSuccess(QBSession result, Bundle params) {
-                                init();
-                            }
 
-                            @Override
-                            public void onError(List<String> errors) {
-                                startActivity(new Intent(MainActivity.this, Login.class));
-                                finish();
-
-                            }
-                        });
-            }
-        } catch (BaseServiceException e) {
-            prefs=PreferenceManager.getDefaultSharedPreferences(this);
-            QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
-                    new QBEntityCallbackImpl<QBSession>() {
-                        @Override
-                        public void onSuccess(QBSession result, Bundle params) {
-                            init();
-                        }
-
-                        @Override
-                        public void onError(List<String> errors) {
-                            startActivity(new Intent(MainActivity.this, Login.class));
-                            finish();
-
-                        }
-                    });
-        }
-
-
-
-
-    }
-    protected void  init(){
-        QBChatService chatService=null;
-        if (!QBChatService.isInitialized()) {
-            QBChatService.init(context);
-        }
-        chatService = QBChatService.getInstance();
-
-
-
-
-        prefs=PreferenceManager.getDefaultSharedPreferences(this);
-        final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER,""),prefs.getString(Util.QB_PASSWORD,""));
-        qbUser.setId(prefs.getInt(Util.QB_USERID, 0));
-        chatService.login(qbUser, new QBEntityCallbackImpl() {
-            @Override
-            public void onSuccess() {
-                try {
-                    QBChatService.getInstance().startAutoSendPresence(60);
-
-                    QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener( chatListener);
-
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(List errors) {
-                // errror
-            }
-        });
-
-
-
-        loadUsers();
-
-        if (!isUserRegistered(context)) {
-
-
-            if (checkPlayServices()) {
-                gcm = GoogleCloudMessaging.getInstance(this);
-                regid = getRegistrationId(context);
-
-                if (regid.isEmpty()) {
-                    registerInBackground();
-                }else {
-                    sendRegistrationIdToBackend(regid);
-                }
-
-
-            } else {
-                Log.i("MAIN", "No valid Google Play Services APK found.");
-            }
-        }
-        listView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        performClickAction(position);
-                    }
-                }
-        );
-
-
-    }
 
 
 
@@ -395,41 +288,80 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     protected void loadUsers(){
-        prefs=PreferenceManager.getDefaultSharedPreferences(this);
+
         QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
+        pagedRequestBuilder.setPerPage(10);
         pagedRequestBuilder.setPage(1);
-        pagedRequestBuilder.setPerPage(100);
-        QBUsers.getUsers(pagedRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBUser>>() {
-            @Override
-            public void onSuccess(ArrayList<QBUser> users, Bundle params) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                int currentUserId = prefs.getInt(Util.QB_USERID, 0);
-                for (int i = 0; i < users.size(); i++) {
+        QBUsers.getUsers(pagedRequestBuilder, qbUsersCallback);
 
-                    if (users.get(i).getId() == currentUserId) {
-                        users.remove(i);
-
-                    }
-                }
-
-                adapter = new UserListAdapter(context, 0, users);
-                listView.setAdapter(adapter);
-            }
-
-            @Override
-            public void onError(List<String> errors) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                Util.onError(errors, MainActivity.this);
-            }
-        });
     }
+    private QBEntityCallbackImpl<ArrayList<QBUser>> qbUsersCallback= new QBEntityCallbackImpl<ArrayList<QBUser>>() {
+        @Override
+        public void onSuccess(ArrayList<QBUser> users, Bundle params) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            int currentUserId = prefs.getInt(Util.QB_USERID, 0);
+            for (int i = 0; i < users.size(); i++) {
+
+                if (users.get(i).getId() == currentUserId) {
+                    users.remove(i);
+
+                }
+            }
+
+            adapter = new UserListAdapter(context, 0, users);
+            listView.setAdapter(adapter);
+        }
+
+        @Override
+        public void onError(List<String> errors) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            Util.onError(errors, MainActivity.this);
+        }
+    };
 
     @Override
     protected void onStop() {
-        super.onStop();
         if (QBChatService.isInitialized()) {
             QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
         }
+        super.onStop();
+
+    }
+
+    @Override
+    public void onQBConnect() {
+
+        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+
+        loadUsers();
+
+        if (!isUserRegistered(context)) {
+
+
+            if (checkPlayServices()) {
+                gcm = GoogleCloudMessaging.getInstance(this);
+                regid = getRegistrationId(context);
+
+                if (regid.isEmpty()) {
+                    registerInBackground();
+                }else {
+                    sendRegistrationIdToBackend(regid);
+                }
+
+
+            } else {
+                Log.i("MAIN", "No valid Google Play Services APK found.");
+            }
+        }
+        listView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        performClickAction(position);
+                    }
+                }
+        );
+
     }
 
     @Override
