@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
+import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -25,39 +26,28 @@ import saberapplications.pawpads.ui.login.LoginActivity;
  * Created by Stas on 22.01.16.
  */
 public abstract class BaseActivity extends AppCompatActivity {
-    private static int openActivitiesCount;
+    public static int openActivitiesCount = 0;
 
     @Override
     protected void onStart() {
-        openActivitiesCount++;
         super.onStart();
-        if (!isConnected()) {
-            recreateSession();
-        }else{
-            onQBConnect();
-        }
-
+//        openActivitiesCount++;
+//        if (!isConnected()) {
+        recreateSession();
+//        } else {
+//            onQBConnect();
+//        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        openActivitiesCount--;
-        if (openActivitiesCount==0){
-            logOut();
 
-        }
+        logOut();
+
     }
 
-    private boolean isConnected(){
-        try{
-            return QBChatService.isInitialized() && QBAuth.getSession()!=null && QBAuth.getSession().getToken()!=null;
-        }catch (Exception e){
-            return  false;
-        }
-    }
-
-    protected  void recreateSession(){
+    protected void recreateSession() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
                 new QBEntityCallbackImpl<QBSession>() {
@@ -80,46 +70,68 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
-    protected void loginToChat(){
+    protected void loginToChat() {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(getBaseContext());
         }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER,""),prefs.getString(Util.QB_PASSWORD,""));
+        final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""));
         qbUser.setId(prefs.getInt(Util.QB_USERID, 0));
-
-        QBChatService.getInstance().login(qbUser, new QBEntityCallbackImpl() {
-            @Override
-            public void onSuccess() {
-                try {
-                    QBChatService.getInstance().startAutoSendPresence(60);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            onQBConnect();
-                        }
-                    });
-
-
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
+        if (QBChatService.getInstance().isLoggedIn()) {
+            try {
+                if (QBChatService.getInstance() != null) {
+                    onQBConnect();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            @Override
-            public void onError(List errors) {
-                Util.onError(errors, getBaseContext());
-            }
-        });
+        } else
+
+        {
+            QBChatService.getInstance().login(qbUser, new QBEntityCallbackImpl() {
+                @Override
+                public void onSuccess() {
+                    try {
+                        QBChatService.getInstance().startAutoSendPresence(60);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    if (QBChatService.getInstance() != null) {
+                                        onQBConnect();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
+                    } catch (SmackException.NotLoggedInException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(List errors) {
+                    Util.onError(errors, getBaseContext());
+                }
+            });
+        }
 
     }
-    protected void logOut(){
+
+    protected void logOut() {
         try {
-            QBChatService.getInstance().logout();
-        } catch (SmackException.NotConnectedException e) {
+            if (QBChatService.isInitialized()) {
+                QBChatService.getInstance().logout();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public abstract void onQBConnect();
+
+    public abstract void onQBConnect() throws Exception;
 
 }

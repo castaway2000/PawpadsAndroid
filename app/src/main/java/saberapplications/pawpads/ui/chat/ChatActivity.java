@@ -1,7 +1,9 @@
 package saberapplications.pawpads.ui.chat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,6 +22,7 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 
@@ -29,11 +32,29 @@ import java.util.List;
 import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.ui.BaseActivity;
 
 
-public class ChatActivity extends Activity {
+public class ChatActivity extends BaseActivity {
+    private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
+        @Override
+        public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
+            if (!createdLocally) {
+                qbPrivateChat.addMessageListener(new QBMessageListener() {
+                    @Override
+                    public void processMessage(final QBChat qbChat, final QBChatMessage qbChatMessage) {
+                        chatAdapter.notifyDataSetChanged();
+                    }
 
-    public static final String EXTRA_DIALOG ="dialog" ;
+                    @Override
+                    public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
+
+                    }
+                });
+            }
+        }
+    };
+    public static final String EXTRA_DIALOG = "dialog";
     //EditText editText_mail_id;
     EditText editText_chat_message;
     ListView listView_chat_messages;
@@ -43,7 +64,7 @@ public class ChatActivity extends Activity {
     private QBDialog dialog;
     private ChatAdapter chatAdapter;
 
-    private QBMessageListener messageListener =new QBMessageListener() {
+    private QBMessageListener messageListener = new QBMessageListener() {
         @Override
         public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
             ChatActivity.this.runOnUiThread(new Runnable() {
@@ -65,7 +86,7 @@ public class ChatActivity extends Activity {
     QBPrivateChatManagerListener privateChatManagerListener = new QBPrivateChatManagerListener() {
         @Override
         public void chatCreated(final QBPrivateChat privateChat, final boolean createdLocally) {
-            if(!createdLocally){
+            if (!createdLocally) {
                 privateChat.addMessageListener(messageListener);
             }
         }
@@ -80,13 +101,30 @@ public class ChatActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
-
+        if (getIntent() != null) {
+            dialog = (QBDialog) getIntent().getSerializableExtra(EXTRA_DIALOG);
+        } else if (savedInstanceState != null) {
+            dialog = (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
+        }
 
         //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
         //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    public void onQBConnect() {
+//        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
         final String recipient = getIntent().getExtras().getString("user", null);
         final String displayPic = getIntent().getExtras().getString("image", null);
-        ((android.widget.TextView)findViewById(R.id.chat_header_recipient_name)).setText(recipient);
+        ((android.widget.TextView) findViewById(R.id.chat_header_recipient_name)).setText(recipient);
         ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
         ImageLoader il = ImageLoader.getInstance();
         il.displayImage(displayPic, iv);
@@ -104,11 +142,11 @@ public class ChatActivity extends Activity {
                 msg.setRecipientId(sendTo);
                 msg.setDialogId(dialog.getDialogId());
                 msg.setProperty("send_to_chat", "1");
-                QBChatService.createMessage(msg,new QBEntityCallbackImpl<QBChatMessage>(){
+                QBChatService.createMessage(msg, new QBEntityCallbackImpl<QBChatMessage>() {
                     @Override
                     public void onSuccess(QBChatMessage result, Bundle params) {
                         super.onSuccess(result, params);
-                        showChat(ChatObject.SENT,result.getBody());
+                        showChat(ChatObject.SENT, result.getBody());
                     }
                 });
 
@@ -116,11 +154,7 @@ public class ChatActivity extends Activity {
             }
         });
 
-        if (getIntent()!=null){
-            dialog = (QBDialog) getIntent().getSerializableExtra(EXTRA_DIALOG);
-        }else if(savedInstanceState!=null){
-            dialog= (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
-        }
+
 
 
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
@@ -133,7 +167,7 @@ public class ChatActivity extends Activity {
                     chat_list = new ArrayList<>();
                 }
                 for (QBChatMessage qbChatMessage : result) {
-                    String type = currentUserId.equals( qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
+                    String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
                     chat_list.add(new
                             ChatObject(qbChatMessage.getBody(), type));
 
@@ -147,20 +181,13 @@ public class ChatActivity extends Activity {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ChatActivity.this);
         currentUserId = prefs.getInt(Util.QB_USERID, 0);
-        sendTo=0;
-        for(Integer userid:dialog.getOccupants()){
-            if (userid.intValue()!=currentUserId){
-                sendTo=userid;
+        sendTo = 0;
+        for (Integer userid : dialog.getOccupants()) {
+            if (userid.intValue() != currentUserId) {
+                sendTo = userid;
             }
         }
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
     }
 
     private void showChat(String type, String message) {
@@ -178,6 +205,6 @@ public class ChatActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(EXTRA_DIALOG,dialog);
+        outState.putSerializable(EXTRA_DIALOG, dialog);
     }
 }

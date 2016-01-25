@@ -58,7 +58,7 @@ public class DialogsAdapter extends BaseAdapter {
             lastDate.setText(lastDateFormat);
             lastMessage.setText(dialog.getLastMessage());
             if(dialog.getUnreadMessageCount()>0){
-                convertView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
+                view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
             }
         return view;
     }

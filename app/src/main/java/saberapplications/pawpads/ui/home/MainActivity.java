@@ -35,6 +35,7 @@ import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
@@ -80,7 +81,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
 
-    private QBPrivateChatManagerListener chatListener=new QBPrivateChatManagerListener() {
+    private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
         @Override
         public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
             if (!createdLocally) {
@@ -103,8 +104,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                                 QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
                                                     @Override
                                                     public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
-//                                                        if (result.size()==0) return;
-//                                                        openChat(result.get(0),);
+                                                        if (result.size() == 0) return;
+                                                        openChat(result.get(0));
+
                                                     }
                                                 });
 
@@ -128,12 +130,17 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     };
 
+    @Override
+    protected void onStart() {
+        BaseActivity.openActivitiesCount++;
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        prefs=PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         context = getApplicationContext();
         listView = (ListView) findViewById(R.id.listView);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
@@ -213,8 +220,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 userLocalStore.setUserLoggedIn(false);
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
+                return true;
             case R.id.action_dialogs_activity:
                 startActivity(new Intent(this, DialogsListActivity.class));
+                return true;
 
 
             default:
@@ -223,12 +232,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     }
 
 
-
-
-
     public void setListView(UserList userList) {
         //final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
-      //  listView.setAdapter(listAdapter);
+        //  listView.setAdapter(listAdapter);
 
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -253,7 +259,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
                         @Override
                         public void onSuccess(QBDialog result, Bundle params) {
-                            openChat(result,user);
+                            openChat(result, user);
                         }
 
                         @Override
@@ -263,7 +269,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                     });
 
                 } else {
-                    openChat(result.get(0),user );
+                    openChat(result.get(0), user);
                 }
             }
 
@@ -274,20 +280,45 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         });
 
     }
-    private void openChat(QBDialog dialog,QBUser user ){
-//        Intent intent=new Intent(MainActivity.this,ChatActivity.class);
-//        intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
-//        startActivity(intent);
-        Intent intent=new Intent(MainActivity.this,profilepage.class);
+
+    private void openChat(QBDialog dialog, QBUser user) {
+
+        Intent intent = new Intent(MainActivity.this, profilepage.class);
         intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
-        intent.putExtra(Util.USER_NAME,user.getFullName());
-        intent.putExtra(Util.USER_INFO,user.getCustomData());
-        intent.putExtra(Util.USER_AVATAR_PATH,"");
-        intent.putExtra(Util.USER_LOCATION,"");
+        intent.putExtra(Util.USER_NAME, user.getFullName());
+        intent.putExtra(Util.USER_INFO, user.getCustomData());
+        intent.putExtra(Util.USER_AVATAR_PATH, "");
+        intent.putExtra(Util.USER_LOCATION, "");
         startActivity(intent);
     }
 
-    protected void loadUsers(){
+    private void openChat(final QBDialog dialog) {
+        QBUsers.getUser(dialog.getUserId(), new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                Intent intent = new Intent(MainActivity.this, profilepage.class);
+                intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+                intent.putExtra(Util.USER_NAME, qbUser.getFullName());
+                intent.putExtra(Util.USER_INFO, qbUser.getCustomData());
+                intent.putExtra(Util.USER_AVATAR_PATH, "");
+                intent.putExtra(Util.USER_LOCATION, "");
+                startActivity(intent);
+            }
+
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(List<String> list) {
+
+            }
+        });
+
+    }
+
+    protected void loadUsers() {
 
         QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
         pagedRequestBuilder.setPerPage(10);
@@ -295,7 +326,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         QBUsers.getUsers(pagedRequestBuilder, qbUsersCallback);
 
     }
-    private QBEntityCallbackImpl<ArrayList<QBUser>> qbUsersCallback= new QBEntityCallbackImpl<ArrayList<QBUser>>() {
+
+    private QBEntityCallbackImpl<ArrayList<QBUser>> qbUsersCallback = new QBEntityCallbackImpl<ArrayList<QBUser>>() {
         @Override
         public void onSuccess(ArrayList<QBUser> users, Bundle params) {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -329,7 +361,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onQBConnect() {
+    public void onQBConnect() throws Exception{
 
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
 
@@ -344,7 +376,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
                 if (regid.isEmpty()) {
                     registerInBackground();
-                }else {
+                } else {
                     sendRegistrationIdToBackend(regid);
                 }
 
@@ -378,7 +410,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
 
     private void registerInBackground() {
-        new AsyncTask<Void,Void,String>() {
+        new AsyncTask<Void, Void, String>() {
 
 
             @Override
@@ -451,7 +483,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     }
 
 
-
     private SharedPreferences getGCMPreferences(Context context) {
         // This sample app persists the registration ID in shared preferences, but
         // how you store the registration ID in your app is up to you.
@@ -462,7 +493,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     //  private RequestQueue mRequestQueue;
     private void sendRegistrationIdToBackend(String registrationID) {
-        String deviceId =Build.MANUFACTURER+" "+Build.MODEL;
+        String deviceId = Build.MANUFACTURER + " " + Build.MODEL;
 
         QBMessages.subscribeToPushNotificationsTask(registrationID, deviceId, QBEnvironment.DEVELOPMENT, new QBEntityCallbackImpl<ArrayList<QBSubscription>>() {
             @Override
@@ -480,25 +511,24 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     /**
      * Handle the result of a request for permissions.
-     *
+     * <p/>
      * Watches for the result of a request for permission to use fine location (GPS) data.
      * If the request was granted, continue processing.
      * If the request was denied, stop; the application needs location data to work and cannot be
      * used without permission to use location data.
      *
-     * @param requestCode The ID of the permissions request.
-     * @param permissions The permissions that were requested.
+     * @param requestCode  The ID of the permissions request.
+     * @param permissions  The permissions that were requested.
      * @param grantResults The grant or denial for each requested permission.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch(requestCode) {
+        switch (requestCode) {
             case GPS.PermissionRequestId:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // TODO continue processing
                     android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
-                }
-                else {
+                } else {
                     // TODO stop login
                     android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
                 }
