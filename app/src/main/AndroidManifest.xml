@@ -48,7 +48,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Login"
+            android:name=".ui.login.LoginActivity"
             android:label="PawPads" >
             <intent-filter>
                 <action android:name="android.intent.action.Login" />

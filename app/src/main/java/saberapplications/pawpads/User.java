@@ -4,7 +4,7 @@ package saberapplications.pawpads;
  * Created by blaze on 10/21/2015.
  */
 public class User{
-    String username, password, email, regid;
+    public String username, password, email, regid;
     Double lat, lng;
 
     public User (Double lat, Double lng, String user, String pass){
