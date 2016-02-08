@@ -71,7 +71,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
         proDescr = (EditText) findViewById(R.id.editProfileText);
-        textOut = (EditText) findViewById(R.id.editProfileText);
+//        textOut = (EditText) findViewById(R.id.editProfileText);
 
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
