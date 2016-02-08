@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,8 +22,6 @@ import android.widget.ListView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
@@ -37,33 +34,32 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.core.exception.BaseServiceException;
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.location.QBLocations;
+import com.quickblox.location.model.QBLocation;
+import com.quickblox.location.request.QBLocationRequestBuilder;
+import com.quickblox.location.request.SortField;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.SmackException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import saberapplications.pawpads.profilepage;
-import saberapplications.pawpads.ui.BaseActivity;
-import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.GPS;
-import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.profileEditPage;
+import saberapplications.pawpads.profilepage;
+import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
+import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -288,7 +284,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         intent.putExtra(Util.USER_NAME, user.getFullName());
         intent.putExtra(Util.USER_INFO, user.getCustomData());
         intent.putExtra(Util.USER_AVATAR_PATH, "");
-        intent.putExtra(Util.USER_LOCATION, "");
         startActivity(intent);
     }
 
@@ -301,7 +296,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 intent.putExtra(Util.USER_NAME, qbUser.getFullName());
                 intent.putExtra(Util.USER_INFO, qbUser.getCustomData());
                 intent.putExtra(Util.USER_AVATAR_PATH, "");
-                intent.putExtra(Util.USER_LOCATION, "");
                 startActivity(intent);
             }
 
@@ -318,30 +312,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     }
 
-    protected void loadUsers() {
-
-        QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
-        pagedRequestBuilder.setPerPage(10);
-        pagedRequestBuilder.setPage(1);
-        QBUsers.getUsers(pagedRequestBuilder, qbUsersCallback);
-
-    }
 
     private QBEntityCallbackImpl<ArrayList<QBUser>> qbUsersCallback = new QBEntityCallbackImpl<ArrayList<QBUser>>() {
         @Override
-        public void onSuccess(ArrayList<QBUser> users, Bundle params) {
-            mSwipeRefreshLayout.setRefreshing(false);
-            int currentUserId = prefs.getInt(Util.QB_USERID, 0);
-            for (int i = 0; i < users.size(); i++) {
-
-                if (users.get(i).getId() == currentUserId) {
-                    users.remove(i);
-
-                }
-            }
-
-            adapter = new UserListAdapter(context, 0, users);
-            listView.setAdapter(adapter);
+        public void onSuccess(final ArrayList<QBUser> users, Bundle params) {
+            loadAndSetNearUsers();
         }
 
         @Override
@@ -361,11 +336,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onQBConnect() throws Exception{
+    public void onQBConnect() throws Exception {
 
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
 
-        loadUsers();
+        loadAndSetNearUsers();
 
         if (!isUserRegistered(context)) {
 
@@ -399,7 +374,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
 
-        loadUsers();
+       loadAndSetNearUsers();
     }
 
 
@@ -538,6 +513,37 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     }
 
+    private void loadAndSetNearUsers() {
+
+        final int currentUserId = prefs.getInt(Util.QB_USERID, 0);
+        final ArrayList<QBUser> nearUsers = new ArrayList<>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
+        Double latitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LAT, ""));
+        Double longitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LONG, ""));
+        getLocationsBuilder.setRadius(latitude, longitude, 10);
+        getLocationsBuilder.setSort(SortField.DISTANCE);
+
+        QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
+            @Override
+            public void onSuccess(ArrayList<QBLocation> locations, Bundle params) {
+                for (QBLocation qbLocation : locations) {
+                    if (qbLocation.getUser().getId() != currentUserId && !nearUsers.contains(qbLocation.getUser())) {
+                        nearUsers.add(qbLocation.getUser());
+                    }
+                }
+                adapter = new UserListAdapter(context, 0, nearUsers);
+                listView.setAdapter(adapter);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+                mSwipeRefreshLayout.setRefreshing(false);
+                Util.onError(errors, MainActivity.this);
+            }
+        });
+    }
 }
 
 

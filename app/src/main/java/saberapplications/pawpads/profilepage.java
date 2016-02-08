@@ -31,12 +31,14 @@ public class profilepage extends AppCompatActivity {
         String userName = getIntent().getExtras().getString(Util.USER_NAME, "");
         String userInfo = getIntent().getExtras().getString(Util.USER_INFO, "");
         final String imgVal = getIntent().getExtras().getString(Util.USER_AVATAR_PATH, "");
-        String loc = getIntent().getExtras().getString(Util.USER_LOCATION, "");
+//        String loc = getIntent().getExtras().getString(Util.USER_LOCATION, "");
         dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.EXTRA_DIALOG);
 //        //setting new data into profile
         String newTitle = "PawPads | " + userName;
         ImageView iv = (ImageView) findViewById(R.id.profilepic);
         TextView tv = (TextView) findViewById(R.id.profileinfo);
+//        TextView userLocation = (TextView) findViewById(R.id.userLocation);
+//        userLocation.setText(loc);
 //
 //        //this is getting an async task that is setting the image.
 //        //TODO: make this from local stored variable.

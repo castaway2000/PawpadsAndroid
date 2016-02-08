@@ -1,7 +1,10 @@
 package saberapplications.pawpads.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,8 @@ import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.location.QBLocations;
+import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -27,10 +32,12 @@ import saberapplications.pawpads.ui.login.LoginActivity;
  */
 public abstract class BaseActivity extends AppCompatActivity {
     public static int openActivitiesCount = 0;
+    private LocationManager locationManager;
 
     @Override
     protected void onStart() {
         super.onStart();
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 //        openActivitiesCount++;
 //        if (!isConnected()) {
         recreateSession();
@@ -49,13 +56,33 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void recreateSession() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
                 new QBEntityCallbackImpl<QBSession>() {
                     @Override
-                    public void onSuccess(QBSession result, Bundle params) {
-                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
-                        editor.putInt(Util.QB_USERID, result.getUserId());
-                        editor.apply();
+                    public void onSuccess(final QBSession result, Bundle params) {
+                        String locationGPSProvider = LocationManager.GPS_PROVIDER;
+                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
+
+                        double latitude = lastKnownLocation.getLatitude();
+                        double longitude = lastKnownLocation.getLongitude();
+                        QBLocation location = new QBLocation(latitude, longitude);
+                        location.setUserId(result.getUserId());
+                        QBLocations.createLocation(location, new QBEntityCallbackImpl<QBLocation>() {
+                            @Override
+                            public void onSuccess(QBLocation qbLocation, Bundle args) {
+                                editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
+                                editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
+                                editor.putInt(Util.QB_USERID, result.getUserId());
+                                editor.apply();
+                            }
+
+                            @Override
+                            public void onError(List<String> errors) {
+
+                            }
+                        });
+
                         loginToChat();
 
                     }

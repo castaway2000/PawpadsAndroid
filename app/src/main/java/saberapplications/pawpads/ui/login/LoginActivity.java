@@ -1,8 +1,11 @@
 package saberapplications.pawpads.ui.login;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +17,8 @@ import android.widget.TextView;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.location.QBLocations;
+import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -34,13 +39,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button bLogin;
     EditText etUsername, etPassword;
     TextView registerLink;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setTitle("PawPads | Login");
-
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         etUsername = (EditText) findViewById(R.id.etUsername);
         etPassword = (EditText) findViewById(R.id.etPassword);
         bLogin = (Button) findViewById(R.id.bLogin);
@@ -68,15 +74,36 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         qbUser.setLogin(username);
                         qbUser.setPassword(password);
 
+
                         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
                             @Override
-                            public void onSuccess(QBUser user, Bundle params) {
-                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
-                                editor.putString(Util.QB_USER, username);
-                                editor.putString(Util.USER_NAME, username);
-                                editor.putString(Util.QB_PASSWORD, password);
-                                editor.putInt(Util.QB_USERID, user.getId());
-                                editor.apply();
+                            public void onSuccess(final QBUser user, Bundle params) {
+                                final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
+                                String locationGPSProvider = LocationManager.GPS_PROVIDER;
+                                Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
+
+                                double latitude = lastKnownLocation.getLatitude();
+                                double longitude = lastKnownLocation.getLongitude();
+                                QBLocation location = new QBLocation(latitude, longitude);
+                                location.setUserId(user.getId());
+                                QBLocations.createLocation(location, new QBEntityCallbackImpl<QBLocation>() {
+                                    @Override
+                                    public void onSuccess(QBLocation qbLocation, Bundle args) {
+                                        editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
+                                        editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
+                                        editor.putString(Util.QB_USER, username);
+                                        editor.putString(Util.USER_NAME, username);
+                                        editor.putString(Util.QB_PASSWORD, password);
+                                        editor.putInt(Util.QB_USERID, user.getId());
+                                        editor.apply();
+                                    }
+
+                                    @Override
+                                    public void onError(List<String> errors) {
+
+                                    }
+                                });
+
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
 
