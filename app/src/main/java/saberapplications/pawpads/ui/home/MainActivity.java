@@ -144,7 +144,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
-
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
         setTitle("PawPads | " + userName);
 
     }
@@ -281,9 +286,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         Intent intent = new Intent(MainActivity.this, profilepage.class);
         intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
-        intent.putExtra(Util.USER_NAME, user.getFullName());
-        intent.putExtra(Util.USER_INFO, user.getCustomData());
-        intent.putExtra(Util.USER_AVATAR_PATH, "");
+        intent.putExtra(Util.QB_USERID, user.getId());
         startActivity(intent);
     }
 
@@ -293,9 +296,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 Intent intent = new Intent(MainActivity.this, profilepage.class);
                 intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
-                intent.putExtra(Util.USER_NAME, qbUser.getFullName());
-                intent.putExtra(Util.USER_INFO, qbUser.getCustomData());
-                intent.putExtra(Util.USER_AVATAR_PATH, "");
+                intent.putExtra(Util.QB_USERID, qbUser.getId());
                 startActivity(intent);
             }
 
