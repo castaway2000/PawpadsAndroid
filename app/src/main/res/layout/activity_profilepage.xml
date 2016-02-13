@@ -30,6 +30,15 @@
             android:layout_row="1"
             android:layout_column="0"
             android:layout_gravity="bottom|center" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="70dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/userLocation"
+            android:layout_row="5"
+            android:layout_column="0"
+            android:text="@string/profile"
+            android:layout_gravity="top|bottom" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -39,11 +48,7 @@
             android:layout_row="17"
             android:layout_column="0"
             android:text="@string/profile"
-            android:layout_gravity="top|bottom"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:nestedScrollingEnabled="false" />
+            android:layout_gravity="top|bottom" />
 
     </GridLayout>
 

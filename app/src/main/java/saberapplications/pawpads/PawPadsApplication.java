@@ -4,10 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
-import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBSettings;
-import com.quickblox.messages.model.QBDevice;
 
 import vc908.stickerfactory.StickersManager;
 
