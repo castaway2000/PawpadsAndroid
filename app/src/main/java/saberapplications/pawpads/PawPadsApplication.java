@@ -18,6 +18,7 @@ public class PawPadsApplication extends Application {
         QBSettings.getInstance().fastConfigInit(Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
         StickersManager.initialize(Util.STICKERS_API_KEY, this);
     }
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);

@@ -31,6 +31,11 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.squareup.picasso.Picasso;
 
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -86,7 +91,9 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 currentQbUser = qbUser;
-                proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
+                if(currentQbUser.getCustomData()!=null) {
+                    proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
+                }
                 if (currentQbUser.getFileId() != null) {
                     int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
 
@@ -343,17 +350,12 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "tempAvatar.jpg");
         try {
             OutputStream os = new FileOutputStream(file);
-
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            //read from is to buffer
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-            inputStream.close();
-            //flush OutputStream to write any buffered data to file
-            os.flush();
-            os.close();
+            Bitmap bmp = BitmapFactory.decodeStream(inputStream);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            InputStream in = new ByteArrayInputStream(bos.toByteArray());
+            ContentBody photo = new InputStreamBody(in, "image/jpeg", "filename");
+            photo.writeTo(os);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

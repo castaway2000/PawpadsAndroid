@@ -54,7 +54,9 @@ public class profilepage extends AppCompatActivity {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 currentQbUser = qbUser;
-                profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
+                if(currentQbUser.getCustomData()!=null) {
+                    profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
+                }
                 String newTitle = "PawPads | " + qbUser.getFullName();
                 setTitle(newTitle);
                 if (currentQbUser.getFileId() != null) {
