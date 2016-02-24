@@ -352,7 +352,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             OutputStream os = new FileOutputStream(file);
             Bitmap bmp = BitmapFactory.decodeStream(inputStream);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 10, bos);
             InputStream in = new ByteArrayInputStream(bos.toByteArray());
             ContentBody photo = new InputStreamBody(in, "image/jpeg", "filename");
             photo.writeTo(os);

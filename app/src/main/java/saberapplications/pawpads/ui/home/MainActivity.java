@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -246,8 +247,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         //occupants_ids
         QBRequestGetBuilder builder = new QBRequestGetBuilder();
-        final QBUser user = adapter.getItem(position);
-        builder.in("occupants_ids", user.getId());
+        final QBLocation qbLocation = adapter.getItem(position);
+        builder.in("occupants_ids", qbLocation.getUser().getId());
 
         QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
             @Override
@@ -256,11 +257,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 if (result.size() == 0) {
 
                     QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
-                    chatManager.createDialog(user.getId(), new QBEntityCallbackImpl<QBDialog>() {
+                    chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallbackImpl<QBDialog>() {
 
                         @Override
                         public void onSuccess(QBDialog result, Bundle params) {
-                            openChat(result, user);
+                            openChat(result, qbLocation.getUser());
                         }
 
                         @Override
@@ -270,7 +271,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                     });
 
                 } else {
-                    openChat(result.get(0), user);
+                    openChat(result.get(0), qbLocation.getUser());
                 }
             }
 
@@ -375,7 +376,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
 
-       loadAndSetNearUsers();
+        loadAndSetNearUsers();
     }
 
 
@@ -487,7 +488,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     /**
      * Handle the result of a request for permissions.
-     * <p/>
+     * <p>
      * Watches for the result of a request for permission to use fine location (GPS) data.
      * If the request was granted, continue processing.
      * If the request was denied, stop; the application needs location data to work and cannot be
@@ -517,23 +518,30 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     private void loadAndSetNearUsers() {
 
         final int currentUserId = prefs.getInt(Util.QB_USERID, 0);
-        final ArrayList<QBUser> nearUsers = new ArrayList<>();
+        final ArrayList<QBLocation> nearLocations = new ArrayList<>();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
         Double latitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LAT, ""));
         Double longitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LONG, ""));
-        getLocationsBuilder.setRadius(latitude, longitude, 10);
+        getLocationsBuilder.setRadius(latitude, longitude, 200);
+        getLocationsBuilder.setLastOnly();
         getLocationsBuilder.setSort(SortField.DISTANCE);
-
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
             @Override
             public void onSuccess(ArrayList<QBLocation> locations, Bundle params) {
                 for (QBLocation qbLocation : locations) {
-                    if (qbLocation.getUser().getId() != currentUserId && !nearUsers.contains(qbLocation.getUser())) {
-                        nearUsers.add(qbLocation.getUser());
+                    boolean isContain = false;
+                    for (QBLocation location : nearLocations) {
+                        if (location.getUserId().equals(qbLocation.getUserId())) {
+                            isContain = true;
+                            break;
+                        }
+                    }
+                    if (qbLocation.getUser().getId() != currentUserId && !isContain) {
+                        nearLocations.add(qbLocation);
                     }
                 }
-                adapter = new UserListAdapter(context, 0, nearUsers);
+                adapter = new UserListAdapter(context, 0, nearLocations);
                 listView.setAdapter(adapter);
                 mSwipeRefreshLayout.setRefreshing(false);
             }

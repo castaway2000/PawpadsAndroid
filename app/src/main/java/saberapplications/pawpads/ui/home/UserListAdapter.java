@@ -3,6 +3,8 @@ package saberapplications.pawpads.ui.home;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBProgressCallback;
+import com.quickblox.location.QBLocations;
+import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.model.QBUser;
 
 import java.io.InputStream;
@@ -30,9 +34,9 @@ import saberapplications.pawpads.Util;
 /**
  * Created by Stas on 28.12.15.
  */
-public class UserListAdapter extends ArrayAdapter<QBUser> {
+public class UserListAdapter extends ArrayAdapter<QBLocation> {
 
-    public UserListAdapter(Context context, int resource, List<QBUser> objects) {
+    public UserListAdapter(Context context, int resource, List<QBLocation> objects) {
         super(context, resource, objects);
     }
 
@@ -47,20 +51,31 @@ public class UserListAdapter extends ArrayAdapter<QBUser> {
         }
 
         //set username info
-        QBUser user = getItem(position);
+        QBLocation qbLocation = getItem(position);
         TextView blazetext = (TextView) customView.findViewById(R.id.blazeText);
-        blazetext.setText(user.getLogin());
+        blazetext.setText(qbLocation.getUser().getLogin());
+        String locationGPSProvider = LocationManager.GPS_PROVIDER;
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
 
+        if (lastKnownLocation == null) {
+            String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
+            lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
+        }
+        Location userLocation = new Location("");
+        userLocation.setLatitude(qbLocation.getLatitude());
+        userLocation.setLongitude(qbLocation.getLongitude());
+        int distanceTo = Math.round(lastKnownLocation.distanceTo(userLocation)/3.2808f);
         //gps coordinates
         TextView gps = (TextView) customView.findViewById(R.id.geoloc);
-        //gps.setText(geoloc[position]);
+        gps.setText(String.valueOf(distanceTo) + " feet");
 
         //set image sequence;
         ImageLoader imageloader = ImageLoader.getInstance();
         imageloader.init(ImageLoaderConfiguration.createDefault(getContext()));
         final ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
-        if (user.getFileId() != null) {
-            int userProfilePictureID = user.getFileId(); // user - an instance of QBUser class
+        if (qbLocation.getUser().getFileId() != null) {
+            int userProfilePictureID = qbLocation.getUser().getFileId(); // user - an instance of QBUser class
 
             QBContent.downloadFileTask(userProfilePictureID, new QBEntityCallback<InputStream>() {
                 @Override

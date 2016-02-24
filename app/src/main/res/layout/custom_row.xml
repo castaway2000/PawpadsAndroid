@@ -40,7 +40,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
         android:id="@+id/geoloc"
-        android:gravity="bottom|right"
+        android:gravity="center"
         android:layout_row="0"
         android:layout_column="13"
         android:layout_gravity="top|bottom|right"
