@@ -2,13 +2,13 @@ package saberapplications.pawpads;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
@@ -158,6 +157,8 @@ public class profilepage extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
             profileAvatar.setImageBitmap(bitmap);
+            profileInfo.setMovementMethod(new ScrollingMovementMethod());
+
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }

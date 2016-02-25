@@ -24,11 +24,12 @@
         android:text="Large Text"
         android:ellipsize="end"
         android:layout_margin="5dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textColor="#000000" />
 
 
     <TextView
-        android:textColor="@android:color/darker_gray"
+        android:textColor="#000000"
         android:id="@+id/dialog_date_last_message"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"

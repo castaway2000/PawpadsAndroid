@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     UserLocalStore userLocalStore;
     Button bLogin;
     EditText etUsername, etPassword;
-    TextView registerLink;
+    TextView registerLink, forgotpasswordLink;
     private LocationManager locationManager;
 
     @Override
@@ -51,10 +51,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         etPassword = (EditText) findViewById(R.id.etPassword);
         bLogin = (Button) findViewById(R.id.bLogin);
         registerLink = (TextView) findViewById(R.id.tvRegisterLink);
+        forgotpasswordLink = (TextView) findViewById(R.id.tvForgottenPassLink);
         userLocalStore = new UserLocalStore(this);
 
         bLogin.setOnClickListener(this);
         registerLink.setOnClickListener(this);
+        forgotpasswordLink.setOnClickListener(this);
+        //TODO: logic for forgotten password
     }
 
     @Override

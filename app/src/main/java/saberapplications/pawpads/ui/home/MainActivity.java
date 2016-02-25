@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import saberapplications.pawpads.About;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
@@ -226,7 +226,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             case R.id.action_dialogs_activity:
                 startActivity(new Intent(this, DialogsListActivity.class));
                 return true;
-
+            case R.id.action_about_devs:
+                startActivity(new Intent(this, About.class));
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

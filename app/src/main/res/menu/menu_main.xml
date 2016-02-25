@@ -3,11 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.MainActivity">
     <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_profileID"
         android:title="@string/action_profile"
         android:orderInCategory="100"
         app:showAsAction="never" />
-
     <item
         android:id="@+id/action_logout"
         android:title="Logout"
@@ -16,6 +20,11 @@
     <item
         android:id="@+id/action_dialogs_activity"
         android:title="@string/show_dialogs"
+        android:orderInCategory="110"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about_devs"
+        android:title="@string/About"
         android:orderInCategory="110"
         app:showAsAction="never" />
 

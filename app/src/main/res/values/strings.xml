@@ -6,4 +6,5 @@
     <string name="title_activity_chat">PawPads Chat</string>
     <string name="profile"/>
     <string name="show_dialogs">Show Dialogs</string>
+    <string name="About">About</string>
 </resources>

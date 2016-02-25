@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="#59d8ff">
+    android:background="#97159cc6">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipelayout"
@@ -41,16 +41,6 @@
                     android:text="Chat Now!" />
 
                 <TextView
-                    android:id="@+id/userLocation"
-                    android:layout_width="fill_parent"
-                    android:layout_height="70dp"
-                    android:layout_column="0"
-                    android:layout_gravity="top|bottom"
-                    android:layout_row="5"
-                    android:text="@string/profile"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <TextView
                     android:id="@+id/profileinfo"
                     android:layout_width="fill_parent"
                     android:layout_height="370dp"
@@ -58,6 +48,8 @@
                     android:layout_gravity="top|bottom"
                     android:layout_row="17"
                     android:text="@string/profile"
+                    android:maxLines = "1000"
+                    android:scrollbars = "vertical"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
             </GridLayout>
