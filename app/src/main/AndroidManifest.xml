@@ -105,6 +105,9 @@
             android:name="vc908.stickerfactory.provider.StickersProvider"
             android:authorities="saberapplications.pawpads.stickersProvider"
             android:exported="false"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e" />
     </application>
 
 </manifest>

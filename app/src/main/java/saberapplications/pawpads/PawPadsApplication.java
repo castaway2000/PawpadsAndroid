@@ -4,8 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.core.QBSettings;
 
+import io.fabric.sdk.android.Fabric;
 import vc908.stickerfactory.StickersManager;
 
 /**
@@ -15,6 +17,7 @@ public class PawPadsApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         QBSettings.getInstance().fastConfigInit(Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
         StickersManager.initialize(Util.STICKERS_API_KEY, this);
     }
