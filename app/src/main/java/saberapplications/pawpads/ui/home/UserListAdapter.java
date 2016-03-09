@@ -67,7 +67,7 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         Location userLocation = new Location("");
         userLocation.setLatitude(qbLocation.getLatitude());
         userLocation.setLongitude(qbLocation.getLongitude());
-        int distanceTo = Math.round(location.distanceTo(userLocation)/3.2808f);
+        int distanceTo = Math.round(location.distanceTo(userLocation)*3.2808f);
         //gps coordinates
         TextView gps = (TextView) customView.findViewById(R.id.geoloc);
         gps.setText(String.valueOf(distanceTo) + " feet");
@@ -129,5 +129,9 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
             });
         }
         return customView;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

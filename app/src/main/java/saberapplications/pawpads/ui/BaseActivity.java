@@ -218,7 +218,7 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
         updateUserLocation(location);
-        locationChanged(location);
+
     }
 
     protected void updateUserLocation(Location location){
@@ -254,11 +254,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
 
     }
-    /*
-    Method could be overrided in descendants
-     */
-    public void locationChanged(Location location){
 
-    }
 
 }

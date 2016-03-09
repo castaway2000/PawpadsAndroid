@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -78,6 +79,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     private ListView listView;
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
+    private Location lastListUpdatedLocation;
 
     private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
         @Override
@@ -522,11 +524,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         final int currentUserId = prefs.getInt(Util.QB_USERID, 0);
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-        Double latitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LAT, ""));
-        Double longitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LONG, ""));
-        getLocationsBuilder.setRadius(latitude, longitude, 200);
+        lastListUpdatedLocation=getLastLocation();
+        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), 1.219f);
         getLocationsBuilder.setLastOnly();
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
@@ -557,6 +558,18 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 Util.onError(errors, MainActivity.this);
             }
         });
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        super.onLocationChanged(location);
+        if (lastListUpdatedLocation==null) return;
+        if (lastListUpdatedLocation.distanceTo(location)<100){
+            adapter.setLocation(location);
+            adapter.notifyDataSetChanged();
+        }else {
+            loadAndSetNearUsers();
+        }
     }
 }
 
