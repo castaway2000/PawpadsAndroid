@@ -39,6 +39,7 @@ import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
 import com.quickblox.location.request.QBLocationRequestBuilder;
 import com.quickblox.location.request.SortField;
+import com.quickblox.location.request.SortOrder;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
@@ -527,7 +528,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         Double longitude = Double.valueOf(prefs.getString(Util.USER_LOCATION_LONG, ""));
         getLocationsBuilder.setRadius(latitude, longitude, 200);
         getLocationsBuilder.setLastOnly();
-        getLocationsBuilder.setSort(SortField.DISTANCE);
+        getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
+
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
             @Override
             public void onSuccess(ArrayList<QBLocation> locations, Bundle params) {
@@ -544,6 +546,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                     }
                 }
                 adapter = new UserListAdapter(context, 0, nearLocations);
+                adapter.setLocation(getLastLocation());
                 listView.setAdapter(adapter);
                 mSwipeRefreshLayout.setRefreshing(false);
             }

@@ -19,11 +19,14 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBProgressCallback;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.model.QBUser;
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.util.List;
@@ -40,6 +43,11 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         super(context, resource, objects);
     }
 
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    private  Location location;
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View customView;
@@ -54,25 +62,16 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         QBLocation qbLocation = getItem(position);
         TextView blazetext = (TextView) customView.findViewById(R.id.blazeText);
         blazetext.setText(qbLocation.getUser().getLogin());
-        String locationGPSProvider = LocationManager.GPS_PROVIDER;
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
 
-        if (lastKnownLocation == null) {
-            String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
-            lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
-        }
+
         Location userLocation = new Location("");
         userLocation.setLatitude(qbLocation.getLatitude());
         userLocation.setLongitude(qbLocation.getLongitude());
-        int distanceTo = Math.round(lastKnownLocation.distanceTo(userLocation)/3.2808f);
+        int distanceTo = Math.round(location.distanceTo(userLocation)/3.2808f);
         //gps coordinates
         TextView gps = (TextView) customView.findViewById(R.id.geoloc);
         gps.setText(String.valueOf(distanceTo) + " feet");
 
-        //set image sequence;
-        ImageLoader imageloader = ImageLoader.getInstance();
-        imageloader.init(ImageLoaderConfiguration.createDefault(getContext()));
         final ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
         if (qbLocation.getUser().getFileId() != null) {
             int userProfilePictureID = qbLocation.getUser().getFileId(); // user - an instance of QBUser class
@@ -84,6 +83,7 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
 
                         @Override
                         protected Bitmap doInBackground(InputStream... params) {
+
                             BitmapFactory.Options o = new BitmapFactory.Options();
                             int width_tmp = o.outWidth, height_tmp = o.outHeight;
                             int scale = 1;

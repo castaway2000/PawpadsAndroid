@@ -50,6 +50,12 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean isLoggedIn;
     private Integer userId;
 
+    public Location getLastLocation() {
+        return lastLocation;
+    }
+
+    private Location lastLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,6 +179,10 @@ public abstract class BaseActivity extends AppCompatActivity
             if (QBChatService.isInitialized()) {
                 QBChatService.getInstance().logout();
             }
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.clear();
+            editor.apply();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,6 +202,7 @@ public abstract class BaseActivity extends AppCompatActivity
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, locationRequest, this);
+        lastLocation=LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
     }
 
     @Override
@@ -222,6 +233,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     mGoogleApiClient);
         }
         if (location==null) return;
+        lastLocation=location;
         QBLocation qbLocation = new QBLocation(location.getLatitude(), location.getLongitude());
         qbLocation.setUserId(userId);
         QBLocations.createLocation(qbLocation, new QBEntityCallbackImpl<QBLocation>() {
