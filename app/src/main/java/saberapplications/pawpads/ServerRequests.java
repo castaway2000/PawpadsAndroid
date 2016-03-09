@@ -4,19 +4,24 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
+
+import com.google.gson.JsonElement;
+
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.http.GET;
+import retrofit.http.Query;
 
 
 /**
@@ -30,6 +35,11 @@ public class ServerRequests{
     Double LNG;
     String USER;
 
+    interface  API{
+        @GET("/test.php")
+        public void register(@Query("username") String userName,@Query("password") String password,@Query("email") String email,
+                             @Query("lat") double lat,@Query("lng") double lng, Callback<JsonElement> callback);
+    }
 
     public ServerRequests(Context context, Double lat, Double lng, String username){
         this.LAT = lat;
@@ -49,10 +59,33 @@ public class ServerRequests{
     }
 
 
-    public void storeUserDataInBackground(User user, GetUserCallback userCallback){
+    public void storeUserDataInBackground(User user, final GetUserCallback userCallback){
         progressDialog.show();
-        new StoreUserDataAsyncTask(user, userCallback).execute();
+        RestAdapter restAdapter= new RestAdapter.Builder()
+                .setEndpoint(SERVER_ADDRESS)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .build();
+
+        API apiClient = restAdapter.create(API.class);
+
+        apiClient.register(user.username, user.password,user.email,LAT, LNG, new Callback<JsonElement>() {
+            @Override
+            public void success(JsonElement element, Response response) {
+                userCallback.done(null);
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                userCallback.done(null);
+                progressDialog.dismiss();
+
+            }
+        });
+
     }
+
+    /*
     public void fetchUserDataInBackground(User user, GetUserCallback userCallback){
         progressDialog.show();
         new FetchUserDataAsyncTask(user, userCallback).execute();
@@ -77,6 +110,8 @@ public class ServerRequests{
 
         @Override
         protected Void doInBackground(Void... params) {
+
+
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIME);
@@ -251,4 +286,6 @@ public class ServerRequests{
             super.onPostExecute(returnedUser);
         }
     }
+*/
+
 }

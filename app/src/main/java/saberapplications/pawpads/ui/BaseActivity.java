@@ -1,14 +1,22 @@
 package saberapplications.pawpads.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChat;
@@ -27,17 +35,40 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
+
 /**
  * Created by Stas on 22.01.16.
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     public static int openActivitiesCount = 0;
-    private LocationManager locationManager;
+
+    private GoogleApiClient mGoogleApiClient;
+
+    protected boolean isLoggedIn;
+    private Integer userId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Create an instance of GoogleAPIClient.
+        isLoggedIn = false;
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+    }
 
     @Override
     protected void onStart() {
+        mGoogleApiClient.connect();
         super.onStart();
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 //        openActivitiesCount++;
 //        if (!isConnected()) {
         recreateSession();
@@ -49,45 +80,26 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
+        }
+        mGoogleApiClient.disconnect();
         logOut();
 
     }
 
     protected void recreateSession() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
                 new QBEntityCallbackImpl<QBSession>() {
                     @Override
                     public void onSuccess(final QBSession result, Bundle params) {
                         try {
-                        String locationGPSProvider = LocationManager.GPS_PROVIDER;
-                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
-                            if (lastKnownLocation == null) {
-                                String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
-                                lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
-                            }
-                        double latitude = lastKnownLocation.getLatitude();
-                        double longitude = lastKnownLocation.getLongitude();
-                        QBLocation location = new QBLocation(latitude, longitude);
-                        location.setUserId(result.getUserId());
-                        QBLocations.createLocation(location, new QBEntityCallbackImpl<QBLocation>() {
-                            @Override
-                            public void onSuccess(QBLocation qbLocation, Bundle args) {
-                                editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
-                                editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
-                                editor.putInt(Util.QB_USERID, result.getUserId());
-                                editor.apply();
-                            }
-
-                            @Override
-                            public void onError(List<String> errors) {
-
-                            }
-                        });
-
-                        loginToChat();
+                            userId = result.getUserId();
+                            isLoggedIn = true;
+                            updateUserLocation(null);
+                            loginToChat();
                         } catch (Exception e) {
 
                         }
@@ -167,5 +179,74 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public abstract void onQBConnect() throws Exception;
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        updateUserLocation(null);
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(120000);
+        locationRequest.setFastestInterval(60000);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, locationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        updateUserLocation(location);
+        locationChanged(location);
+    }
+
+    protected void updateUserLocation(Location location){
+        if (!mGoogleApiClient.isConnected()) return;
+        if (!isLoggedIn) return;
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        if (location==null){
+            location=LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        }
+        if (location==null) return;
+        QBLocation qbLocation = new QBLocation(location.getLatitude(), location.getLongitude());
+        qbLocation.setUserId(userId);
+        QBLocations.createLocation(qbLocation, new QBEntityCallbackImpl<QBLocation>() {
+            @Override
+            public void onSuccess(QBLocation qbLocation, Bundle args) {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
+                editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
+                editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
+                editor.putInt(Util.QB_USERID, userId);
+                editor.apply();
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+
+            }
+        });
+
+
+    }
+    /*
+    Method could be overrided in descendants
+     */
+    public void locationChanged(Location location){
+
+    }
 
 }

@@ -44,6 +44,7 @@ public class UserData {
         String username = uls.getLoggedInUser().username;
 
         ServerRequests serverRequests = new ServerRequests(this.mContext, lat, lng, username);
+        /*
         serverRequests.fetchListDataInBackground(null, new GetUserListCallback() {
             @Override
             public void done(UserList returnedUser) {
@@ -53,6 +54,6 @@ public class UserData {
                 UserData.this.descr = returnedUser.profile;
                 ((MainActivity) UserData.this.mContext).setListView(returnedUser);
             }
-        });
+        });*/
     }
 }

@@ -1,4 +1,4 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui.profile;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -29,7 +29,6 @@ import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBProgressCallback;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
@@ -44,13 +43,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import saberapplications.pawpads.R;
+import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 /**
  * Created by blaze on 10/17/2015.
  */
-public class profileEditPage extends AppCompatActivity implements View.OnClickListener {
+public class ProfileEditActivity extends AppCompatActivity implements View.OnClickListener {
     //TODO: send profile info to the database.
     private final static int SELECT_IMAGE = 1;
     private static File avatarFile;
@@ -86,7 +87,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         });
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
-        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this);
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(ProfileEditActivity.this);
         QBUsers.getUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -110,7 +111,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
                         @Override
                         public void onError(List<String> list) {
-                            Util.onError(list, profileEditPage.this);
+                            Util.onError(list, ProfileEditActivity.this);
                         }
 
 
@@ -133,7 +134,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void onError(List<String> list) {
-                Util.onError(list, profileEditPage.this);
+                Util.onError(list, ProfileEditActivity.this);
             }
         });
         removeProfile.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +182,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onError(List<String> list) {
                             mSwipeRefreshLayout.setRefreshing(false);
-                            Util.onError(list, profileEditPage.this);
+                            Util.onError(list, ProfileEditActivity.this);
                         }
                     });
                 }
@@ -253,10 +254,10 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     }
 
     private void buildRemoveAlertDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(profileEditPage.this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(ProfileEditActivity.this);
         alertDialog.setTitle("Remove profile");
         alertDialog.setMessage("Enter Password");
-        final EditText input = new EditText(profileEditPage.this);
+        final EditText input = new EditText(ProfileEditActivity.this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -271,7 +272,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
                                 @Override
                                 public void onSuccess() {
-                                    Toast.makeText(profileEditPage.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ProfileEditActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
                                     Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
                                     startActivity(myIntent1);
                                     finish();
@@ -280,11 +281,11 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
                                 @Override
                                 public void onError(List errors) {
-                                    Util.onError(errors, profileEditPage.this);
+                                    Util.onError(errors, ProfileEditActivity.this);
                                 }
                             });
                         } else {
-                            Toast.makeText(profileEditPage.this, "Wrong password", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ProfileEditActivity.this, "Wrong password", Toast.LENGTH_LONG).show();
                         }
 
 
@@ -322,7 +323,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onError(List<String> list) {
                         mSwipeRefreshLayout.setRefreshing(false);
-                        Util.onError(list, profileEditPage.this);
+                        Util.onError(list, ProfileEditActivity.this);
                     }
                 });
             }
@@ -335,7 +336,7 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onError(List<String> list) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                Util.onError(list, profileEditPage.this);
+                Util.onError(list, ProfileEditActivity.this);
             }
 
         }, new QBProgressCallback() {

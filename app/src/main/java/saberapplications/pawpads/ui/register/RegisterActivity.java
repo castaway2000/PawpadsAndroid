@@ -1,7 +1,6 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui.register;
 
 
-import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -19,11 +18,18 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
+import saberapplications.pawpads.GPS;
+import saberapplications.pawpads.GetUserCallback;
+import saberapplications.pawpads.R;
+import saberapplications.pawpads.ServerRequests;
+import saberapplications.pawpads.User;
+import saberapplications.pawpads.Util;
+
 
 /**
  * Created by blaze on 10/21/2015.
  */
-public class Register extends AppCompatActivity implements View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     Button bRegister;
@@ -123,7 +129,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                             @Override
                             public void onError(List<String> errors) {
-                                Util.onError(errors,Register.this);
+                                Util.onError(errors,RegisterActivity.this);
                             }
                         });
 
@@ -131,7 +137,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,Register.this);
+                        Util.onError(errors,RegisterActivity.this);
                     }
                 });
 

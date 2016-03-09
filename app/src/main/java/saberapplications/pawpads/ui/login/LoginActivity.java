@@ -25,11 +25,11 @@ import com.quickblox.users.model.QBUser;
 import java.util.List;
 
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.Register;
 import saberapplications.pawpads.User;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.home.MainActivity;
+import saberapplications.pawpads.ui.register.RegisterActivity;
 
 /**
  * Created by blaze on 10/21/2015.
@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 break;
             case R.id.tvRegisterLink:
-                startActivity(new Intent(this, Register.class));
+                startActivity(new Intent(this, RegisterActivity.class));
                 break;
         }
     }

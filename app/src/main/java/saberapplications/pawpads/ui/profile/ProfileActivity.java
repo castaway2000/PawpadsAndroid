@@ -1,4 +1,4 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui.profile;
 
 
 import android.content.Intent;
@@ -26,9 +26,11 @@ import com.quickblox.users.model.QBUser;
 import java.io.InputStream;
 import java.util.List;
 
+import saberapplications.pawpads.R;
+import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 
-public class profilepage extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
     private QBDialog dialog;
     private QBUser currentQbUser;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -74,7 +76,7 @@ public class profilepage extends AppCompatActivity {
 
                         @Override
                         public void onError(List<String> list) {
-                            Util.onError(list, profilepage.this);
+                            Util.onError(list, ProfileActivity.this);
                         }
 
 
@@ -97,14 +99,14 @@ public class profilepage extends AppCompatActivity {
 
             @Override
             public void onError(List<String> list) {
-                Util.onError(list, profilepage.this);
+                Util.onError(list, ProfileActivity.this);
             }
         });
         Button button = (Button) findViewById(R.id.chatBtn);
         View.OnClickListener clickHandler = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(profilepage.this, ChatActivity.class);
+                Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
                 i.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
                 startActivity(i);
                 finish();

@@ -55,8 +55,8 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.profileEditPage;
-import saberapplications.pawpads.profilepage;
+import saberapplications.pawpads.ui.profile.ProfileEditActivity;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
@@ -212,7 +212,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_profileID:
-                Intent i = new Intent(MainActivity.this, profileEditPage.class);
+                Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
                 startActivity(i);
                 return true;
 
@@ -287,7 +287,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     private void openChat(QBDialog dialog, QBUser user) {
 
-        Intent intent = new Intent(MainActivity.this, profilepage.class);
+        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
         intent.putExtra(Util.QB_USERID, user.getId());
         startActivity(intent);
@@ -297,7 +297,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         QBUsers.getUser(dialog.getUserId(), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
-                Intent intent = new Intent(MainActivity.this, profilepage.class);
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                 intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
                 intent.putExtra(Util.QB_USERID, qbUser.getId());
                 startActivity(intent);
