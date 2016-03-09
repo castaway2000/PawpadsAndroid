@@ -34,10 +34,12 @@ public class Util {
     public final static String send_chat_url = base_url + "sendChatmessage.php";
 
    //notes: chat implemented with quickblox. these are my own not the contractors
-    public static final String QB_APPID="33547";
-    public static final String QB_AUTH_KEY="w8YNQSmstbNJ6AJ";
-    public static final String QB_AUTH_SECRET="ckSWjeEkjgNpdJ-";
-
+//    public static final String QB_APPID="33547";
+//    public static final String QB_AUTH_KEY="w8YNQSmstbNJ6AJ";
+//    public static final String QB_AUTH_SECRET="ckSWjeEkjgNpdJ-";
+   public static final String QB_APPID="35252";
+    public static final String QB_AUTH_KEY="GHHUHJMGTcGN8EY";
+    public static final String QB_AUTH_SECRET="NNSa7QQZDUzRvpB";
     public static final String QB_USER="qb_user";
     public static final String QB_PASSWORD="qb_password";
     public static final String QB_USERID ="qb_userid" ;

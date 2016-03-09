@@ -42,11 +42,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"
+        android:text=">>"
         android:id="@+id/button_send_chat"
         android:singleLine="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:textSize="20dp" />
 
     <ListView
         android:layout_width="wrap_content"

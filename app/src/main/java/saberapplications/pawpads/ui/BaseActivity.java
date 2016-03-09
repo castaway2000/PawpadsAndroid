@@ -61,9 +61,13 @@ public abstract class BaseActivity extends AppCompatActivity {
                 new QBEntityCallbackImpl<QBSession>() {
                     @Override
                     public void onSuccess(final QBSession result, Bundle params) {
+                        try {
                         String locationGPSProvider = LocationManager.GPS_PROVIDER;
                         Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
-
+                            if (lastKnownLocation == null) {
+                                String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
+                                lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
+                            }
                         double latitude = lastKnownLocation.getLatitude();
                         double longitude = lastKnownLocation.getLongitude();
                         QBLocation location = new QBLocation(latitude, longitude);
@@ -84,6 +88,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                         });
 
                         loginToChat();
+                        } catch (Exception e) {
+
+                        }
 
                     }
 

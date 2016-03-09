@@ -1,64 +1,68 @@
 package saberapplications.pawpads;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import android.util.Base64;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.QBProgressCallback;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
+import com.squareup.picasso.Picasso;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.List;
 
-import saberapplications.pawpads.ui.home.MainActivity;
+import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 /**
  * Created by blaze on 10/17/2015.
  */
-public class profileEditPage extends AppCompatActivity implements View.OnClickListener{
+public class profileEditPage extends AppCompatActivity implements View.OnClickListener {
     //TODO: send profile info to the database.
     private final static int SELECT_IMAGE = 1;
+    private static File avatarFile;
     String selectedImagePath;
     ImageView img;
     EditText textOut, proDescr;
-    Button saveBtn, getimgbtn;
+    Button saveBtn, getimgbtn, removeProfile;
     Uri path;
+    private QBUser currentQbUser;
+    private SharedPreferences defaultSharedPreferences;
+    private Bitmap bitmap;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,24 +74,81 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
+        removeProfile = (Button) findViewById(R.id.removeProfile);
         proDescr = (EditText) findViewById(R.id.editProfileText);
 //        textOut = (EditText) findViewById(R.id.editProfileText);
-
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this);
-        final String imgVal = defaultSharedPreferences.getString(Util.USER_AVATAR_PATH, "");
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this);
+        QBUsers.getUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                currentQbUser = qbUser;
+                if(currentQbUser.getCustomData()!=null) {
+                    proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
+                }
+                if (currentQbUser.getFileId() != null) {
+                    int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
 
-        if(!imgVal.isEmpty()) {
-            ImageLoader imageloader = ImageLoader.getInstance();
-            imageloader.displayImage(imgVal, img);
-        }
+                    QBContent.downloadFileTask(userProfilePictureID, new QBEntityCallback<InputStream>() {
+                        @Override
+                        public void onSuccess(InputStream inputStream, Bundle params) {
+                            new BitmapDownloader().execute(inputStream);
+                        }
+
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(List<String> list) {
+                            Util.onError(list, profileEditPage.this);
+                        }
+
+
+                    }, new QBProgressCallback() {
+                        @Override
+                        public void onProgressUpdate(int progress) {
+
+                        }
+                    });
+                } else {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(List<String> list) {
+                Util.onError(list, profileEditPage.this);
+            }
+        });
+        removeProfile.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 buildRemoveAlertDialog();
+                                             }
+                                         }
+        );
     }
 
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.newPicButton:
                 Intent intent = new Intent();
                 intent.setType("image/*");
@@ -96,22 +157,51 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.profileSave:
+                mSwipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+                if (avatarFile != null) {
+                    updateAvatar(avatarFile);
+                } else {
+                    currentQbUser.setCustomData(proDescr.getText().toString());
+                    QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
+                        @Override
+                        public void onSuccess(QBUser user, Bundle args) {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(List<String> list) {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                            Util.onError(list, profileEditPage.this);
+                        }
+                    });
+                }
+
                 //saved image state passed to database
-                Bitmap image = ((BitmapDrawable)img.getDrawable()).getBitmap();
-                new UploadImage(image, proDescr.getText().toString());
-
-                //saved description updated to database
-                String descr = proDescr.getText().toString();
-                textOut.setText(descr);
-
-                //back to main activity
-                Intent i = new Intent(profileEditPage.this, profilepage.class);
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this).edit();
-                editor.putString(Util.USER_INFO, textOut.getText().toString());
-                editor.putString(Util.USER_AVATAR_PATH, selectedImagePath);
-                editor.apply();
-                startActivity(i);
-                finish();
+//                Bitmap image = ((BitmapDrawable) img.getDrawable()).getBitmap();
+//                new UploadImage(image, proDescr.getText().toString());
+//
+//                //saved description updated to database
+//                String descr = proDescr.getText().toString();
+//                textOut.setText(descr);
+//
+//                //back to main activity
+//                Intent i = new Intent(profileEditPage.this, profilepage.class);
+//                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this).edit();
+//                editor.putString(Util.USER_INFO, textOut.getText().toString());
+//                editor.putString(Util.USER_AVATAR_PATH, selectedImagePath);
+//                editor.apply();
+//                startActivity(i);
+//                finish();
                 break;
         }
     }
@@ -126,7 +216,8 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
 
                 System.out.println("Image Path : " + selectedImagePath);
                 try {
-                    img.setImageBitmap(decodeUri(getApplicationContext(), selectedImageUri, 80));
+                    bitmap = decodeUri(getApplicationContext(), selectedImageUri, 80);
+                    img.setImageBitmap(bitmap);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -135,22 +226,21 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
     }
 
     public String getPath(Uri uri) {
-        return  uri.getPath();
+        return uri.getPath();
     }
 
 
-    public static Bitmap decodeUri(Context c, Uri uri, final int requiredSize)
+    public Bitmap decodeUri(Context c, Uri uri, final int requiredSize)
             throws FileNotFoundException {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o);
-
-        int width_tmp = o.outWidth
-                , height_tmp = o.outHeight;
+        InputStream inputStream = c.getContentResolver().openInputStream(uri);
+        avatarFile = getAvatarFile(inputStream);
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
         int scale = 1;
 
-        while(true) {
-            if(width_tmp / 2 < requiredSize || height_tmp / 2 < requiredSize)
+        while (true) {
+            if (width_tmp / 2 < requiredSize || height_tmp / 2 < requiredSize)
                 break;
             width_tmp /= 2;
             height_tmp /= 2;
@@ -162,50 +252,151 @@ public class profileEditPage extends AppCompatActivity implements View.OnClickLi
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
     }
 
-    public class UploadImage extends AsyncTask<Void,Void,Void>{
-        Bitmap image;
-        String name;
+    private void buildRemoveAlertDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(profileEditPage.this);
+        alertDialog.setTitle("Remove profile");
+        alertDialog.setMessage("Enter Password");
+        final EditText input = new EditText(profileEditPage.this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+        alertDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(Util.QB_PASSWORD, ""))) {
+                            QBUsers.deleteUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallbackImpl() {
 
-        public UploadImage(Bitmap image, String name){
-            this.image = image;
-            this.name = name;
-        }
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(profileEditPage.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
+                                    Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
+                                    startActivity(myIntent1);
+                                    finish();
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-            String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                                }
 
-            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-            dataToSend.add(new BasicNameValuePair("image", encodedImage));
-            dataToSend.add(new BasicNameValuePair("name", name));
+                                @Override
+                                public void onError(List errors) {
+                                    Util.onError(errors, profileEditPage.this);
+                                }
+                            });
+                        } else {
+                            Toast.makeText(profileEditPage.this, "Wrong password", Toast.LENGTH_LONG).show();
+                        }
 
-            HttpParams httpRequestParams = getHttprequestParams();
 
-            HttpClient client = new DefaultHttpClient(httpRequestParams);
-            HttpPost post = new HttpPost(ServerRequests.SERVER_ADDRESS + "SavePicture.php");
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+    }
 
-            try{
-                post.setEntity(new UrlEncodedFormEntity(dataToSend));
-                client.execute(post);
-            }catch (Exception e){
-                e.printStackTrace();
+    private void updateAvatar(File file) {
+
+        QBContent.uploadFileTask(file, false, file.getAbsolutePath(), new QBEntityCallback<QBFile>() {
+            @Override
+            public void onSuccess(QBFile qbFile, Bundle params) {
+
+                int uploadedFileID = qbFile.getId();
+                currentQbUser.setFileId(uploadedFileID);
+                currentQbUser.setCustomData(proDescr.getText().toString());
+                QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
+                    @Override
+                    public void onSuccess(QBUser user, Bundle args) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(List<String> list) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        Util.onError(list, profileEditPage.this);
+                    }
+                });
             }
+
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(List<String> list) {
+                mSwipeRefreshLayout.setRefreshing(false);
+                Util.onError(list, profileEditPage.this);
+            }
+
+        }, new QBProgressCallback() {
+            @Override
+            public void onProgressUpdate(int progress) {
+
+            }
+        });
+    }
+
+    private File getAvatarFile(InputStream inputStream) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "tempAvatar.jpg");
+        try {
+            OutputStream os = new FileOutputStream(file);
+            Bitmap bmp = BitmapFactory.decodeStream(inputStream);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 10, bos);
+            InputStream in = new ByteArrayInputStream(bos.toByteArray());
+            ContentBody photo = new InputStreamBody(in, "image/jpeg", "filename");
+            photo.writeTo(os);
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
+        return file;
+    }
 
-        @Override
-        protected void onPostExecute(Void aVoid){
-            super.onPostExecute(aVoid);
-            Toast.makeText(getApplicationContext(),"Profile has been updated!", Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(avatarFile!=null){
+            avatarFile.delete();
         }
     }
 
-    private HttpParams getHttprequestParams(){
-        HttpParams httpRequestParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpRequestParams, 1000 * 30);
-        HttpConnectionParams.setSoTimeout(httpRequestParams, 1000*30);
-        return httpRequestParams;
+    private class BitmapDownloader extends AsyncTask<InputStream, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(InputStream... params) {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+
+            while (true) {
+                if (width_tmp / 2 < 80 || height_tmp / 2 < 80)
+                    break;
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeStream(params[0], null, o2);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            img.setImageBitmap(bitmap);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 }

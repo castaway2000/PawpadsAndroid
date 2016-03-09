@@ -34,11 +34,11 @@ import saberapplications.pawpads.ui.home.MainActivity;
 /**
  * Created by blaze on 10/21/2015.
  */
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     UserLocalStore userLocalStore;
     Button bLogin;
     EditText etUsername, etPassword;
-    TextView registerLink;
+    TextView registerLink, forgotpasswordLink;
     private LocationManager locationManager;
 
     @Override
@@ -51,15 +51,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         etPassword = (EditText) findViewById(R.id.etPassword);
         bLogin = (Button) findViewById(R.id.bLogin);
         registerLink = (TextView) findViewById(R.id.tvRegisterLink);
+        forgotpasswordLink = (TextView) findViewById(R.id.tvForgottenPassLink);
         userLocalStore = new UserLocalStore(this);
 
         bLogin.setOnClickListener(this);
         registerLink.setOnClickListener(this);
+        forgotpasswordLink.setOnClickListener(this);
+        //TODO: logic for forgotten password
     }
 
     @Override
-    public void onClick(View v){
-        switch (v.getId()){
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.bLogin:
                 final String username = etUsername.getText().toString();
                 final String password = etPassword.getText().toString();
@@ -81,7 +84,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
                                 String locationGPSProvider = LocationManager.GPS_PROVIDER;
                                 Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
-
+                                if (lastKnownLocation == null) {
+                                    String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
+                                    lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
+                                }
                                 double latitude = lastKnownLocation.getLatitude();
                                 double longitude = lastKnownLocation.getLongitude();
                                 QBLocation location = new QBLocation(latitude, longitude);
@@ -96,19 +102,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         editor.putString(Util.QB_PASSWORD, password);
                                         editor.putInt(Util.QB_USERID, user.getId());
                                         editor.apply();
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     }
 
                                     @Override
                                     public void onError(List<String> errors) {
-
+                                        Util.onError(errors, LoginActivity.this);
                                     }
                                 });
 
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
 
-                                finish();
                             }
+
                             @Override
                             public void onError(List<String> errors) {
                                 Util.onError(errors, LoginActivity.this);
@@ -118,7 +125,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,LoginActivity.this);
+                        Util.onError(errors, LoginActivity.this);
                     }
                 });
 
@@ -131,15 +138,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-
-    private void showErrorMessage(){
+    private void showErrorMessage() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
         dialogBuilder.setMessage("Incorrect username or Password");
         dialogBuilder.setPositiveButton("Ok", null);
         dialogBuilder.show();
     }
 
-    private void logUserIn(User returnedUser){
+    private void logUserIn(User returnedUser) {
         userLocalStore.storeUserData(returnedUser);
         userLocalStore.setUserLoggedIn(true);
         String test = userLocalStore.getLoggedInUser().username;
