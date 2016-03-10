@@ -71,8 +71,9 @@ public class ProfileActivity extends BaseActivity {
 
                 if (currentQbUser.getFileId() != null) {
                     int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
-
-                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar);
+                    float d=getResources().getDisplayMetrics().density;
+                    int size=Math.round(150* d);
+                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar,size,size);
 
                 }
                 mSwipeRefreshLayout.setRefreshing(false);

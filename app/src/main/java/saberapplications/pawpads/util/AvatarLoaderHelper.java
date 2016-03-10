@@ -25,13 +25,13 @@ import saberapplications.pawpads.Util;
  * Created by Stanislav Volnyansky on 10.03.16.
  */
 public class AvatarLoaderHelper {
-    public static void loadImage(int fileId, final ImageView imageView){
+    public static void loadImage(int fileId, final ImageView imageView, final int width, final int height){
         if (fileId==0) return;
         File CacheDir=PawPadsApplication.getInstance().getCacheDir();
         final File file=new File(CacheDir.getAbsolutePath()+"/"+fileId+".jpg");
         // Trying get image from cache
         if (file.exists()){
-            Picasso.with(imageView.getContext()).load(file).into(imageView);
+            Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width,height).into(imageView);
         }
         else {
             QBContent.downloadFileTask(fileId, new QBEntityCallback<InputStream>() {
@@ -74,7 +74,7 @@ public class AvatarLoaderHelper {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Picasso.with(imageView.getContext()).load(file).into(imageView);
+                            Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width,height).into(imageView);
 
 
                         }
@@ -99,6 +99,7 @@ public class AvatarLoaderHelper {
                 }
             });
         }
+
 
     }
 }

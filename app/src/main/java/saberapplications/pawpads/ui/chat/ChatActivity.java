@@ -126,7 +126,9 @@ public class ChatActivity extends BaseActivity {
         }
         ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
         if (recipient.getFileId()!=null){
-            AvatarLoaderHelper.loadImage(recipient.getFileId(), iv);
+            float d=getResources().getDisplayMetrics().density;
+            int size=Math.round(80 * d);
+            AvatarLoaderHelper.loadImage(recipient.getFileId(), iv,size,size);
         }
 
 
