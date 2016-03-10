@@ -84,12 +84,13 @@ public class AvatarLoaderHelper {
                                 FileOutputStream stream=new FileOutputStream(file);
                                 bitmap.compress(Bitmap.CompressFormat.JPEG,90,stream);
                                 stream.close();
+                                bitmap.recycle();
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Picasso.with(imageView.getContext()).load(file).centerCrop().into(imageView);
+                            Picasso.with(imageView.getContext()).load(file).into(imageView);
 
 
                         }
