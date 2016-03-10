@@ -71,7 +71,13 @@ public abstract class BaseActivity extends AppCompatActivity
         }
 
 
-
+        if (isLoggedIn){
+            try {
+                onQBConnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -80,13 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onStart();
         incrementActivityCount();
         recreateSession();
-        if (isLoggedIn){
-            try {
-                onQBConnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+
     }
 
     @Override
@@ -280,11 +280,12 @@ public abstract class BaseActivity extends AppCompatActivity
         openActivitiesCount++;
     }
     public synchronized void decrementActivityCount(){
-        openActivitiesCount--;
+
         Handler handler=new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                openActivitiesCount--;
                 if (openActivitiesCount==0){
                     logOutChat();
                 }

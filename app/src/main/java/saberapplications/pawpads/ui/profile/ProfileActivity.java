@@ -73,10 +73,9 @@ public class ProfileActivity extends BaseActivity {
                     int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
 
                     AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar);
-                    mSwipeRefreshLayout.setRefreshing(false);
-                } else {
-                    mSwipeRefreshLayout.setRefreshing(false);
+
                 }
+                mSwipeRefreshLayout.setRefreshing(false);
 
             }
 

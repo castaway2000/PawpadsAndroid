@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBProgressCallback;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,19 +31,20 @@ public class AvatarLoaderHelper {
         final File file=new File(CacheDir.getAbsolutePath()+"/"+fileId+".jpg");
         // Trying get image from cache
         if (file.exists()){
-            AsyncTask<File,Void,Bitmap> task=new AsyncTask<File, Void, Bitmap>() {
+            AsyncTask<File,Void,File> task=new AsyncTask<File, Void, File>() {
                 @Override
-                protected Bitmap doInBackground(File... params) {
+                protected File doInBackground(File... params) {
                     for (File f:params){
-                        return BitmapFactory.decodeFile(f.getAbsolutePath());
+                         BitmapFactory.decodeFile(f.getAbsolutePath());
+                        return f;
                     }
                     return null;
                 }
 
                 @Override
-                protected void onPostExecute(Bitmap bitmap) {
-                    if (bitmap==null) return;
-                    imageView.setImageBitmap(bitmap);
+                protected void onPostExecute(File file) {
+                    if (file==null) return;
+                    Picasso.with(imageView.getContext()).load(file).into(imageView);
                 }
             };
             task.execute(file);
@@ -55,7 +57,7 @@ public class AvatarLoaderHelper {
 
                         @Override
                         protected Bitmap doInBackground(InputStream... params) {
-
+/*
                             BitmapFactory.Options o = new BitmapFactory.Options();
                             int width_tmp = o.outWidth, height_tmp = o.outHeight;
                             int scale = 1;
@@ -70,13 +72,14 @@ public class AvatarLoaderHelper {
 
                             BitmapFactory.Options o2 = new BitmapFactory.Options();
                             o2.inSampleSize = scale;
-                            return BitmapFactory.decodeStream(params[0], null, o2);
+*/
+                            return BitmapFactory.decodeStream(params[0]);
                         }
 
                         @Override
                         protected void onPostExecute(Bitmap bitmap) {
                             super.onPostExecute(bitmap);
-                            imageView.setImageBitmap(bitmap);
+
                             try {
                                 FileOutputStream stream=new FileOutputStream(file);
                                 bitmap.compress(Bitmap.CompressFormat.JPEG,90,stream);
@@ -86,6 +89,7 @@ public class AvatarLoaderHelper {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            Picasso.with(imageView.getContext()).load(file).centerCrop().into(imageView);
 
 
                         }

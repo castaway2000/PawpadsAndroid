@@ -77,7 +77,6 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         if (qbLocation.getUser().getFileId() != null) {
             int userProfilePictureID = qbLocation.getUser().getFileId(); // user - an instance of QBUser class
             AvatarLoaderHelper.loadImage(userProfilePictureID,blazeImage);
-
         }
         return customView;
     }

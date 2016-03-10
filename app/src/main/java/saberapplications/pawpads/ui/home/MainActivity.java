@@ -552,10 +552,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         if (lastListUpdatedLocation == null) return;
         if (location == null) return;
         if (adapter==null) return;
-        if (lastListUpdatedLocation.distanceTo(location) < 100) {
+        if (lastListUpdatedLocation.distanceTo(location) >20 && lastListUpdatedLocation.distanceTo(location) < 100) {
             adapter.setLocation(location);
             adapter.notifyDataSetChanged();
-        } else {
+        } else if (lastListUpdatedLocation.distanceTo(location) > 100){
             loadAndSetNearUsers();
         }
     }
