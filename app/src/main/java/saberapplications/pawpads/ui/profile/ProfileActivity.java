@@ -29,6 +29,7 @@ import java.util.List;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 public class ProfileActivity extends AppCompatActivity {
     private QBDialog dialog;
@@ -56,36 +57,22 @@ public class ProfileActivity extends AppCompatActivity {
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 currentQbUser = qbUser;
                 if(currentQbUser.getCustomData()!=null) {
-                    profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
+                    String info=String.valueOf(currentQbUser.getCustomData());
+                    if (!info.equals("null")){
+                        profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
+                    }
                 }
-                String newTitle = "PawPads | " + qbUser.getFullName();
-                setTitle(newTitle);
+                if (qbUser.getFullName()!=null){
+                    setTitle( "PawPads | " + qbUser.getFullName());
+                }else{
+                    setTitle( "PawPads | " + qbUser.getLogin());
+                }
+
                 if (currentQbUser.getFileId() != null) {
                     int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
 
-                    QBContent.downloadFileTask(userProfilePictureID, new QBEntityCallback<InputStream>() {
-                        @Override
-                        public void onSuccess(InputStream inputStream, Bundle params) {
-                            new BitmapDownloader().execute(inputStream);
-                        }
-
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(List<String> list) {
-                            Util.onError(list, ProfileActivity.this);
-                        }
-
-
-                    }, new QBProgressCallback() {
-                        @Override
-                        public void onProgressUpdate(int progress) {
-
-                        }
-                    });
+                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar);
+                    mSwipeRefreshLayout.setRefreshing(false);
                 } else {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -134,34 +121,5 @@ public class ProfileActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    private class BitmapDownloader extends AsyncTask<InputStream, Void, Bitmap> {
 
-        @Override
-        protected Bitmap doInBackground(InputStream... params) {
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            int width_tmp = o.outWidth, height_tmp = o.outHeight;
-            int scale = 1;
-
-            while (true) {
-                if (width_tmp / 2 < 80 || height_tmp / 2 < 80)
-                    break;
-                width_tmp /= 2;
-                height_tmp /= 2;
-                scale *= 2;
-            }
-
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(params[0], null, o2);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            profileAvatar.setImageBitmap(bitmap);
-            profileInfo.setMovementMethod(new ScrollingMovementMethod());
-
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
 }
