@@ -95,6 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
                 i.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+                i.putExtra(ChatActivity.RECIPIENT,currentQbUser);
                 startActivity(i);
                 finish();
             }

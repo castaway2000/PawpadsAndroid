@@ -105,7 +105,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                                     @Override
                                                     public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
                                                         if (result.size() == 0) return;
-                                                        openChat(result.get(0));
+                                                        openProfile(result.get(0));
 
                                                     }
                                                 });
@@ -253,31 +253,16 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         //occupants_ids
         QBRequestGetBuilder builder = new QBRequestGetBuilder();
         final QBLocation qbLocation = adapter.getItem(position);
-        builder.in("occupants_ids", qbLocation.getUser().getId());
+        builder.eq("occupants_ids", qbLocation.getUser().getId());
 
-        QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
+
+        QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
+
+        chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallbackImpl<QBDialog>() {
+
             @Override
-            public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
-                super.onSuccess(result, params);
-                if (result.size() == 0) {
-
-                    QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
-                    chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallbackImpl<QBDialog>() {
-
-                        @Override
-                        public void onSuccess(QBDialog result, Bundle params) {
-                            openChat(result, qbLocation.getUser());
-                        }
-
-                        @Override
-                        public void onError(List<String> errors) {
-                            Util.onError(errors, MainActivity.this);
-                        }
-                    });
-
-                } else {
-                    openChat(result.get(0), qbLocation.getUser());
-                }
+            public void onSuccess(QBDialog result, Bundle params) {
+                openProfile(result, qbLocation.getUser());
             }
 
             @Override
@@ -286,9 +271,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
         });
 
+
     }
 
-    private void openChat(QBDialog dialog, QBUser user) {
+    private void openProfile(QBDialog dialog, QBUser user) {
 
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
@@ -296,7 +282,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         startActivity(intent);
     }
 
-    private void openChat(final QBDialog dialog) {
+    private void openProfile(final QBDialog dialog) {
         QBUsers.getUser(dialog.getUserId(), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -493,7 +479,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     /**
      * Handle the result of a request for permissions.
-     * <p>
+     * <p/>
      * Watches for the result of a request for permission to use fine location (GPS) data.
      * If the request was granted, continue processing.
      * If the request was denied, stop; the application needs location data to work and cannot be
@@ -526,7 +512,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
 
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-        lastListUpdatedLocation=getLastLocation();
+        lastListUpdatedLocation = getLastLocation();
         getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), 1.219f);
         getLocationsBuilder.setLastOnly();
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
@@ -563,12 +549,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     public void onLocationChanged(Location location) {
         super.onLocationChanged(location);
-        if (lastListUpdatedLocation==null) return;
-        if (location==null) return;
-        if (lastListUpdatedLocation.distanceTo(location)<100){
+        if (lastListUpdatedLocation == null) return;
+        if (location == null) return;
+        if (lastListUpdatedLocation.distanceTo(location) < 100) {
             adapter.setLocation(location);
             adapter.notifyDataSetChanged();
-        }else {
+        } else {
             loadAndSetNearUsers();
         }
     }

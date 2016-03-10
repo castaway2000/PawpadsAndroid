@@ -62,7 +62,6 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Create an instance of GoogleAPIClient.
-        isLoggedIn = false;
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -70,6 +69,8 @@ public abstract class BaseActivity extends AppCompatActivity
                     .addApi(LocationServices.API)
                     .build();
         }
+
+
 
     }
 
@@ -79,9 +80,13 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onStart();
         incrementActivityCount();
         recreateSession();
-//        } else {
-//            onQBConnect();
-//        }
+        if (isLoggedIn){
+            try {
+                onQBConnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -96,7 +101,14 @@ public abstract class BaseActivity extends AppCompatActivity
 
     }
     public void logOutChat(){
-
+        if (QBChatService.isInitialized()) {
+            try {
+                QBChatService.getInstance().logout();
+                isLoggedIn=false;
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected void recreateSession() {
@@ -239,6 +251,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     mGoogleApiClient);
         }
         if (location==null) return;
+        if (userId==null) return;
         lastLocation=location;
         QBLocation qbLocation = new QBLocation(location.getLatitude(), location.getLongitude());
         qbLocation.setUserId(userId);
@@ -276,4 +289,7 @@ public abstract class BaseActivity extends AppCompatActivity
         },500);
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
 }

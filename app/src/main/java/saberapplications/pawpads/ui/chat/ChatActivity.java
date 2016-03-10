@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChat;
@@ -25,6 +26,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.model.QBUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 public class ChatActivity extends BaseActivity {
@@ -55,6 +59,7 @@ public class ChatActivity extends BaseActivity {
         }
     };
     public static final String EXTRA_DIALOG = "dialog";
+    public static final String RECIPIENT="recipient";
     //EditText editText_mail_id;
     EditText editText_chat_message;
     ListView listView_chat_messages;
@@ -62,6 +67,7 @@ public class ChatActivity extends BaseActivity {
     private List<ChatObject> chat_list;
     BroadcastReceiver recieve_chat;
     private QBDialog dialog;
+    private QBUser recipient;
     private ChatAdapter chatAdapter;
 
     private QBMessageListener messageListener = new QBMessageListener() {
@@ -103,9 +109,23 @@ public class ChatActivity extends BaseActivity {
         setTitle("PawPads | Chat");
         if (getIntent() != null) {
             dialog = (QBDialog) getIntent().getSerializableExtra(EXTRA_DIALOG);
+            recipient= (QBUser) getIntent().getSerializableExtra(RECIPIENT);
         } else if (savedInstanceState != null) {
             dialog = (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
+            recipient= (QBUser) savedInstanceState.get(RECIPIENT);
         }
+
+        if (recipient==null || dialog==null){
+            finish();
+        }
+        TextView header= (TextView) findViewById(R.id.chat_header_recipient_name);
+        if (recipient.getFullName()!=null){
+            header.setText(recipient.getFullName());
+        }else{
+            header.setText(recipient.getLogin());
+        }
+        ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
+        AvatarLoaderHelper.loadImage(recipient.getFileId(), iv);
 
         //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
         //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
@@ -122,12 +142,7 @@ public class ChatActivity extends BaseActivity {
     @Override
     public void onQBConnect() {
 //        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-        final String recipient = getIntent().getExtras().getString("user", null);
-        final String displayPic = getIntent().getExtras().getString("image", null);
-        ((android.widget.TextView) findViewById(R.id.chat_header_recipient_name)).setText(recipient);
-        ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
-        ImageLoader il = ImageLoader.getInstance();
-        il.displayImage(displayPic, iv);
+
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
@@ -150,7 +165,7 @@ public class ChatActivity extends BaseActivity {
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,getApplicationContext());
+                        Util.onError(errors,ChatActivity.this);
                     }
                 });
 
@@ -210,5 +225,6 @@ public class ChatActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(EXTRA_DIALOG, dialog);
+        outState.putSerializable(RECIPIENT,recipient);
     }
 }
