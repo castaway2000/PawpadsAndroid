@@ -52,9 +52,6 @@ dependencies {
     compile files('libs/quickblox-android-sdk-messages-2.4.jar')
     compile files('libs/quickblox-android-sdk-location-2.4.jar')
     compile files('libs/quickblox-android-sdk-content-2.4.jar')
-    compile('vc908.stickers:stickerfactory:0.2.2@aar') {
-        transitive = true;
-    }
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.retrofit:retrofit:1.9.0'

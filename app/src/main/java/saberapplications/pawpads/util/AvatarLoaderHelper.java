@@ -25,6 +25,7 @@ import saberapplications.pawpads.Util;
  */
 public class AvatarLoaderHelper {
     public static void loadImage(int fileId, final ImageView imageView){
+        if (fileId==0) return;
         File CacheDir=PawPadsApplication.getInstance().getCacheDir();
         final File file=new File(CacheDir.getAbsolutePath()+"/"+fileId+".jpg");
         // Trying get image from cache

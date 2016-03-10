@@ -125,7 +125,10 @@ public class ChatActivity extends BaseActivity {
             header.setText(recipient.getLogin());
         }
         ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
-        AvatarLoaderHelper.loadImage(recipient.getFileId(), iv);
+        if (recipient.getFileId()!=null){
+            AvatarLoaderHelper.loadImage(recipient.getFileId(), iv);
+        }
+
 
         //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
         //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
@@ -133,11 +136,7 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-    @Override
-    protected void onStop() {
-        super.onStop();
 
-    }
 
     @Override
     public void onQBConnect() {

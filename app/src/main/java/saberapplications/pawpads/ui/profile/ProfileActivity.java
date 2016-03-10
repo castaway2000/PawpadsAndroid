@@ -28,10 +28,11 @@ import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseActivity {
     private QBDialog dialog;
     private QBUser currentQbUser;
     private SwipeRefreshLayout mSwipeRefreshLayout;

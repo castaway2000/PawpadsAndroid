@@ -132,7 +132,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     @Override
     protected void onStart() {
-        BaseActivity.openActivitiesCount++;
+
         super.onStart();
     }
 
@@ -551,6 +551,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         super.onLocationChanged(location);
         if (lastListUpdatedLocation == null) return;
         if (location == null) return;
+        if (adapter==null) return;
         if (lastListUpdatedLocation.distanceTo(location) < 100) {
             adapter.setLocation(location);
             adapter.notifyDataSetChanged();

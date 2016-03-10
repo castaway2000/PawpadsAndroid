@@ -45,7 +45,7 @@ public abstract class BaseActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
-    public static int openActivitiesCount = 0;
+    private static int openActivitiesCount = 0;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -206,7 +206,9 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
-    public abstract void onQBConnect() throws Exception;
+    public  void onQBConnect() throws Exception{
+
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -274,6 +276,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     }
     public synchronized void incrementActivityCount(){
+
         openActivitiesCount++;
     }
     public synchronized void decrementActivityCount(){

@@ -19,7 +19,7 @@ import android.support.v4.content.ContextCompat;
 public class GPS extends Activity {
     Context mContext;
 
-    public final static int PermissionRequestId = 0x5abe0001;
+    public final static int PermissionRequestId = 100000;
     public final static long UpdateInterval = 1 * 60 * 1000; // 1 minute in milliseconds
     public final static float UpdateDistanceThreshold = 5.0f; // meters
 

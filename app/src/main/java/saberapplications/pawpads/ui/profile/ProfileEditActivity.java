@@ -45,13 +45,14 @@ import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 /**
  * Created by blaze on 10/17/2015.
  */
-public class ProfileEditActivity extends AppCompatActivity implements View.OnClickListener {
+public class ProfileEditActivity extends BaseActivity implements View.OnClickListener {
     //TODO: send profile info to the database.
     private final static int SELECT_IMAGE = 1;
     private static File avatarFile;

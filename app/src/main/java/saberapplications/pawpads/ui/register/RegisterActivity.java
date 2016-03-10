@@ -1,15 +1,22 @@
 package saberapplications.pawpads.ui.register;
 
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -29,11 +36,14 @@ import saberapplications.pawpads.Util;
 /**
  * Created by blaze on 10/21/2015.
  */
-public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
 
+    private static final int PERMISSION_REQUEST = 10000;
     Button bRegister;
     EditText etUsername, etPassword, etPasswordChk, etEmail;
+    private GoogleApiClient mGoogleApiClient;
+    private Location lastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +54,37 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         etPassword = (EditText) findViewById(R.id.etRegPassword);
         etPasswordChk = (EditText) findViewById(R.id.etRegPasswordChk);
         etEmail = (EditText) findViewById(R.id.etEmail);
-        bRegister = ( Button ) findViewById(R.id.bRegister);
+        bRegister = (Button) findViewById(R.id.bRegister);
         bRegister.setOnClickListener(this);
+
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+
     }
 
     @Override
-    public void onClick(View v){
-        switch (v.getId()){
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()){
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.bRegister:
                 String username = etUsername.getText().toString();
                 String email = etEmail.getText().toString();
@@ -58,55 +92,52 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String passwordCHK = etPasswordChk.getText().toString();
 
                 //TODO: implement ssl encryption
-                if(password.equals(passwordCHK) && email.contains("@") && username.length() != 0 && password.length() != 0 && password.length()>=8) {
+                if (password.equals(passwordCHK) && email.contains("@") && username.length() != 0 && password.length() != 0 && password.length() >= 8) {
 
                     User user = new User(username, password, email, Util.GCMREGID);
-                    registerUser(user);
+                    if (checkPermissions()){
+                        registerUser(user);
+                    }
                     break;
-                }
-                else if(username.length() == 0){
-                    Toast toast = Toast.makeText(this, "Please enter a username",Toast.LENGTH_SHORT);
+                } else if (username.length() == 0) {
+                    Toast toast = Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT);
                     toast.show();
-                }
-                else if (password.length() == 0){
-                    Toast toast = Toast.makeText(this, "Please enter a password",Toast.LENGTH_SHORT);
+                } else if (password.length() == 0) {
+                    Toast toast = Toast.makeText(this, "Please enter a password", Toast.LENGTH_SHORT);
                     toast.show();
-                }
-                else if (password.length() < 8){
-                    Toast toast = Toast.makeText(this, "Password is to short ( minimum 8 characters)",Toast.LENGTH_SHORT);
+                } else if (password.length() < 8) {
+                    Toast toast = Toast.makeText(this, "Password is to short ( minimum 8 characters)", Toast.LENGTH_SHORT);
                     toast.show();
-                }
-                else if (!password.equals(passwordCHK)){
-                    Toast toast = Toast.makeText(this, "Passwords do not match",Toast.LENGTH_SHORT);
+                } else if (!password.equals(passwordCHK)) {
+                    Toast toast = Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT);
                     toast.show();
-                }
-                else if(!email.contains("@")){
-                    Toast toast = Toast.makeText(this, "Please input valid email",Toast.LENGTH_SHORT);
+                } else if (!email.contains("@")) {
+                    Toast toast = Toast.makeText(this, "Please input valid email", Toast.LENGTH_SHORT);
                     toast.show();
                 }
         }
     }
 
-    private void registerUser(final User user){
-        GPS gps = new GPS(this);
-        Location loc = null;
-        try {
-            loc = new Location(gps.getLastBestLocation());
+    private boolean checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST);
+                return false;
+            }
 
         }
-        catch(NullPointerException e) {
-            android.util.Log.w(this.toString(),
-                    "GPS.getLastBestLocation() failed -- location services may be turned off");
-            // TODO Better way to tell the user that something went wrong
-            Toast.makeText(
-                    this,
-                    "Couldn't register. Turn on location services and try again.",
-                    Toast.LENGTH_LONG
-            ).show();
-            return;
+
+        return true;
+    }
+
+    private void registerUser(final User user) {
+
+        if (lastLocation==null){
+            lastLocation=new Location("null");
         }
-        Double lat = loc.getLatitude();
-        Double lng = loc.getLongitude();
+        Double lat = lastLocation.getLatitude();
+        Double lng = lastLocation.getLongitude();
         ServerRequests serverRequests = new ServerRequests(this, lat, lng, null);
 
         serverRequests.storeUserDataInBackground(user, new GetUserCallback() {
@@ -129,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                             @Override
                             public void onError(List<String> errors) {
-                                Util.onError(errors,RegisterActivity.this);
+                                Util.onError(errors, RegisterActivity.this);
                             }
                         });
 
@@ -137,11 +168,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,RegisterActivity.this);
+                        Util.onError(errors, RegisterActivity.this);
                     }
                 });
-
-
 
 
             }
@@ -150,13 +179,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch(requestCode) {
-            case GPS.PermissionRequestId:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // TODO continue processing
+        switch (requestCode) {
+            case PERMISSION_REQUEST:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
-                }
-                else {
+                    String username = etUsername.getText().toString();
+                    String email = etEmail.getText().toString();
+                    String password = etPassword.getText().toString();
+                    User user = new User(username, password, email, Util.GCMREGID);
+                    lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    registerUser(user);
+                } else {
                     // Do nothing. User has denied the request for location data, so registration
                     // cannot continue.
                     android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
@@ -165,5 +198,24 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }
