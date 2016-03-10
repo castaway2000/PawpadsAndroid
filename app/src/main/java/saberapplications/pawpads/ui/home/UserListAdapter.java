@@ -33,6 +33,7 @@ import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 /**
  * Created by Stas on 28.12.15.
@@ -75,58 +76,8 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         final ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
         if (qbLocation.getUser().getFileId() != null) {
             int userProfilePictureID = qbLocation.getUser().getFileId(); // user - an instance of QBUser class
+            AvatarLoaderHelper.loadImage(userProfilePictureID,blazeImage);
 
-            QBContent.downloadFileTask(userProfilePictureID, new QBEntityCallback<InputStream>() {
-                @Override
-                public void onSuccess(InputStream inputStream, Bundle params) {
-                    new AsyncTask<InputStream, Void, Bitmap>() {
-
-                        @Override
-                        protected Bitmap doInBackground(InputStream... params) {
-
-                            BitmapFactory.Options o = new BitmapFactory.Options();
-                            int width_tmp = o.outWidth, height_tmp = o.outHeight;
-                            int scale = 1;
-
-                            while (true) {
-                                if (width_tmp / 2 < 80 || height_tmp / 2 < 80)
-                                    break;
-                                width_tmp /= 2;
-                                height_tmp /= 2;
-                                scale *= 2;
-                            }
-
-                            BitmapFactory.Options o2 = new BitmapFactory.Options();
-                            o2.inSampleSize = scale;
-                            return BitmapFactory.decodeStream(params[0], null, o2);
-                        }
-
-                        @Override
-                        protected void onPostExecute(Bitmap bitmap) {
-                            super.onPostExecute(bitmap);
-                            blazeImage.setImageBitmap(bitmap);
-
-                        }
-                    }.execute(inputStream);
-                }
-
-                @Override
-                public void onSuccess() {
-
-                }
-
-                @Override
-                public void onError(List<String> list) {
-                    Util.onError(list, getContext());
-                }
-
-
-            }, new QBProgressCallback() {
-                @Override
-                public void onProgressUpdate(int progress) {
-
-                }
-            });
         }
         return customView;
     }

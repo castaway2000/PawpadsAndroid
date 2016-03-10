@@ -564,6 +564,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     public void onLocationChanged(Location location) {
         super.onLocationChanged(location);
         if (lastListUpdatedLocation==null) return;
+        if (location==null) return;
         if (lastListUpdatedLocation.distanceTo(location)<100){
             adapter.setLocation(location);
             adapter.notifyDataSetChanged();

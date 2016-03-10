@@ -14,9 +14,11 @@ import vc908.stickerfactory.StickersManager;
  * Created by Stas on 28.12.15.
  */
 public class PawPadsApplication extends Application {
+    static PawPadsApplication instance;
     @Override
     public void onCreate() {
         super.onCreate();
+        instance=this;
         Fabric.with(this, new Crashlytics());
         QBSettings.getInstance().fastConfigInit(Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
         StickersManager.initialize(Util.STICKERS_API_KEY, this);
@@ -26,5 +28,9 @@ public class PawPadsApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+    public static PawPadsApplication getInstance() {
+        return instance;
     }
 }

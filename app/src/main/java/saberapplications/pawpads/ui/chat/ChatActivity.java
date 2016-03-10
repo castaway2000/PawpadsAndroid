@@ -145,8 +145,12 @@ public class ChatActivity extends BaseActivity {
                 QBChatService.createMessage(msg, new QBEntityCallbackImpl<QBChatMessage>() {
                     @Override
                     public void onSuccess(QBChatMessage result, Bundle params) {
-                        super.onSuccess(result, params);
                         showChat(ChatObject.SENT, result.getBody());
+                    }
+
+                    @Override
+                    public void onError(List<String> errors) {
+                        Util.onError(errors,getApplicationContext());
                     }
                 });
 

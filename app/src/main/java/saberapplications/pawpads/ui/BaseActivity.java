@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.model.QBUser;
@@ -47,7 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     private GoogleApiClient mGoogleApiClient;
 
-    protected boolean isLoggedIn;
+    protected static boolean isLoggedIn;
     private Integer userId;
 
     public Location getLastLocation() {
@@ -75,8 +77,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
-//        openActivitiesCount++;
-//        if (!isConnected()) {
+        incrementActivityCount();
         recreateSession();
 //        } else {
 //            onQBConnect();
@@ -91,11 +92,15 @@ public abstract class BaseActivity extends AppCompatActivity
                     mGoogleApiClient, this);
         }
         mGoogleApiClient.disconnect();
-        logOut();
+        decrementActivityCount();
+
+    }
+    public void logOutChat(){
 
     }
 
     protected void recreateSession() {
+        if (isLoggedIn) return;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
                 new QBEntityCallbackImpl<QBSession>() {
@@ -182,6 +187,7 @@ public abstract class BaseActivity extends AppCompatActivity
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.clear();
             editor.apply();
+            isLoggedIn=false;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -254,6 +260,20 @@ public abstract class BaseActivity extends AppCompatActivity
 
 
     }
-
+    public synchronized void incrementActivityCount(){
+        openActivitiesCount++;
+    }
+    public synchronized void decrementActivityCount(){
+        openActivitiesCount--;
+        Handler handler=new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (openActivitiesCount==0){
+                    logOutChat();
+                }
+            }
+        },500);
+    }
 
 }
