@@ -513,7 +513,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
         lastListUpdatedLocation = getLastLocation();
-        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), 1.219f);
+        // radius in kilometers
+        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), 10);
         getLocationsBuilder.setLastOnly();
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 

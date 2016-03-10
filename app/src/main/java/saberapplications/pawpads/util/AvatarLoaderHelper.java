@@ -31,23 +31,7 @@ public class AvatarLoaderHelper {
         final File file=new File(CacheDir.getAbsolutePath()+"/"+fileId+".jpg");
         // Trying get image from cache
         if (file.exists()){
-            AsyncTask<File,Void,File> task=new AsyncTask<File, Void, File>() {
-                @Override
-                protected File doInBackground(File... params) {
-                    for (File f:params){
-                         BitmapFactory.decodeFile(f.getAbsolutePath());
-                        return f;
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(File file) {
-                    if (file==null) return;
-                    Picasso.with(imageView.getContext()).load(file).into(imageView);
-                }
-            };
-            task.execute(file);
+            Picasso.with(imageView.getContext()).load(file).into(imageView);
         }
         else {
             QBContent.downloadFileTask(fileId, new QBEntityCallback<InputStream>() {
