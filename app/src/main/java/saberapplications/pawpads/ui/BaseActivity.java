@@ -50,7 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
 
     protected static boolean isLoggedIn;
-    private Integer userId;
+    private static Integer userId;
 
     public Location getLastLocation() {
         return lastLocation;
@@ -71,6 +71,11 @@ public abstract class BaseActivity extends AppCompatActivity
         }
 
 
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         if (isLoggedIn){
             try {
                 onQBConnect();

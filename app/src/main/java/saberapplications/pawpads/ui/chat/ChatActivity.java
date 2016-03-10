@@ -114,10 +114,12 @@ public class ChatActivity extends BaseActivity {
             dialog = (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
             recipient= (QBUser) savedInstanceState.get(RECIPIENT);
         }
-
         if (recipient==null || dialog==null){
             finish();
         }
+        currentUserId = getUserId();
+        sendTo = recipient.getId();
+
         TextView header= (TextView) findViewById(R.id.chat_header_recipient_name);
         if (recipient.getFullName()!=null){
             header.setText(recipient.getFullName());
@@ -166,7 +168,7 @@ public class ChatActivity extends BaseActivity {
 
                     @Override
                     public void onError(List<String> errors) {
-                        Util.onError(errors,ChatActivity.this);
+                        Util.onError(errors, ChatActivity.this);
                     }
                 });
 
@@ -199,14 +201,8 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ChatActivity.this);
-        currentUserId = prefs.getInt(Util.QB_USERID, 0);
-        sendTo = 0;
-        for (Integer userid : dialog.getOccupants()) {
-            if (userid.intValue() != currentUserId) {
-                sendTo = userid;
-            }
-        }
+
+
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
     }
 
