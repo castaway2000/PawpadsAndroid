@@ -77,7 +77,7 @@ public class GcmIntentService extends IntentService {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.pplogo)
                         .setAutoCancel(true)
-                        .setContentTitle("GCM Notification")
+                        .setContentTitle("PawPads")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);
