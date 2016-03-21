@@ -1,4 +1,4 @@
-package saberapplications.pawpads;
+package saberapplications.pawpads.ui;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -7,10 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import saberapplications.pawpads.R;
+
 /**
  * Created by blaze on 2/25/2016.
  */
-public class About extends AppCompatActivity implements View.OnClickListener {
+public class AboutActivity extends AppCompatActivity implements View.OnClickListener {
     TextView riverbreak, blazecollie;
     Intent browserIntent;
 

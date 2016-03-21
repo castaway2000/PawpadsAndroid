@@ -51,7 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import saberapplications.pawpads.About;
+import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
@@ -230,7 +230,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 startActivity(new Intent(this, DialogsListActivity.class));
                 return true;
             case R.id.action_about_devs:
-                startActivity(new Intent(this, About.class));
+                startActivity(new Intent(this, AboutActivity.class));
                 return true;
 
             default:

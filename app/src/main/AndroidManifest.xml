@@ -83,6 +83,10 @@
 			android:label="Register">
 		</activity>
 
+		<activity
+			android:name=".ui.AboutActivity"
+			android:label="@string/About">
+		</activity>
 		<receiver
 			android:name=".GcmBroadcastReceiver"
 			android:exported="true"
