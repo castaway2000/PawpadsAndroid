@@ -322,7 +322,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     protected void onStop() {
         if (QBChatService.isInitialized()) {
-            QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+            if (QBChatService.getInstance()!=null && QBChatService.getInstance().getPrivateChatManager()!=null && chatListener!=null){
+                QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+            }
         }
         super.onStop();
 
