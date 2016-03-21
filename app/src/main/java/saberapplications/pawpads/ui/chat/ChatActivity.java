@@ -60,6 +60,7 @@ public class ChatActivity extends BaseActivity {
     };
     public static final String EXTRA_DIALOG = "dialog";
     public static final String RECIPIENT="recipient";
+    public static final String CURRENT_USER_ID="current user id";
     //EditText editText_mail_id;
     EditText editText_chat_message;
     ListView listView_chat_messages;
@@ -107,17 +108,20 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
+
+        currentUserId = getUserId();
         if (getIntent() != null) {
             dialog = (QBDialog) getIntent().getSerializableExtra(EXTRA_DIALOG);
             recipient= (QBUser) getIntent().getSerializableExtra(RECIPIENT);
         } else if (savedInstanceState != null) {
             dialog = (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
             recipient= (QBUser) savedInstanceState.get(RECIPIENT);
+            currentUserId = savedInstanceState.getInt(CURRENT_USER_ID,0);
         }
         if (recipient==null || dialog==null){
             finish();
         }
-        currentUserId = getUserId();
+
         sendTo = recipient.getId();
 
         TextView header= (TextView) findViewById(R.id.chat_header_recipient_name);
@@ -185,9 +189,9 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> result, Bundle params) {
 
-                if (chat_list == null || chat_list.size() == 0) {
-                    chat_list = new ArrayList<>();
-                }
+                
+                chat_list = new ArrayList<>();
+
                 for (QBChatMessage qbChatMessage : result) {
                     String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
                     chat_list.add(new
@@ -223,5 +227,6 @@ public class ChatActivity extends BaseActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable(EXTRA_DIALOG, dialog);
         outState.putSerializable(RECIPIENT,recipient);
+        outState.putInt(CURRENT_USER_ID,currentUserId);
     }
 }
