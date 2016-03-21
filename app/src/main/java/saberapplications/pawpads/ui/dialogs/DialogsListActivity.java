@@ -19,13 +19,17 @@ import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.utils.Utils;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 
@@ -82,9 +86,23 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(DialogsListActivity.this, ChatActivity.class);
-                intent.putExtra(ChatActivity.EXTRA_DIALOG, qbDialogArrayList.get(position));
-                startActivity(intent);
+
+                final QBDialog dialog = qbDialogArrayList.get(position);
+                QBUsers.getUser(dialog.getRecipientId(), new QBEntityCallbackImpl<QBUser>() {
+                    @Override
+                    public void onSuccess(QBUser result, Bundle params) {
+                        Intent intent = new Intent(DialogsListActivity.this, ChatActivity.class);
+                        intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+                        intent.putExtra(ChatActivity.RECIPIENT,result);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(List<String> errors) {
+                        Util.onError(errors, DialogsListActivity.this);
+                    }
+                });
+
             }
         });
     }

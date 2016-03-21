@@ -49,17 +49,22 @@ public class DialogsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            View  view = inflater.inflate(R.layout.row_dialog,parent,false);
-            QBDialog dialog = getItem(position);
-            TextView lastMessage  = (TextView) view.findViewById(R.id.dialog_last_message);
-            TextView lastDate  = (TextView) view.findViewById(R.id.dialog_date_last_message);
-            String lastDateFormat = new SimpleDateFormat("dd MMM yyyy ", Locale.getDefault()).format(dialog.getUpdatedAt());
-            lastDate.setText(lastDateFormat);
-            lastMessage.setText(dialog.getLastMessage());
-            if(dialog.getUnreadMessageCount()>0){
-                view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
-            }
+            view = inflater.inflate(R.layout.row_dialog, parent, false);
+        }else {
+            view=convertView;
+        }
+        QBDialog dialog = getItem(position);
+        TextView lastMessage = (TextView) view.findViewById(R.id.dialog_last_message);
+        TextView lastDate = (TextView) view.findViewById(R.id.dialog_date_last_message);
+        String lastDateFormat = new SimpleDateFormat("dd MMM yyyy ", Locale.getDefault()).format(dialog.getUpdatedAt());
+        lastDate.setText(lastDateFormat);
+        lastMessage.setText(dialog.getLastMessage());
+        if (dialog.getUnreadMessageCount() > 0) {
+            view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
+        }
         return view;
     }
 
