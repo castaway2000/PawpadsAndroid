@@ -1,62 +1,53 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.v7.widget.GridLayout
+	android:id="@+id/gridLayout"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#97159cc6"
+	android:paddingBottom="@dimen/activity_vertical_margin"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin"
+	android:paddingTop="@dimen/activity_vertical_margin"
+	app:columnCount="1"
+	tools:context=".ui.profile.ProfileActivity">
 
-    android:background="#97159cc6">
+	<ImageView
+		android:id="@+id/profilepic"
+		android:layout_width="150dp"
+		android:layout_height="150dp"
+		android:scaleType="centerCrop"
+		app:layout_gravity="center"
+		/>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipelayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+	<Button
+		android:id="@+id/chatBtn"
+		android:layout_width="wrap_content"
+		android:layout_height="50dp"
+		android:text="Chat Now!"
+		app:layout_gravity="bottom|center"
+		/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            tools:context=".ui.profile.ProfileActivity">
-            <GridLayout
-                android:id="@+id/gridLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		app:layout_rowWeight="1"
+		>
 
-                <ImageView
-                    android:id="@+id/profilepic"
-                    android:scaleType="centerCrop"
-                    android:layout_width="150dp"
-                    android:layout_gravity="center"
-                    android:layout_height="150dp"
-                    android:layout_row="0" />
+		<TextView
+			android:id="@+id/profileinfo"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/profile"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			/>
+	</ScrollView>
 
-                <Button
-                    android:id="@+id/chatBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_column="0"
-                    android:layout_gravity="bottom|center"
-                    android:layout_row="1"
-                    android:text="Chat Now!" />
-
-                <TextView
-                    android:id="@+id/profileinfo"
-                    android:layout_width="fill_parent"
-                    android:layout_height="370dp"
-                    android:layout_column="0"
-                    android:layout_gravity="top|bottom"
-                    android:layout_row="17"
-                    android:text="@string/profile"
-                    android:maxLines = "1000"
-                    android:scrollbars = "vertical"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            </GridLayout>
-        </RelativeLayout>
+</android.support.v7.widget.GridLayout>
 
 
-    </android.support.v4.widget.SwipeRefreshLayout>
 
 
-</RelativeLayout>
+
+

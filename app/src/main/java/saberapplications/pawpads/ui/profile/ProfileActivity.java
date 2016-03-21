@@ -35,7 +35,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 public class ProfileActivity extends BaseActivity {
     private QBDialog dialog;
     private QBUser currentQbUser;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     private TextView profileInfo;
     private ImageView profileAvatar;
 
@@ -46,13 +46,6 @@ public class ProfileActivity extends BaseActivity {
         profileAvatar = (ImageView) findViewById(R.id.profilepic);
         profileInfo = (TextView) findViewById(R.id.profileinfo);
         dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.EXTRA_DIALOG);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
-        mSwipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
-        });
         QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -76,7 +69,6 @@ public class ProfileActivity extends BaseActivity {
                     AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar,size,size);
 
                 }
-                mSwipeRefreshLayout.setRefreshing(false);
 
             }
 

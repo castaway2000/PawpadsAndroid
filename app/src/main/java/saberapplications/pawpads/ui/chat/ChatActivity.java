@@ -189,7 +189,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> result, Bundle params) {
 
-                
+
                 chat_list = new ArrayList<>();
 
                 for (QBChatMessage qbChatMessage : result) {
