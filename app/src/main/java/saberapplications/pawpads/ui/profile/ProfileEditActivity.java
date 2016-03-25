@@ -1,8 +1,6 @@
 package saberapplications.pawpads.ui.profile;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -13,19 +11,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBProgressCallback;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -46,7 +39,6 @@ import java.util.List;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
-import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 /**
@@ -59,7 +51,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
     String selectedImagePath;
     ImageView img;
     EditText textOut, proDescr;
-    Button saveBtn, getimgbtn, removeProfile;
+    Button saveBtn, getimgbtn;
     Uri path;
     private QBUser currentQbUser;
     private SharedPreferences defaultSharedPreferences;
@@ -76,7 +68,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
-        removeProfile = (Button) findViewById(R.id.removeProfile);
         proDescr = (EditText) findViewById(R.id.editProfileText);
 //        textOut = (EditText) findViewById(R.id.editProfileText);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
@@ -138,13 +129,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                 Util.onError(list, ProfileEditActivity.this);
             }
         });
-        removeProfile.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 buildRemoveAlertDialog();
-                                             }
-                                         }
-        );
     }
 
     @Override
@@ -187,23 +171,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                         }
                     });
                 }
-
-                //saved image state passed to database
-//                Bitmap image = ((BitmapDrawable) img.getDrawable()).getBitmap();
-//                new UploadImage(image, proDescr.getText().toString());
-//
-//                //saved description updated to database
-//                String descr = proDescr.getText().toString();
-//                textOut.setText(descr);
-//
-//                //back to main activity
-//                Intent i = new Intent(profileEditPage.this, profilepage.class);
-//                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(profileEditPage.this).edit();
-//                editor.putString(Util.USER_INFO, textOut.getText().toString());
-//                editor.putString(Util.USER_AVATAR_PATH, selectedImagePath);
-//                editor.apply();
-//                startActivity(i);
-//                finish();
                 break;
         }
     }
@@ -252,53 +219,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
-    }
-
-    private void buildRemoveAlertDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(ProfileEditActivity.this);
-        alertDialog.setTitle("Remove profile");
-        alertDialog.setMessage("Enter Password");
-        final EditText input = new EditText(ProfileEditActivity.this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setPositiveButton("OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(Util.QB_PASSWORD, ""))) {
-                            QBUsers.deleteUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallbackImpl() {
-
-                                @Override
-                                public void onSuccess() {
-                                    Toast.makeText(ProfileEditActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
-                                    Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
-                                    startActivity(myIntent1);
-                                    finish();
-
-                                }
-
-                                @Override
-                                public void onError(List errors) {
-                                    Util.onError(errors, ProfileEditActivity.this);
-                                }
-                            });
-                        } else {
-                            Toast.makeText(ProfileEditActivity.this, "Wrong password", Toast.LENGTH_LONG).show();
-                        }
-
-
-                    }
-                });
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        alertDialog.show();
     }
 
     private void updateAvatar(File file) {

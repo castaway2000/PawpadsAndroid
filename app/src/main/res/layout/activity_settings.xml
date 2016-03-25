@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#97159cc6"
+        android:orientation="vertical"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="DISTANCE SETTINGS"
+        android:id="@+id/textView6"
+        android:textStyle="bold" />
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="179dp"
+        android:layout_weight="0.05">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Set how far you want to reach users"
+                android:id="@+id/tvRange"
+                android:paddingTop="20dp"
+                android:paddingLeft="5dp" />
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/etRange" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Unit of measure"
+                android:id="@+id/tvUnits"
+                android:paddingLeft="5dp"
+                android:paddingTop="10dp" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Metric"
+                android:id="@+id/tbMetric"
+                android:paddingTop="5dp"
+                android:paddingLeft="5dp" />
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.68">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ACCOUNT SETTINGS"
+            android:id="@+id/textView8"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Permenently Delete Profile"
+            android:id="@+id/tvRemoveProfile"
+            android:paddingTop="20dp"
+            android:paddingLeft="5dp" />
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="89dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete account"
+                android:padding="5dp"
+                android:id="@+id/btRmProfile" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/btProfSave"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

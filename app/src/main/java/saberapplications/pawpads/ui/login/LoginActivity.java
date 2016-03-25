@@ -58,7 +58,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         bLogin.setOnClickListener(this);
         registerLink.setOnClickListener(this);
         forgotpasswordLink.setOnClickListener(this);
-        //TODO: logic for forgotten password
     }
 
     @Override
@@ -141,18 +140,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private void showErrorMessage() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
-        dialogBuilder.setMessage("Incorrect username or Password");
-        dialogBuilder.setPositiveButton("Ok", null);
-        dialogBuilder.show();
-    }
-
-    private void logUserIn(User returnedUser) {
-        userLocalStore.storeUserData(returnedUser);
-        userLocalStore.setUserLoggedIn(true);
-        String test = userLocalStore.getLoggedInUser().username;
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
-    }
+//    private void showErrorMessage() {
+//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+//        dialogBuilder.setMessage("Incorrect username or Password");
+//        dialogBuilder.setPositiveButton("Ok", null);
+//        dialogBuilder.show();
+//    }
+//
+//    private void logUserIn(User returnedUser) {
+//        userLocalStore.storeUserData(returnedUser);
+//        userLocalStore.setUserLoggedIn(true);
+//        String test = userLocalStore.getLoggedInUser().username;
+//        startActivity(new Intent(this, MainActivity.class));
+//        finish();
+//    }
 }

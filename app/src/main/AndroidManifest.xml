@@ -87,6 +87,10 @@
 			android:label="ForgotPass">
 		</activity>
 		<activity
+			android:name=".ui.PrefrenceActivity"
+			android:label="PrefrenceActivity">
+		</activity>
+		<activity
 			android:name=".ui.AboutActivity"
 			android:label="@string/About">
 		</activity>

@@ -57,6 +57,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.ui.PrefrenceActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.BaseActivity;
@@ -232,7 +233,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             case R.id.action_about_devs:
                 startActivity(new Intent(this, AboutActivity.class));
                 return true;
-
+            case R.id.action_settings:
+                startActivity(new Intent(this, PrefrenceActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -516,7 +519,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
         lastListUpdatedLocation = getLastLocation();
         // radius in kilometers
-        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), 10);
+        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), Util.RANGE);
         getLocationsBuilder.setLastOnly();
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
