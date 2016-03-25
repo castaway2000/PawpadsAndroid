@@ -54,7 +54,8 @@
             android:layout_gravity="right"
             android:padding="15dp"
             android:layout_height="wrap_content"
-            android:gravity="right" />
+            android:gravity="right"
+            android:clickable="false" />
     </LinearLayout>
 
 </LinearLayout>

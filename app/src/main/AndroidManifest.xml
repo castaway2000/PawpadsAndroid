@@ -82,7 +82,10 @@
 			android:name=".ui.register.RegisterActivity"
 			android:label="Register">
 		</activity>
-
+		<activity
+			android:name=".ui.ForgotPasswordActivity"
+			android:label="ForgotPass">
+		</activity>
 		<activity
 			android:name=".ui.AboutActivity"
 			android:label="@string/About">

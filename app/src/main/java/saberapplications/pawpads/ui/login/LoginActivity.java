@@ -28,6 +28,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.User;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.ui.ForgotPasswordActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.register.RegisterActivity;
 
@@ -66,7 +67,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.bLogin:
                 final String username = etUsername.getText().toString();
                 final String password = etPassword.getText().toString();
-
 
                 QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
 
@@ -133,6 +133,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.tvRegisterLink:
                 startActivity(new Intent(this, RegisterActivity.class));
+                break;
+            case R.id.tvForgottenPassLink:
+                startActivity(new Intent(this, ForgotPasswordActivity.class));
                 break;
         }
     }
