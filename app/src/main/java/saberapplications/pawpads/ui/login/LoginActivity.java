@@ -76,42 +76,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         qbUser.setLogin(username);
                         qbUser.setPassword(password);
 
-
                         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
                             @Override
                             public void onSuccess(final QBUser user, Bundle params) {
-                                final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
-                                String locationGPSProvider = LocationManager.GPS_PROVIDER;
-                                Location lastKnownLocation = locationManager.getLastKnownLocation(locationGPSProvider);
-                                if (lastKnownLocation == null) {
-                                    String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
-                                    lastKnownLocation = locationManager.getLastKnownLocation(locationNetworkProvider);
-                                }
-                                double latitude = lastKnownLocation.getLatitude();
-                                double longitude = lastKnownLocation.getLongitude();
-                                QBLocation location = new QBLocation(latitude, longitude);
-                                location.setUserId(user.getId());
-                                QBLocations.createLocation(location, new QBEntityCallbackImpl<QBLocation>() {
-                                    @Override
-                                    public void onSuccess(QBLocation qbLocation, Bundle args) {
-                                        editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
-                                        editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
-                                        editor.putString(Util.QB_USER, username);
-                                        editor.putString(Util.USER_NAME, username);
-                                        editor.putString(Util.QB_PASSWORD, password);
-                                        editor.putInt(Util.QB_USERID, user.getId());
-                                        editor.apply();
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }
 
-                                    @Override
-                                    public void onError(List<String> errors) {
-                                        Util.onError(errors, LoginActivity.this);
-                                    }
-                                });
-
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
+                                editor.putString(Util.QB_USER, username);
+                                editor.putString(Util.USER_NAME, username);
+                                editor.putString(Util.QB_PASSWORD, password);
+                                editor.putInt(Util.QB_USERID, user.getId());
+                                editor.apply();
+                                
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
 
                             }
 

@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
@@ -517,10 +518,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
 
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-        lastListUpdatedLocation = getLastLocation();
-        // radius in kilometers
-        getLocationsBuilder.setRadius(getLastLocation().getLatitude(), getLastLocation().getLongitude(), Util.RANGE);
         getLocationsBuilder.setLastOnly();
+        lastListUpdatedLocation = UserLocationService.getLastLocation();
+        // radius in kilometers
+        if (lastListUpdatedLocation==null) return;
+        getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.RANGE);
+
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
@@ -539,7 +542,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                     }
                 }
                 adapter = new UserListAdapter(context, 0, nearLocations);
-                adapter.setLocation(getLastLocation());
+                adapter.setLocation(UserLocationService.getLastLocation());
                 listView.setAdapter(adapter);
                 mSwipeRefreshLayout.setRefreshing(false);
             }

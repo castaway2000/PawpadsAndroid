@@ -22,7 +22,7 @@
 	<!--
 		 To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
 		 option is required to comply with the Google+ Sign-In developer policies
-	-->
+    -->
 	<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 	<!-- To auto-complete the email text field in the login form with the user's emails -->
 	<uses-permission android:name="android.permission.READ_PROFILE"/>
@@ -34,12 +34,12 @@
 		android:icon="@drawable/pplogo"
 		android:label="@string/app_name"
 		android:theme="@style/AppTheme">
-
 		<activity
 			android:name=".ui.home.MainActivity"
 			android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
+
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
@@ -48,6 +48,7 @@
 			android:label="PawPads">
 			<intent-filter>
 				<action android:name="android.intent.action.profilepage"/>
+
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
@@ -56,10 +57,10 @@
 			android:label="PawPads">
 			<intent-filter>
 				<action android:name="android.intent.action.Login"/>
+
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
-
 		<activity
 			android:name=".ui.chat.ChatActivity"
 			android:label="Chat">
@@ -68,16 +69,15 @@
 			android:name=".ui.dialogs.DialogsListActivity"
 			android:label="DialogsList">
 		</activity>
-
 		<activity
 			android:name=".ui.profile.ProfileEditActivity"
 			android:label="PawPads">
 			<intent-filter>
 				<action android:name="android.intent.action.profileEditPage"/>
+
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
-
 		<activity
 			android:name=".ui.register.RegisterActivity"
 			android:label="Register">
@@ -94,13 +94,15 @@
 			android:name=".ui.AboutActivity"
 			android:label="@string/About">
 		</activity>
+
 		<receiver
 			android:name=".GcmBroadcastReceiver"
 			android:exported="true"
 			android:permission="com.google.android.c2dm.permission.SEND">
 			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+				<action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
 				<action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+
 				<category android:name="saberapplications.pawpads"/>
 			</intent-filter>
 		</receiver>
@@ -119,10 +121,15 @@
 		<meta-data
 			android:name="com.google.android.maps.v2.API_KEY"
 			android:value="AIzaSyAdM4oHjDSaAPHZ5liLJ0uSSGeW2g24Mkc"/>
-
 		<meta-data
 			android:name="io.fabric.ApiKey"
 			android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e"/>
+
+		<service
+			android:name=".service.UserLocationService"
+			android:enabled="true"
+			>
+		</service>
 	</application>
 
 </manifest>
