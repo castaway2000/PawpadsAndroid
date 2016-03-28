@@ -1,8 +1,5 @@
 package saberapplications.pawpads.ui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,8 +15,6 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.chat.utils.Utils;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
@@ -88,12 +83,14 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 final QBDialog dialog = qbDialogArrayList.get(position);
-                QBUsers.getUser(dialog.getRecipientId(), new QBEntityCallbackImpl<QBUser>() {
+                Integer userId = dialog.getUserId().equals(getUserId())?dialog.getRecipientId():dialog.getUserId();
+
+                QBUsers.getUser(userId, new QBEntityCallbackImpl<QBUser>() {
                     @Override
                     public void onSuccess(QBUser result, Bundle params) {
                         Intent intent = new Intent(DialogsListActivity.this, ChatActivity.class);
-                        intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
-                        intent.putExtra(ChatActivity.RECIPIENT,result);
+                        intent.putExtra(ChatActivity.DIALOG, dialog);
+                        intent.putExtra(ChatActivity.RECIPIENT, result);
                         startActivity(intent);
                     }
 

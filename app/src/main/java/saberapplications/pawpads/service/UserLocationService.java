@@ -170,6 +170,10 @@ public class UserLocationService extends Service implements
         if (qbLocation == null) {
             initUserLocation(lastLocation);
         }
+        if (qbLocation==null){
+            stopSelf();
+            return;
+        }
         lastLocation = location;
         qbLocation.setLatitude(location.getLatitude());
         qbLocation.setLongitude(location.getLongitude());

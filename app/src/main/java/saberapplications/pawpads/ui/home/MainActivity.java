@@ -281,7 +281,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     private void openProfile(QBDialog dialog, QBUser user) {
 
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+        intent.putExtra(ChatActivity.DIALOG, dialog);
         intent.putExtra(Util.QB_USERID, user.getId());
         startActivity(intent);
     }
@@ -291,7 +291,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+                intent.putExtra(ChatActivity.DIALOG, dialog);
                 intent.putExtra(Util.QB_USERID, qbUser.getId());
                 startActivity(intent);
             }

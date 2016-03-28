@@ -5,12 +5,22 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import android.view.View;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
+
+import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 
@@ -58,6 +68,12 @@ public class GcmIntentService extends IntentService {
                 Intent sendIntent = new Intent("message_recieved");
                 sendIntent.putExtra("message", recieved_message);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
+                if (intent.hasExtra("dialog_id") && intent.hasExtra("user_id")) {
+                    sendNotificationChat(intent);
+                } else {
+                    sendNotification(recieved_message);
+                }
+
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -67,14 +83,14 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String msg) {
+    private void sendNotification(final String msg) {
         mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, DialogsListActivity.class), 0);
+                GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+        PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
+                new Intent(GcmIntentService.this, MainActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(GcmIntentService.this)
                         .setSmallIcon(R.drawable.pplogo)
                         .setAutoCancel(true)
                         .setContentTitle("PawPads")
@@ -84,5 +100,34 @@ public class GcmIntentService extends IntentService {
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void sendNotificationChat(final Intent intent) {
+        Bundle extras = intent.getExtras();
+
+        String msg = extras.getString("message");
+
+        mNotificationManager = (NotificationManager)
+                GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
+        chatIntent.putExtra("user_id", extras.getString("user_id"));
+        chatIntent.putExtra("dialog_id", extras.getString("dialog_id"));
+        PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
+                chatIntent, 0);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(GcmIntentService.this)
+                        .setSmallIcon(R.drawable.pplogo)
+                        .setAutoCancel(true)
+                        .setContentTitle("PawPads")
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(msg))
+                        .setContentText(msg);
+
+        mBuilder.setContentIntent(contentIntent);
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        //10672731
+
+
     }
 }

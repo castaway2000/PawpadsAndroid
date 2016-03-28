@@ -1,12 +1,9 @@
 package saberapplications.pawpads.ui.chat;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
@@ -25,9 +21,10 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +55,11 @@ public class ChatActivity extends BaseActivity {
             }
         }
     };
-    public static final String EXTRA_DIALOG = "dialog";
-    public static final String RECIPIENT="recipient";
-    public static final String CURRENT_USER_ID="current user id";
+    public static final String DIALOG = "dialog";
+    public static final String RECIPIENT = "recipient";
+    public static final String DIALOG_ID = "dialog_id";
+    public static final String USER_ID = "user_id";
+    public static final String CURRENT_USER_ID = "current user id";
     //EditText editText_mail_id;
     EditText editText_chat_message;
     ListView listView_chat_messages;
@@ -77,7 +76,9 @@ public class ChatActivity extends BaseActivity {
             ChatActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    chatAdapter.add(new ChatObject(qbChatMessage.getBody(), ChatObject.RECEIVED));
+                    if (chatAdapter != null) {
+                        chatAdapter.add(new ChatObject(qbChatMessage.getBody(), ChatObject.RECEIVED));
+                    }
                 }
             });
 
@@ -102,6 +103,7 @@ public class ChatActivity extends BaseActivity {
     private QBPrivateChat chat;
     private Integer currentUserId;
     private int sendTo;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,32 +111,20 @@ public class ChatActivity extends BaseActivity {
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
 
-        currentUserId = getUserId();
+
         if (getIntent() != null) {
-            dialog = (QBDialog) getIntent().getSerializableExtra(EXTRA_DIALOG);
-            recipient= (QBUser) getIntent().getSerializableExtra(RECIPIENT);
+            if (getIntent().hasExtra(DIALOG)) {
+                dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
+                recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
+            }
         } else if (savedInstanceState != null) {
-            dialog = (QBDialog) savedInstanceState.get(EXTRA_DIALOG);
-            recipient= (QBUser) savedInstanceState.get(RECIPIENT);
-            currentUserId = savedInstanceState.getInt(CURRENT_USER_ID,0);
-        }
-        if (recipient==null || dialog==null){
-            finish();
+            dialog = (QBDialog) savedInstanceState.get(DIALOG);
+            recipient = (QBUser) savedInstanceState.get(RECIPIENT);
+            currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
         }
 
-        sendTo = recipient.getId();
-
-        TextView header= (TextView) findViewById(R.id.chat_header_recipient_name);
-        if (recipient.getFullName()!=null){
-            header.setText(recipient.getFullName());
-        }else{
-            header.setText(recipient.getLogin());
-        }
-        ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
-        if (recipient.getFileId()!=null){
-            float d=getResources().getDisplayMetrics().density;
-            int size=Math.round(80 * d);
-            AvatarLoaderHelper.loadImage(recipient.getFileId(), iv,size,size);
+        if (recipient != null && dialog != null) {
+            init();
         }
 
 
@@ -143,13 +133,68 @@ public class ChatActivity extends BaseActivity {
 
     }
 
+    private void loadDataById() {
+        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    recipient = QBUsers.getUser(Integer.parseInt(getIntent().getStringExtra(USER_ID)));
+                    QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+                    requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
+                    Bundle bundle = new Bundle();
+                    ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
+                    dialog = dialogs.get(0);
+                } catch (QBResponseException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
 
+            @Override
+            protected void onPostExecute(Boolean result) {
+                progressDialog.dismiss();
+                if (result) {
+                    init();
+                    onQBConnect();
+                } else {
+                    finish();
+                }
+
+            }
+        };
+        task.execute();
+
+    }
+
+    private void init() {
+        sendTo = recipient.getId();
+
+        TextView header = (TextView) findViewById(R.id.chat_header_recipient_name);
+        if (recipient.getFullName() != null) {
+            header.setText(recipient.getFullName());
+        } else {
+            header.setText(recipient.getLogin());
+        }
+        ImageView iv = (ImageView) findViewById(R.id.chat_header_profile_image);
+        if (recipient.getFileId() != null) {
+            float d = getResources().getDisplayMetrics().density;
+            int size = Math.round(80 * d);
+            AvatarLoaderHelper.loadImage(recipient.getFileId(), iv, size, size);
+        }
+    }
 
 
     @Override
     public void onQBConnect() {
+        // init recipient and dialog if intent contains only their ids
+        if (getIntent().hasExtra(DIALOG_ID) && dialog == null) {
+            loadDataById();
+            return;
+        }
+        currentUserId = getUserId();
 //        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-
+        if (dialog == null) return;
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
@@ -181,15 +226,13 @@ public class ChatActivity extends BaseActivity {
         });
 
 
-
-
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setPagesLimit(100);
         QBChatService.getDialogMessages(dialog, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> result, Bundle params) {
 
-
+                progressDialog.dismiss();
                 chat_list = new ArrayList<>();
 
                 for (QBChatMessage qbChatMessage : result) {
@@ -203,8 +246,13 @@ public class ChatActivity extends BaseActivity {
 
                 //chatAdapter.notifyDataSetChanged();
             }
-        });
 
+            @Override
+            public void onError(List<String> errors) {
+                progressDialog.dismiss();
+                Util.onError(errors, ChatActivity.this);
+            }
+        });
 
 
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
@@ -225,8 +273,18 @@ public class ChatActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(EXTRA_DIALOG, dialog);
-        outState.putSerializable(RECIPIENT,recipient);
-        outState.putInt(CURRENT_USER_ID,currentUserId);
+        outState.putSerializable(DIALOG, dialog);
+        outState.putSerializable(RECIPIENT, recipient);
+        outState.putInt(CURRENT_USER_ID, currentUserId);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading data");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
     }
 }
