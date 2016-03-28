@@ -197,7 +197,6 @@ public class UserLocationService extends Service implements
     protected void initUserLocation(Location location) {
         try {
             QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-            getLocationsBuilder.setLastOnly();
             getLocationsBuilder.setSort(SortField.CREATED_AT, SortOrder.DESCENDING);
             getLocationsBuilder.setUserId(userId);
             Bundle bundle = new Bundle();
