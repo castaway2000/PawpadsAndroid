@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Set how far you want to reach users"
+                android:text="Range in kilometers"
                 android:id="@+id/tvRange"
                 android:paddingTop="20dp"
                 android:paddingLeft="5dp" />

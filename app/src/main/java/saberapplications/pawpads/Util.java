@@ -23,7 +23,7 @@ public class Util {
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
     public static String UNIT_OF_MEASURE = "standard";
     // search range in km
-    public static int RANGE = 10;
+    public static int RANGE = 60;
 
 
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
