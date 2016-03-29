@@ -170,6 +170,10 @@ public class UserLocationService extends Service implements
         if (qbLocation == null) {
             initUserLocation(lastLocation);
         }
+        if (qbLocation==null){
+            stopSelf();
+            return;
+        }
         lastLocation = location;
         qbLocation.setLatitude(location.getLatitude());
         qbLocation.setLongitude(location.getLongitude());
@@ -193,7 +197,6 @@ public class UserLocationService extends Service implements
     protected void initUserLocation(Location location) {
         try {
             QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-            getLocationsBuilder.setLastOnly();
             getLocationsBuilder.setSort(SortField.CREATED_AT, SortOrder.DESCENDING);
             getLocationsBuilder.setUserId(userId);
             Bundle bundle = new Bundle();

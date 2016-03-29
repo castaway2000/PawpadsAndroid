@@ -2,13 +2,7 @@ package saberapplications.pawpads.ui.profile;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,13 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBProgressCallback;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import java.io.InputStream;
 import java.util.List;
 
 import saberapplications.pawpads.R;
@@ -45,7 +36,7 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profilepage);
         profileAvatar = (ImageView) findViewById(R.id.profilepic);
         profileInfo = (TextView) findViewById(R.id.profileinfo);
-        dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.EXTRA_DIALOG);
+        dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
         QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -87,7 +78,7 @@ public class ProfileActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
-                i.putExtra(ChatActivity.EXTRA_DIALOG, dialog);
+                i.putExtra(ChatActivity.DIALOG, dialog);
                 i.putExtra(ChatActivity.RECIPIENT,currentQbUser);
                 startActivity(i);
                 finish();

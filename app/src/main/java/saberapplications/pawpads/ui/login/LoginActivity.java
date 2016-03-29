@@ -28,6 +28,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.User;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.ForgotPasswordActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.register.RegisterActivity;
@@ -86,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 editor.putString(Util.QB_PASSWORD, password);
                                 editor.putInt(Util.QB_USERID, user.getId());
                                 editor.apply();
-                                
+                                UserLocationService.startService(user.getId());
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
