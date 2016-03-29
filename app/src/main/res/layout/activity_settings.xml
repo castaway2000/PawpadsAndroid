@@ -17,8 +17,8 @@
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="179dp"
-        android:layout_weight="0.05">
+            android:layout_height="140dp"
+        android:layout_weight="0.65">
 
         <TextView
                 android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Metric"
-                android:id="@+id/tbMetric"
+                android:id="@+id/ckMetric"
                 android:paddingTop="5dp"
                 android:paddingLeft="5dp" />
 
@@ -58,8 +58,53 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
+        android:layout_height="146dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="NOTIFICATION SETTINGS"
+            android:id="@+id/NotificationSetting"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView9" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toggle Push Notifications"
+            android:id="@+id/ckPushNotifications"
+            android:enabled="true"
+            android:checked="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView10" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toggle Messaging Popups"
+            android:id="@+id/ckImNotification"
+            android:checked="true"
+            android:enabled="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.68">
+        android:weightSum="1"
+        android:layout_weight="0.25">
 
         <TextView
             android:layout_width="fill_parent"
@@ -80,7 +125,8 @@
 
         <FrameLayout
             android:layout_width="fill_parent"
-            android:layout_height="89dp">
+            android:layout_height="84dp"
+            android:layout_weight="0.41">
 
             <Button
                 android:layout_width="wrap_content"
@@ -89,15 +135,15 @@
                 android:padding="5dp"
                 android:id="@+id/btRmProfile" />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:id="@+id/btProfSave"
+                android:layout_gravity="center_horizontal|bottom" />
+
         </FrameLayout>
 
     </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:id="@+id/btProfSave"
-        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

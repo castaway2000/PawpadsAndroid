@@ -93,31 +93,33 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle("New Chat Message")
-                                        .setMessage(qbChatMessage.getBody())
-                                        .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                QBRequestGetBuilder builder = new QBRequestGetBuilder();
+                                if(Util.IM_ALERT == true) {
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("New Chat Message")
+                                            .setMessage(qbChatMessage.getBody())
+                                            .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    QBRequestGetBuilder builder = new QBRequestGetBuilder();
 
-                                                builder.in("_id", qbChat.getDialogId());
+                                                    builder.in("_id", qbChat.getDialogId());
 
-                                                QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
-                                                    @Override
-                                                    public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
-                                                        if (result.size() == 0) return;
-                                                        openProfile(result.get(0));
+                                                    QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
+                                                        @Override
+                                                        public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
+                                                            if (result.size() == 0) return;
+                                                            openProfile(result.get(0));
 
-                                                    }
-                                                });
+                                                        }
+                                                    });
 
-                                                ///qbChat.getDialogId()
-                                                ///qbChat.getDialogId()
-                                            }
-                                        })
-                                        .setNegativeButton("Cancel", null)
-                                        .show();
+                                                    ///qbChat.getDialogId()
+                                                    ///qbChat.getDialogId()
+                                                }
+                                            })
+                                            .setNegativeButton("Cancel", null)
+                                            .show();
+                                }
                             }
                         });
 

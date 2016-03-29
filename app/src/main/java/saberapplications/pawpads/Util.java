@@ -21,6 +21,8 @@ public class Util {
     public static final String USER_AVATAR_PATH= "user_avatar_path";
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
+    public static boolean PUSH_NOTIFICIATIONS = true;
+    public static boolean IM_ALERT = true;
     public static String UNIT_OF_MEASURE = "standard";
     // search range in km
     public static int RANGE = 60;
