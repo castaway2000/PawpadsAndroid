@@ -58,7 +58,7 @@ public class ChatActivity extends BaseActivity {
     public static final String DIALOG = "dialog";
     public static final String RECIPIENT = "recipient";
     public static final String DIALOG_ID = "dialog_id";
-    public static final String USER_ID = "user_id";
+    public static final String RECIPIENT_ID = "user_id";
     public static final String CURRENT_USER_ID = "current user id";
     //EditText editText_mail_id;
     EditText editText_chat_message;
@@ -138,7 +138,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    recipient = QBUsers.getUser(Integer.parseInt(getIntent().getStringExtra(USER_ID)));
+                    recipient = QBUsers.getUser(Integer.parseInt(getIntent().getStringExtra(RECIPIENT_ID)));
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
                     Bundle bundle = new Bundle();

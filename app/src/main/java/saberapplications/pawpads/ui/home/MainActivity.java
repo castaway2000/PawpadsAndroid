@@ -90,6 +90,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 qbPrivateChat.addMessageListener(new QBMessageListener() {
                     @Override
                     public void processMessage(final QBChat qbChat, final QBChatMessage qbChatMessage) {
+
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -99,19 +100,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                         .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                QBRequestGetBuilder builder = new QBRequestGetBuilder();
-
-                                                builder.in("_id", qbChat.getDialogId());
-
-                                                QBChatService.getChatDialogs(QBDialogType.PRIVATE, builder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
-                                                    @Override
-                                                    public void onSuccess(ArrayList<QBDialog> result, Bundle params) {
-                                                        if (result.size() == 0) return;
-                                                        openProfile(result.get(0));
-
-                                                    }
-                                                });
-
+                                                Intent intent=new Intent(MainActivity.this,ChatActivity.class);
+                                                intent.putExtra(ChatActivity.DIALOG_ID,qbChatMessage.getDialogId().toString());
+                                                intent.putExtra(ChatActivity.RECIPIENT_ID,qbChatMessage.getSenderId().toString());
+                                                startActivity(intent);
                                                 ///qbChat.getDialogId()
                                                 ///qbChat.getDialogId()
                                             }
@@ -567,6 +559,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         } else if (lastListUpdatedLocation.distanceTo(location) > 100){
             loadAndSetNearUsers();
         }
+    }
+
+    private void openChat(QBDialog dialog){
+
     }
 }
 
