@@ -94,6 +94,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+							if(Util.IM_ALERT == true) {
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setTitle("New Chat Message")
                                         .setMessage(qbChatMessage.getBody())
@@ -110,6 +111,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                         })
                                         .setNegativeButton("Cancel", null)
                                         .show();
+								}
                             }
                         });
 

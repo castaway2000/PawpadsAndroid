@@ -30,7 +30,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     private SharedPreferences defaultSharedPreferences;
     Button removeProfile, savebtn;
     EditText dist;
-    CheckBox checkBox;
+    CheckBox tbMetricBox, tbImBox, tbPushBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +40,20 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
         dist = (EditText) findViewById(R.id.etRange);
         dist.setText(String.valueOf(Util.RANGE));
-        checkBox = (CheckBox) findViewById(R.id.tbMetric);
+
+        tbMetricBox = (CheckBox) findViewById(R.id.ckMetric);
+        tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
+        tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
         if(Util.UNIT_OF_MEASURE == "metric"){
-            checkBox.setChecked(true);
+            tbMetricBox.setChecked(true);
         }
+        if(Util.PUSH_NOTIFICIATIONS == false){
+            tbPushBox.setChecked(false);
+        }
+        if(Util.IM_ALERT == false){
+            tbImBox.setChecked(false);
+        }
+
         savebtn = (Button) findViewById(R.id.btProfSave);
         removeProfile = (Button) findViewById(R.id.btRmProfile);
         savebtn.setOnClickListener(this);
@@ -66,11 +76,19 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                 else {
                     Util.RANGE = Integer.valueOf(String.valueOf(dist.getText()));
                 }
-                if(checkBox.isChecked()){
+                if(tbMetricBox.isChecked()){
                     Util.UNIT_OF_MEASURE = "metric";
-                    checkBox.setChecked(true);
+
                 }
-                else {Util.UNIT_OF_MEASURE = "standard";}
+                else { Util.UNIT_OF_MEASURE = "standard"; }
+                if(tbPushBox.isChecked()){
+                    Util.PUSH_NOTIFICIATIONS = true;
+                }
+                else { Util.PUSH_NOTIFICIATIONS = false; }
+                if (tbImBox.isChecked()){
+                    Util.IM_ALERT = true;
+                }
+                else { Util.IM_ALERT = false; }
                 break;
         }
     }
