@@ -52,7 +52,7 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         //,
         userLocation.setLatitude(qbLocation.getLatitude());
         userLocation.setLongitude(qbLocation.getLongitude());
-        if(Util.UNIT_OF_MEASURE == "standard") {
+        if(Util.UNIT_OF_MEASURE.equals("standard")) {
             float distanceTo = location.distanceTo(userLocation) * 3.2808f;
             //gps coordinates
             TextView gps = (TextView) customView.findViewById(R.id.geoloc);

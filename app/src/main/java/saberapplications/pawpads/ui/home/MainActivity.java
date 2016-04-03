@@ -134,24 +134,25 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     };
 
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        context = getApplicationContext();
-        listView = (ListView) findViewById(R.id.listView);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        context = getApplicationContext();
+        listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
+        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");//        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+        Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "standard");
+        Util.RANGE = defaultSharedPreferences.getInt("range", 60);
+        Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
+        Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
+
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -160,6 +161,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         });
         setTitle("PawPads | " + userName);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     private boolean checkPlayServices() {
@@ -524,6 +530,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         lastListUpdatedLocation = UserLocationService.getLastLocation();
         // radius in kilometers
         if (lastListUpdatedLocation==null) return;
+
+        //included for testing reasons
+        //int dRange = (int)Math.rint(Util.RANGE / 1.6755);
+
         getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.RANGE);
 
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);

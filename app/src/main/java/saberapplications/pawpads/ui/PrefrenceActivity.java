@@ -31,6 +31,9 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     Button removeProfile, savebtn;
     EditText dist;
     CheckBox tbMetricBox, tbImBox, tbPushBox;
+    int range, gRange;
+    public String unit, gUnit;
+    Boolean alert, push, gAlert, gPush;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +42,27 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         setTitle("PawPads | Settings");
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
         dist = (EditText) findViewById(R.id.etRange);
-        dist.setText(String.valueOf(Util.RANGE));
-
         tbMetricBox = (CheckBox) findViewById(R.id.ckMetric);
         tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
         tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
-        if(Util.UNIT_OF_MEASURE == "metric"){
-            tbMetricBox.setChecked(true);
-        }
-        if(Util.PUSH_NOTIFICIATIONS == false){
+
+        gRange = defaultSharedPreferences.getInt("range", 60);
+        dist.setText(String.valueOf(gRange));
+
+        gUnit = defaultSharedPreferences.getString("unit", "standard");
+        gAlert = defaultSharedPreferences.getBoolean("alert", true);
+        gPush = defaultSharedPreferences.getBoolean("push", true);
+
+        //check box funtionality. defaults: standard, true, true;
+        if(gUnit.equals("standard")){
+            tbMetricBox.setChecked(false);
+        } else { tbMetricBox.setChecked(true);}
+        if(!gPush){
             tbPushBox.setChecked(false);
-        }
-        if(Util.IM_ALERT == false){
+        } else {tbPushBox.setChecked(true);}
+        if(!gAlert){
             tbImBox.setChecked(false);
-        }
+        } else { tbImBox.setChecked(true); }
 
         savebtn = (Button) findViewById(R.id.btProfSave);
         removeProfile = (Button) findViewById(R.id.btRmProfile);
@@ -66,33 +76,46 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         );
     }
 
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btProfSave:
-                if(dist.getText().length() == 0){
-                    Util.RANGE = 10;
-                }
-                else {
-                    Util.RANGE = Integer.valueOf(String.valueOf(dist.getText()));
-                }
-                if(tbMetricBox.isChecked()){
-                    Util.UNIT_OF_MEASURE = "metric";
+                if(dist.getText().length() > 0){
+                    range = Integer.valueOf(String.valueOf(dist.getText()));
+                }else { range = 60; }
 
-                }
-                else { Util.UNIT_OF_MEASURE = "standard"; }
+                if(tbMetricBox.isChecked()){
+                    unit = "metric";
+                } else { unit = "standard"; }
+
                 if(tbPushBox.isChecked()){
-                    Util.PUSH_NOTIFICIATIONS = true;
-                }
-                else { Util.PUSH_NOTIFICIATIONS = false; }
+                   push = true;
+                } else { push = false; }
+
                 if (tbImBox.isChecked()){
-                    Util.IM_ALERT = true;
-                }
-                else { Util.IM_ALERT = false; }
+                    alert = true;
+                } else { alert = false; }
+
+                saveSettings(range, unit, alert, push);
                 break;
         }
     }
 
+    public void saveSettings(int range, String unit, Boolean alert, Boolean push ){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
+        editor.putInt("range", range);
+        editor.putString("unit", unit);
+        editor.putBoolean("alert", alert);
+        editor.putBoolean("push", push);
+        editor.commit();
+        editor.apply();
+
+        Util.PUSH_NOTIFICIATIONS = push;
+        Util.IM_ALERT = alert;
+        Util.UNIT_OF_MEASURE = unit;
+        Util.RANGE = range;
+    }
 
     private void buildRemoveAlertDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrefrenceActivity.this);

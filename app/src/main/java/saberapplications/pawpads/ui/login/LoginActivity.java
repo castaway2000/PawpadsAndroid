@@ -1,10 +1,8 @@
 package saberapplications.pawpads.ui.login;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,15 +15,12 @@ import android.widget.TextView;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.location.QBLocations;
-import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.User;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
@@ -117,20 +112,4 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
         }
     }
-
-
-//    private void showErrorMessage() {
-//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
-//        dialogBuilder.setMessage("Incorrect username or Password");
-//        dialogBuilder.setPositiveButton("Ok", null);
-//        dialogBuilder.show();
-//    }
-//
-//    private void logUserIn(User returnedUser) {
-//        userLocalStore.storeUserData(returnedUser);
-//        userLocalStore.setUserLoggedIn(true);
-//        String test = userLocalStore.getLoggedInUser().username;
-//        startActivity(new Intent(this, MainActivity.class));
-//        finish();
-//    }
 }

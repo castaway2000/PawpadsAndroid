@@ -81,7 +81,7 @@
             android:text="Toggle Push Notifications"
             android:id="@+id/ckPushNotifications"
             android:enabled="true"
-            android:checked="true" />
+            android:checked="false" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:text="Toggle Messaging Popups"
             android:id="@+id/ckImNotification"
-            android:checked="true"
+            android:checked="false"
             android:enabled="true" />
     </LinearLayout>
 

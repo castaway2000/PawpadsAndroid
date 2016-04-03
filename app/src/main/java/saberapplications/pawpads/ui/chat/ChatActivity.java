@@ -220,7 +220,6 @@ public class ChatActivity extends BaseActivity {
                         Util.onError(errors, ChatActivity.this);
                     }
                 });
-
                 editText_chat_message.setText("");
             }
         });

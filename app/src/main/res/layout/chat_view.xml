@@ -5,7 +5,6 @@
     android:background="#97159cc6"
     android:clickable="true">
 
-
     <!--suppress AndroidDomInspection -->
     <TextView
         android:layout_width="wrap_content"
@@ -20,7 +19,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:layout_marginRight="20dp"
-        android:gravity="center"
+        android:gravity="left"
 
         android:layout_marginTop="10dp" />
     <!--suppress AndroidDomInspection -->
@@ -33,7 +32,7 @@
         android:id="@+id/textView_right_chat"
         android:layout_alignParentTop="true"
         android:visibility="visible"
-        android:gravity="center"
+        android:gravity="center_vertical|left"
 
         android:layout_alignParentRight="true"
         android:layout_marginRight="42dp"
