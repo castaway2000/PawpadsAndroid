@@ -20,7 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
@@ -29,7 +28,6 @@ import com.quickblox.location.request.SortField;
 import com.quickblox.location.request.SortOrder;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import saberapplications.pawpads.PawPadsApplication;
 import saberapplications.pawpads.Util;
@@ -200,7 +198,6 @@ public class UserLocationService extends Service implements
             getLocationsBuilder.setSort(SortField.CREATED_AT, SortOrder.DESCENDING);
             getLocationsBuilder.setUserId(userId);
             Bundle bundle = new Bundle();
-
             ArrayList<QBLocation> locations = QBLocations.getLocations(getLocationsBuilder, bundle);
             if (locations.size() > 0) {
                 qbLocation = locations.get(0);
@@ -229,7 +226,6 @@ public class UserLocationService extends Service implements
             }
         }
     }
-
     public static Location getLastLocation() {
         return lastLocation;
     }

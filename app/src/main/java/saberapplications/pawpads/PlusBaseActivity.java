@@ -4,12 +4,9 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 
 /**
@@ -19,7 +16,7 @@ public abstract class PlusBaseActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = PlusBaseActivity.class.getSimpleName();
+   // private static final String TAG = PlusBaseActivity.class.getSimpleName();
 
     // A magic number we will use to know that our sign-in error resolution activity has completed
     private static final int OUR_REQUEST_CODE = 49404;
@@ -38,19 +35,9 @@ public abstract class PlusBaseActivity extends AppCompatActivity
     private ConnectionResult mConnectionResult;
 
     /**
-     * Called when the {@link GoogleApiClient} revokes access to this app.
-     */
-    protected abstract void onPlusClientRevokeAccess();
-
-    /**
      * Called when the PlusClient is successfully connected.
      */
     protected abstract void onPlusClientSignIn();
-
-    /**
-     * Called when the {@link GoogleApiClient} is disconnected.
-     */
-    protected abstract void onPlusClientSignOut();
 
     /**
      * Called when the {@link GoogleApiClient} is blocking the UI.  If you have a progress bar widget,
@@ -80,29 +67,6 @@ public abstract class PlusBaseActivity extends AppCompatActivity
                 .build();
     }
 
-    /**
-     * Try to sign in the user.
-     */
-    public void signIn() {
-        if (!mPlusClient.isConnected()) {
-            // Show the dialog as we are now signing in.
-            setProgressBarVisible(true);
-            // Make sure that we will start the resolution (e.g. fire the intent and pop up a
-            // dialog for the user) for any errors that come in.
-            mAutoResolveOnFail = true;
-            // We should always have a connection result ready to resolve,
-            // so we can start that process.
-            if (mConnectionResult != null) {
-                startResolution();
-            } else {
-                // If we don't have one though, we can start connect in
-                // order to retrieve one.
-                initiatePlusClientConnect();
-            }
-        }
-
-        updateConnectButtonState();
-    }
 
     /**
      * Connect the {@link GoogleApiClient} only if a connection isn't already in progress.  This will
@@ -117,7 +81,7 @@ public abstract class PlusBaseActivity extends AppCompatActivity
 
     /**
      * Disconnect the {@link GoogleApiClient} only if it is connected (otherwise, it can throw an error.)
-     * This will call back to {@link #onDisconnected()}.
+     * This will call back to {//@link #onDisconnected()}.
      */
     private void initiatePlusClientDisconnect() {
         if (mPlusClient.isConnected()) {
@@ -125,51 +89,6 @@ public abstract class PlusBaseActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Sign out the user (so they can switch to another account).
-     */
-    public void signOut() {
-
-        // We only want to sign out if we're connected.
-        if (mPlusClient.isConnected()) {
-            // Clear the default account in order to allow the user to potentially choose a
-            // different account from the account chooser.
-            mPlusClient.clearDefaultAccountAndReconnect();
-
-            // Disconnect from Google Play Services, then reconnect in order to restart the
-            // process from scratch.
-            initiatePlusClientDisconnect();
-
-            Log.v(TAG, "Sign out successful!");
-        }
-
-        updateConnectButtonState();
-    }
-
-    /**
-     * Revoke Google+ authorization completely.
-     */
-    public void revokeAccess() {
-        if (mPlusClient.isConnected()) {
-            // Clear the default account as in the Sign Out.
-            mPlusClient.clearDefaultAccountAndReconnect();
-
-            // Revoke access to this entire application. This will call back to
-            // onAccessRevoked when it is complete, as it needs to reach the Google
-            // authentication servers to revoke all tokens.
-            Plus.AccountApi.clearDefaultAccount(mPlusClient);
-            Plus.AccountApi
-                    .revokeAccessAndDisconnect(mPlusClient)
-                    .setResultCallback(new ResultCallback<com.google.android.gms.common.api.Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            updateConnectButtonState();
-                            onPlusClientRevokeAccess();
-                            Log.d(TAG, "Disconnected");
-                        }
-                    });
-        }
-    }
 
     @Override
     protected void onStart() {
@@ -181,10 +100,6 @@ public abstract class PlusBaseActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         initiatePlusClientDisconnect();
-    }
-
-    public boolean isPlusClientConnecting() {
-        return mPlusClientIsConnecting;
     }
 
     private void setProgressBarVisible(boolean flag) {
@@ -248,16 +163,6 @@ public abstract class PlusBaseActivity extends AppCompatActivity
     }
 
     /**
-     * Successfully disconnected (called by PlusClient)
-     */
-
-    //@Override
-    public void onDisconnected() {
-        updateConnectButtonState();
-        onPlusClientSignOut();
-    }
-
-    /**
      * Connection failed for some reason (called by PlusClient)
      * Try and resolve the result.  Failure here is usually not an indication of a serious error,
      * just that the user's input is needed.
@@ -280,7 +185,5 @@ public abstract class PlusBaseActivity extends AppCompatActivity
             }
         }
     }
-    public GoogleApiClient getPlusClient() {
-        return mPlusClient;
-    }
+
 }

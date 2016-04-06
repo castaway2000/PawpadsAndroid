@@ -18,7 +18,7 @@ import retrofit.http.Query;
  */
 public class ServerRequests{
     ProgressDialog progressDialog;
-    public static final int CONNECTION_TIME = 1000 * 15;
+    //public static final int CONNECTION_TIME = 1000 * 15;
     public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
     Double LAT;
     Double LNG;
@@ -39,14 +39,6 @@ public class ServerRequests{
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Please wait...");
     }
-
-    public ServerRequests(Context context){
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setCancelable(false);
-        progressDialog.setTitle("Processing");
-        progressDialog.setMessage("Please wait...");
-    }
-
 
     public void storeUserDataInBackground(User user, final GetUserCallback userCallback){
         progressDialog.show();

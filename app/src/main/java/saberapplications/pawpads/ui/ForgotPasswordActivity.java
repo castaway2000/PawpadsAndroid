@@ -24,7 +24,7 @@ import saberapplications.pawpads.ui.login.LoginActivity;
  * Created by blaze on 3/24/2016.
  */
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final int PERMISSION_REQUEST = 10000;
+    //private static final int PERMISSION_REQUEST = 10000;
     Button buForgotpass;
     EditText etEmail;
 

@@ -1,6 +1,7 @@
 package saberapplications.pawpads.ui.chat;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
     private class ViewHolder {
         TextView textView_left_chat;
         TextView textView_right_chat;
+        View relative_layout;
     }
 
     @Override
@@ -46,6 +48,7 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder = new ViewHolder();
             holder.textView_left_chat = (TextView) convertView.findViewById(R.id.textView_left_chat);
             holder.textView_right_chat = (TextView) convertView.findViewById(R.id.textView_right_chat);
+            holder.relative_layout = convertView.findViewById(R.id.rChatLayout);
 
             convertView.setTag(holder);
         } else {
@@ -56,15 +59,17 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
 
 
         if (chat_data.get(position).getType().equals("sent")) {
+                holder.textView_left_chat.setText(chat_data.get(position).getMessage());
+                holder.textView_right_chat.setVisibility(View.GONE);
+                holder.textView_left_chat.setVisibility(View.VISIBLE);
+                holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
-            holder.textView_left_chat.setText(chat_data.get(position).getMessage());
-            holder.textView_right_chat.setVisibility(View.GONE);
-            holder.textView_left_chat.setVisibility(View.VISIBLE);
         } else {
 
             holder.textView_right_chat.setText(chat_data.get(position).getMessage());
             holder.textView_left_chat.setVisibility(View.GONE);
             holder.textView_right_chat.setVisibility(View.VISIBLE);
+            holder.relative_layout.setBackgroundColor(000000);
         }
 
 

@@ -1,7 +1,8 @@
 <android.support.v7.widget.GridLayout
 	android:id="@+id/gridLayout"
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
@@ -12,6 +13,7 @@
 	android:paddingTop="@dimen/activity_vertical_margin"
 	app:columnCount="1"
 	tools:context=".ui.profile.ProfileActivity">
+
 
 	<ImageView
 		android:id="@+id/profilepic"
@@ -43,6 +45,14 @@
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			/>
 	</ScrollView>
+
+
+	<com.google.android.gms.ads.AdView
+		android:id="@+id/profileAdView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		ads:adUnitId="ca-app-pub-5883625079032168/1470784739"
+		ads:adSize="BANNER" />
 
 </android.support.v7.widget.GridLayout>
 

@@ -1,7 +1,6 @@
 package saberapplications.pawpads.ui.chat;
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -37,24 +36,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 public class ChatActivity extends BaseActivity {
-    private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
-        @Override
-        public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
-            if (!createdLocally) {
-                qbPrivateChat.addMessageListener(new QBMessageListener() {
-                    @Override
-                    public void processMessage(final QBChat qbChat, final QBChatMessage qbChatMessage) {
-                        chatAdapter.notifyDataSetChanged();
-                    }
 
-                    @Override
-                    public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
-
-                    }
-                });
-            }
-        }
-    };
     public static final String DIALOG = "dialog";
     public static final String RECIPIENT = "recipient";
     public static final String DIALOG_ID = "dialog_id";
@@ -65,7 +47,7 @@ public class ChatActivity extends BaseActivity {
     ListView listView_chat_messages;
     Button button_send_chat;
     private List<ChatObject> chat_list;
-    BroadcastReceiver recieve_chat;
+    //BroadcastReceiver recieve_chat;
     private QBDialog dialog;
     private QBUser recipient;
     private ChatAdapter chatAdapter;
@@ -100,7 +82,7 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
-    private QBPrivateChat chat;
+//    private QBPrivateChat chat;
     private Integer currentUserId;
     private int sendTo;
     private ProgressDialog progressDialog;
@@ -110,7 +92,6 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         setTitle("PawPads | Chat");
-
 
         if (getIntent() != null) {
             if (getIntent().hasExtra(DIALOG)) {
@@ -126,11 +107,6 @@ public class ChatActivity extends BaseActivity {
         if (recipient != null && dialog != null) {
             init();
         }
-
-
-        //editText_mail_id = (EditText) findViewById(R.id.editText_mail_id);
-        //editText_mail_id.setText(getIntent().getExtras().getString("user", null));
-
     }
 
     private void loadDataById() {
@@ -202,8 +178,8 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 // send chat message to server
-
-                QBChatMessage msg = new QBChatMessage();
+                if(!editText_chat_message.getText().toString().equals("")){
+                    QBChatMessage msg = new QBChatMessage();
                 msg.setBody(editText_chat_message.getText().toString());
                 msg.setProperty("save_to_history", "1");
                 msg.setRecipientId(sendTo);
@@ -221,9 +197,9 @@ public class ChatActivity extends BaseActivity {
                     }
                 });
                 editText_chat_message.setText("");
+                }
             }
         });
-
 
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setPagesLimit(100);

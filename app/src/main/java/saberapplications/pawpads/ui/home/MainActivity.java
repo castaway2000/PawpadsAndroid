@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -32,8 +34,6 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
@@ -44,27 +44,25 @@ import com.quickblox.location.request.SortOrder;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import saberapplications.pawpads.service.UserLocationService;
-import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.UserList;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.ui.PrefrenceActivity;
-import saberapplications.pawpads.ui.profile.ProfileEditActivity;
-import saberapplications.pawpads.ui.profile.ProfileActivity;
+import saberapplications.pawpads.service.UserLocationService;
+import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.PrefrenceActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
+import saberapplications.pawpads.ui.profile.ProfileEditActivity;
 
 
 public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -76,7 +74,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     String regid;
     String msg;
 
-
+    private AdView adView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -144,6 +142,14 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         Util.RANGE = defaultSharedPreferences.getInt("range", 60);
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
+
+        String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+//        adView = (AdView) this.findViewById(R.id.mainBannerAdView);
+//        AdRequest adRequest = new AdRequest.Builder()
+//                //.addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
+//                .build();
+//        adView.loadAd(adRequest);
 
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
@@ -243,15 +249,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     }
 
 
-    public void setListView(UserList userList) {
-        //final ListAdapter listAdapter = new CustomAdapter(this, ud.user, ud.upics, ud.descr, ud.geol);
-        //  listView.setAdapter(listAdapter);
-
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
-
     public void performClickAction(int position) {
 
         //occupants_ids
@@ -285,43 +282,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         intent.putExtra(Util.QB_USERID, user.getId());
         startActivity(intent);
     }
-
-    private void openProfile(final QBDialog dialog) {
-        QBUsers.getUser(dialog.getUserId(), new QBEntityCallback<QBUser>() {
-            @Override
-            public void onSuccess(QBUser qbUser, Bundle bundle) {
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.putExtra(ChatActivity.DIALOG, dialog);
-                intent.putExtra(Util.QB_USERID, qbUser.getId());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(List<String> list) {
-
-            }
-        });
-
-    }
-
-
-    private QBEntityCallbackImpl<ArrayList<QBUser>> qbUsersCallback = new QBEntityCallbackImpl<ArrayList<QBUser>>() {
-        @Override
-        public void onSuccess(final ArrayList<QBUser> users, Bundle params) {
-            loadAndSetNearUsers();
-        }
-
-        @Override
-        public void onError(List<String> errors) {
-            mSwipeRefreshLayout.setRefreshing(false);
-            Util.onError(errors, MainActivity.this);
-        }
-    };
 
     @Override
     protected void onStop() {
@@ -525,9 +485,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         //included for testing reasons
         //int dRange = (int)Math.rint(Util.RANGE / 1.6755);
-
         getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.RANGE);
-
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
@@ -573,9 +531,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     }
 
-    private void openChat(QBDialog dialog){
-
-    }
 }
 
 

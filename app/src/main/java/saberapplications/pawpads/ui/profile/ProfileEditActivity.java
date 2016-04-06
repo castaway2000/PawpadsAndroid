@@ -50,7 +50,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
     private static File avatarFile;
     String selectedImagePath;
     ImageView img;
-    EditText textOut, proDescr;
+    EditText proDescr;
     Button saveBtn, getimgbtn;
     Uri path;
     private QBUser currentQbUser;
@@ -69,7 +69,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
         getimgbtn = (Button) findViewById(R.id.newPicButton);
         saveBtn = (Button) findViewById(R.id.profileSave);
         proDescr = (EditText) findViewById(R.id.editProfileText);
-//        textOut = (EditText) findViewById(R.id.editProfileText);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
@@ -181,15 +180,14 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
             if (requestCode == SELECT_IMAGE) {
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
-                path = selectedImageUri;
-
                 System.out.println("Image Path : " + selectedImagePath);
+                path = selectedImageUri;
                 try {
                     bitmap = decodeUri(getApplicationContext(), selectedImageUri, 80);
-                    img.setImageBitmap(bitmap);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+                img.setImageBitmap(bitmap);
             }
         }
     }
@@ -215,9 +213,39 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
             height_tmp /= 2;
             scale *= 2;
         }
-
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
+
+        //TODO: image rotation handeling. EXIF does not work.
+//        Bitmap bitmap = BitmapFactory.decodeFile(uri.getPath(),o2);
+//        Bitmap bm = bitmap;
+//
+//            try {
+//                ExifInterface exif = new ExifInterface(uri.getPath());
+//                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+//                Matrix m = new Matrix();
+//                if((orientation==3)){
+//                    m.postRotate(180);
+//                    m.postScale((float)bm.getWidth(), (float)bm.getHeight());
+////               if(m.preRotate(90)){
+//                    bitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
+//                    return  bitmap;
+//                }
+//                else if(orientation==6){
+//                    m.postRotate(90);
+//                    bitmap = Bitmap.createBitmap(bm, 0, 0,bm.getWidth(),bm.getHeight(), m, true);
+//                    return  bitmap;
+//                }
+//                else if(orientation==8){
+//                    m.postRotate(270);
+//                    bitmap = Bitmap.createBitmap(bm, 0, 0,bm.getWidth(),bm.getHeight(), m, true);
+//                    return  bitmap;
+//                }
+//                return bitmap;
+//            }
+//            catch (Exception e) {
+//            }
+//            return null;
         return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
     }
 

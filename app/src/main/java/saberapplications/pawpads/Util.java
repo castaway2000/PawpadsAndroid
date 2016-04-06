@@ -3,7 +3,6 @@ package saberapplications.pawpads;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import java.util.List;
 
@@ -13,12 +12,12 @@ import saberapplications.pawpads.ui.BaseActivity;
  * Created by blaze on 9/7/2015.
  */
 public class Util extends BaseActivity {
-    private SharedPreferences defaultSharedPreferences;
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String USER_NAME = "user_name";
     public static final String USER_LOCATION_LAT= "user_location_lat";
     public static final String USER_LOCATION_LONG= "user_location_long";
+    private static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";
 
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "325095426674";

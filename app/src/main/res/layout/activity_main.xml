@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:id="@+id/MainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,6 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ui.home.MainActivity">
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipelayout"
@@ -27,4 +29,13 @@
             android:layout_alignParentTop="true"
             android:clickable="true" />
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/mainBannerAdView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adUnitId="ca-app-pub-5883625079032168/1470784739"
+        ads:adSize="BANNER"
+        android:layout_alignBottom="@+id/swipelayout"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

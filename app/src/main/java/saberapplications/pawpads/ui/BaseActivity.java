@@ -1,30 +1,22 @@
 package saberapplications.pawpads.ui;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -48,11 +40,9 @@ public abstract class BaseActivity extends AppCompatActivity
     protected static boolean isLoggedIn;
     private static Integer userId;
 
-
-
-    private Location lastLocation;
+//    private Location lastLocation;
     private boolean isActive;
-    protected static QBLocation qbLocation;
+//    protected static QBLocation qbLocation;
 
     BroadcastReceiver locationChanged=new BroadcastReceiver() {
         @Override
@@ -195,22 +185,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
     }
 
-
-
-    protected void logOut() {
-        try {
-            if (QBChatService.isInitialized()) {
-                QBChatService.getInstance().logout();
-            }
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.clear();
-            editor.apply();
-            isLoggedIn = false;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void onQBConnect() throws Exception {
 

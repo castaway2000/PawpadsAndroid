@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdView;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.users.QBUsers;
@@ -25,6 +26,7 @@ public class ProfileActivity extends BaseActivity {
     private QBDialog dialog;
     private QBUser currentQbUser;
 
+    private AdView adView, largeAdView;
     private TextView profileInfo;
     private ImageView profileAvatar;
 
@@ -34,6 +36,14 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profilepage);
         profileAvatar = (ImageView) findViewById(R.id.profilepic);
         profileInfo = (TextView) findViewById(R.id.profileinfo);
+
+        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+//        adView = (AdView) this.findViewById(R.id.profileAdView);
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
+//                .build();
+//        adView.loadAd(adRequest);
+
         dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
         QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
@@ -83,6 +93,10 @@ public class ProfileActivity extends BaseActivity {
             }
         };
         button.setOnClickListener(clickHandler);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
 }
