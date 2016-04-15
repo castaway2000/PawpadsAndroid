@@ -108,13 +108,12 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         editor.putString("unit", unit);
         editor.putBoolean("alert", alert);
         editor.putBoolean("push", push);
-        editor.commit();
         editor.apply();
 
         Util.PUSH_NOTIFICIATIONS = push;
         Util.IM_ALERT = alert;
         Util.UNIT_OF_MEASURE = unit;
-        Util.RANGE = range;
+
     }
 
     private void buildRemoveAlertDialog() {
