@@ -34,6 +34,7 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.utils.Utils;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
@@ -73,6 +74,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     Context context;
     String regid;
     String msg;
+    int range;
 
     private AdView adView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -141,7 +143,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");//        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "standard");
-        Util.RANGE = defaultSharedPreferences.getInt("range", 60);
+        range= Util.getRange();
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
 
@@ -166,7 +168,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     protected void onStart() {
         super.onStart();
-        //gps.checkGPSEnabled();
+        if (range!=Util.getRange()){
+            range=Util.getRange();
+            loadAndSetNearUsers();
+        }
     }
 
     private boolean checkPlayServices() {
@@ -510,7 +515,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         //included for testing reasons
         //int dRange = (int)Math.rint(Util.RANGE / 1.6755);
-        getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.RANGE);
+        getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), range);
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
