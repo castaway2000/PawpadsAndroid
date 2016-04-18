@@ -34,6 +34,7 @@ public class Util extends BaseActivity {
     public static final String QB_USERID ="qb_userid" ;
     public static final String STICKERS_API_KEY="94c58fc501b259bc84282c44cd278fdf";
 
+    public static int ACCURACY;
     public static int RANGE;
     public static boolean PUSH_NOTIFICIATIONS;
     public static boolean IM_ALERT;

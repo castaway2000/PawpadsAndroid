@@ -24,7 +24,6 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
-import saberapplications.pawpads.ui.ForgotPasswordActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.register.RegisterActivity;
 

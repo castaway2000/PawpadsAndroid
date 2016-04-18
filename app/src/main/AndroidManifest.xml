@@ -90,7 +90,7 @@
 			android:label="Register">
 		</activity>
 		<activity
-			android:name=".ui.ForgotPasswordActivity"
+			android:name=".ui.login.ForgotPasswordActivity"
 			android:label="ForgotPass">
 		</activity>
 		<activity

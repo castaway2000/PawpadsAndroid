@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -31,7 +33,9 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     Button removeProfile, savebtn;
     EditText dist;
     CheckBox tbMetricBox, tbImBox, tbPushBox;
-    int range, gRange;
+    RadioGroup rbGroup;
+    RadioButton rbHigh, rbMedium, rbLow;
+    int range, gRange, accuracy, gAccuracy;
     public String unit, gUnit;
     Boolean alert, push, gAlert, gPush;
 
@@ -45,7 +49,12 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         tbMetricBox = (CheckBox) findViewById(R.id.ckMetric);
         tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
         tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
+        rbLow = (RadioButton) findViewById(R.id.rbLow);
+        rbMedium = (RadioButton) findViewById(R.id.rbMedium);
+        rbHigh = (RadioButton) findViewById(R.id.rbHigh);
 
+        //TODO: create GUI for accuracy settings.
+        gAccuracy = defaultSharedPreferences.getInt("accuracy", 6);
         gRange = defaultSharedPreferences.getInt("range", 60);
         dist.setText(String.valueOf(gRange));
 
@@ -63,6 +72,23 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         if(!gAlert){
             tbImBox.setChecked(false);
         } else { tbImBox.setChecked(true); }
+        if(gAccuracy == 1){
+            rbLow.setChecked(true);
+            rbMedium.setChecked(false);
+            rbHigh.setChecked(false);
+
+        }
+        else if(gAccuracy == 3){
+            rbLow.setChecked(false);
+            rbMedium.setChecked(true);
+            rbHigh.setChecked(false);
+        }
+        else{
+            rbLow.setChecked(false);
+            rbMedium.setChecked(false);
+            rbHigh.setChecked(true);
+        }
+
 
         savebtn = (Button) findViewById(R.id.btProfSave);
         removeProfile = (Button) findViewById(R.id.btRmProfile);
@@ -96,14 +122,21 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                 if (tbImBox.isChecked()){
                     alert = true;
                 } else { alert = false; }
+                if(rbLow.isChecked()){
+                    accuracy = 1;
+                }
+                else if (rbMedium.isChecked()){
+                    accuracy = 3;
+                }else{ accuracy = 6; }
 
-                saveSettings(range, unit, alert, push);
+                saveSettings(accuracy, range, unit, alert, push);
                 break;
         }
     }
 
-    public void saveSettings(int range, String unit, Boolean alert, Boolean push ){
+    public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push ){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
+        editor.putInt("accuracy", accuracy);
         editor.putInt("range", range);
         editor.putString("unit", unit);
         editor.putBoolean("alert", alert);
@@ -111,6 +144,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         editor.commit();
         editor.apply();
 
+        Util.ACCURACY = accuracy;
         Util.PUSH_NOTIFICIATIONS = push;
         Util.IM_ALERT = alert;
         Util.UNIT_OF_MEASURE = unit;
@@ -140,7 +174,6 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                                     Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
                                     startActivity(myIntent1);
                                     finish();
-
                                 }
 
                                 @Override

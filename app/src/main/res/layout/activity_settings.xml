@@ -27,7 +27,7 @@
             <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="172dp">
+                    android:layout_height="310dp">
 
                 <TextView
                         android:layout_width="wrap_content"
@@ -62,12 +62,48 @@
                         android:paddingTop="5dp"
                         android:paddingLeft="5dp" />
 
-                </LinearLayout>
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/rgGpsSettings">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="GPS Accuracy"
+                        android:id="@+id/textView9" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="High"
+                        android:id="@+id/rbHigh"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Medum"
+                        android:id="@+id/rbMedium" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Low"
+                        android:id="@+id/rbLow"
+                        android:checked="false" />
+
+                </RadioGroup>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="116dp">
+                android:layout_height="98dp">
 
                 <TextView
                     android:layout_width="wrap_content"
