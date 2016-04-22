@@ -1,4 +1,4 @@
-package saberapplications.pawpads.ui;
+package saberapplications.pawpads.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.ui.login.LoginActivity;
 
 
 /**

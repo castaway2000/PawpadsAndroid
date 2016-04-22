@@ -27,6 +27,8 @@ import com.quickblox.location.request.QBLocationRequestBuilder;
 import com.quickblox.location.request.SortField;
 import com.quickblox.location.request.SortOrder;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import saberapplications.pawpads.PawPadsApplication;
@@ -56,6 +58,7 @@ public class UserLocationService extends Service implements
         Intent intent = new Intent(PawPadsApplication.getInstance(), UserLocationService.class);
         intent.putExtra(USERID, userId);
         PawPadsApplication.getInstance().startService(intent);
+
     }
 
     public static void stop() {
@@ -74,7 +77,6 @@ public class UserLocationService extends Service implements
                     .build();
         }
         mGoogleApiClient.connect();
-
     }
 
     @Override
@@ -133,7 +135,6 @@ public class UserLocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-
         updateLocationAsync(location);
     }
 
@@ -173,8 +174,8 @@ public class UserLocationService extends Service implements
             return;
         }
         lastLocation = location;
-        qbLocation.setLatitude(location.getLatitude());
-        qbLocation.setLongitude(location.getLongitude());
+        qbLocation.setLatitude(accuracySettings(location.getLatitude()));
+        qbLocation.setLongitude(accuracySettings(location.getLongitude()));
 
         try {
             QBLocations.deleteObsoleteLocations(1);
@@ -204,16 +205,22 @@ public class UserLocationService extends Service implements
             } else {
                 qbLocation = new QBLocation();
                 qbLocation.setUserId(userId);
-                qbLocation.setLatitude(location.getLatitude());
-                qbLocation.setLongitude(location.getLongitude());
+
+
+                qbLocation.setLatitude(accuracySettings(location.getLatitude()));
+                qbLocation.setLongitude(accuracySettings(location.getLongitude()));
+
+
                 qbLocation = QBLocations.createLocation(qbLocation);
             }
         } catch (QBResponseException e) {
             if (e.getMessage().equals("Entity you are looking for was not found.")){
                 qbLocation = new QBLocation();
                 qbLocation.setUserId(userId);
-                qbLocation.setLatitude(location.getLatitude());
-                qbLocation.setLongitude(location.getLongitude());
+
+                qbLocation.setLatitude(accuracySettings(location.getLatitude()));
+                qbLocation.setLongitude(accuracySettings(location.getLongitude()));
+
                 try {
                     qbLocation = QBLocations.createLocation(qbLocation);
                 } catch (QBResponseException e1) {
@@ -229,4 +236,25 @@ public class UserLocationService extends Service implements
     public static Location getLastLocation() {
         return lastLocation;
     }
+
+
+    public Double accuracySettings(Double location){
+        Double loc;
+        NumberFormat formatter;
+        if(Util.ACCURACY == 3) {
+            formatter = new DecimalFormat("#.###");
+            loc = Double.valueOf(formatter.format(location));
+            return loc;
+        }
+        else if(Util.ACCURACY == 1) {
+            formatter = new DecimalFormat("#.#");
+            loc = Double.valueOf(formatter.format(location));
+            return loc;
+        }
+        else{
+            return location;
+        }
+    }
+
+
 }

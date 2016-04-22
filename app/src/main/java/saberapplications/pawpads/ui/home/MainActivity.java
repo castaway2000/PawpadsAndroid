@@ -86,6 +86,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
+    public GPS gps;
 
     private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
         @Override
@@ -135,15 +136,16 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        gps = new GPS(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         context = getApplicationContext();
+        //gps.checkGPSEnabled();
         listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");//        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "standard");
         range= Util.getRange();
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
@@ -357,7 +359,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
-
         loadAndSetNearUsers();
     }
 
@@ -366,7 +367,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
      */
-
 
     private void registerInBackground() {
         new AsyncTask<Void, Void, String>() {
@@ -490,11 +490,35 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 } else {
                     // TODO stop login
                     android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
+                    showGPSDisabledAlertToUser();
                 }
                 break;
             default:
                 break;
         }
+    }
+
+
+    private void showGPSDisabledAlertToUser() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Goto Settings Page To Enable GPS",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent callGPSSettingIntent = new Intent(
+                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(callGPSSettingIntent);
+                            }
+                        });
+        alertDialogBuilder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 
     private void loadAndSetNearUsers() {

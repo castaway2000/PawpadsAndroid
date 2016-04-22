@@ -3,6 +3,8 @@ package saberapplications.pawpads.ui.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,6 +31,8 @@ public class ProfileActivity extends BaseActivity {
     private AdView adView, largeAdView;
     private TextView profileInfo;
     private ImageView profileAvatar;
+    MenuItem unblock, block;
+    private Privacy privacy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,9 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profilepage);
         profileAvatar = (ImageView) findViewById(R.id.profilepic);
         profileInfo = (TextView) findViewById(R.id.profileinfo);
+        block = (MenuItem) findViewById(R.id.action_blockUser);
+        unblock = (MenuItem) findViewById(R.id.action_unblock);
+        privacy = new Privacy();
 
         //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 //        adView = (AdView) this.findViewById(R.id.profileAdView);
@@ -65,10 +72,17 @@ public class ProfileActivity extends BaseActivity {
                     int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
                     float d=getResources().getDisplayMetrics().density;
                     int size=Math.round(150* d);
-                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar,size,size);
+                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar, size, size);
 
                 }
 
+//                if(privacy.items.contains(currentQbUser.getId())){
+//                   block.setVisible(false);
+//                    unblock.setVisible(true);
+//                } else {
+//                    unblock.setVisible(false);
+//                    block.setVisible(true);
+//                }
             }
 
             @Override
@@ -99,4 +113,33 @@ public class ProfileActivity extends BaseActivity {
         super.onStart();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_profilepage, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_blockUser:
+                  privacy.addToBlockList(currentQbUser.getId());
+//                  block.setEnabled(false);
+//                block.setVisible(false);
+//                unblock.setVisible(true);
+                finish();
+                return true;
+
+            case R.id.action_unblock:
+                privacy.removeFromBlockList(currentQbUser.getId());
+//                block.setVisible(true);
+//                unblock.setVisible(false);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

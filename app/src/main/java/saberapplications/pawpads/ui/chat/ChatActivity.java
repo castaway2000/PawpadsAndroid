@@ -36,7 +36,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 public class ChatActivity extends BaseActivity {
-
+    //TODO: 
     public static final String DIALOG = "dialog";
     public static final String RECIPIENT = "recipient";
     public static final String DIALOG_ID = "dialog_id";
