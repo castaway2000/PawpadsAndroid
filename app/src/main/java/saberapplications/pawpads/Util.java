@@ -19,7 +19,7 @@ public class Util extends BaseActivity {
     public static final String USER_NAME = "user_name";
     public static final String USER_LOCATION_LAT= "user_location_lat";
     public static final String USER_LOCATION_LONG= "user_location_long";
-    private static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";
+    public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";
 
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "325095426674";
