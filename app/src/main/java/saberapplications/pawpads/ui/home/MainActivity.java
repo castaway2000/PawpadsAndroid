@@ -21,7 +21,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -77,6 +80,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     int range;
 
     private AdView adView;
+    private InterstitialAd interAd;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -146,14 +150,24 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         range= Util.getRange();
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
-
         String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        interAd = new InterstitialAd(this);
+        interAd.setAdUnitId(Util.AD_UNIT_ID);
 
-//        adView = (AdView) this.findViewById(R.id.mainBannerAdView);
-//        AdRequest adRequest = new AdRequest.Builder()
-//                //.addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
-//                .build();
-//        adView.loadAd(adRequest);
+        adView = (AdView) this.findViewById(R.id.mainBannerAdView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
+                .build();
+        adView.loadAd(adRequest);
+
+
+        interAd.loadAd(adRequest);
+        interAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                 displayInterAd();
+            }
+        });
 
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
@@ -162,7 +176,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
         });
         setTitle("PawPads | " + userName);
+    }
 
+    public void  displayInterAd(){
+        if(interAd.isLoaded()){
+            interAd.show();
+        }
     }
 
     @Override
