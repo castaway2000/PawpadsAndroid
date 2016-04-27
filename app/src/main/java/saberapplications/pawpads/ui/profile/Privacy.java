@@ -98,7 +98,6 @@ public class Privacy extends BaseActivity {
 
             @Override
             public void updatedPrivacyList(String listName) {
-
             }
         };
     }

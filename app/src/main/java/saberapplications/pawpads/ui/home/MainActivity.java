@@ -21,10 +21,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -37,7 +35,6 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.utils.Utils;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
@@ -80,7 +77,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     int range;
 
     private AdView adView;
-    private InterstitialAd interAd;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -151,8 +147,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
         String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        interAd = new InterstitialAd(this);
-        interAd.setAdUnitId(Util.AD_UNIT_ID);
 
         adView = (AdView) this.findViewById(R.id.mainBannerAdView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -161,14 +155,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         adView.loadAd(adRequest);
 
 
-        interAd.loadAd(adRequest);
-        interAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                 displayInterAd();
-            }
-        });
-
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -176,12 +162,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
         });
         setTitle("PawPads | " + userName);
-    }
-
-    public void  displayInterAd(){
-        if(interAd.isLoaded()){
-            interAd.show();
-        }
     }
 
     @Override

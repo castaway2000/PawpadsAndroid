@@ -10,7 +10,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.users.QBUsers;
@@ -29,6 +32,7 @@ public class ProfileActivity extends BaseActivity {
     private QBUser currentQbUser;
 
     private AdView adView, largeAdView;
+    private InterstitialAd interAd;
     private TextView profileInfo;
     private ImageView profileAvatar;
     MenuItem unblock, block;
@@ -44,12 +48,22 @@ public class ProfileActivity extends BaseActivity {
         unblock = (MenuItem) findViewById(R.id.action_unblock);
         privacy = new Privacy();
 
+        interAd = new InterstitialAd(this);
+        interAd.setAdUnitId(Util.AD_UNIT_ID);
         //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-//        adView = (AdView) this.findViewById(R.id.profileAdView);
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
-//                .build();
-//        adView.loadAd(adRequest);
+        adView = (AdView) this.findViewById(R.id.profileAdView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        adView.loadAd(adRequest);
+
+        interAd.loadAd(adRequest);
+        interAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                displayInterAd();
+            }
+        });
 
         dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
         QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
@@ -108,6 +122,13 @@ public class ProfileActivity extends BaseActivity {
         };
         button.setOnClickListener(clickHandler);
     }
+    public void  displayInterAd(){
+        int interval = (int) Math.floor(Math.random() * 101)%3;
+        if(interAd.isLoaded() && interval == 0){
+            interAd.show();
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -126,16 +147,11 @@ public class ProfileActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_blockUser:
                   privacy.addToBlockList(currentQbUser.getId());
-//                  block.setEnabled(false);
-//                block.setVisible(false);
-//                unblock.setVisible(true);
                 finish();
                 return true;
 
             case R.id.action_unblock:
                 privacy.removeFromBlockList(currentQbUser.getId());
-//                block.setVisible(true);
-//                unblock.setVisible(false);
                 finish();
                 return true;
             default:

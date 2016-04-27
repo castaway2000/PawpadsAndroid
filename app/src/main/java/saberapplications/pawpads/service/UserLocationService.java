@@ -210,7 +210,6 @@ public class UserLocationService extends Service implements
                 qbLocation.setLatitude(accuracySettings(location.getLatitude()));
                 qbLocation.setLongitude(accuracySettings(location.getLongitude()));
 
-
                 qbLocation = QBLocations.createLocation(qbLocation);
             }
         } catch (QBResponseException e) {
