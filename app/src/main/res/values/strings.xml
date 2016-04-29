@@ -7,4 +7,7 @@
     <string name="profile"/>
     <string name="show_dialogs">Show Dialogs</string>
     <string name="About">About</string>
+    <string name="blocked">BLOCKED</string>
+    <string name="user_added_to_block_list">User was added to your block list</string>
+    <string name="user_removed_from_block_list">User was removed from your block list</string>
 </resources>

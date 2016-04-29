@@ -43,8 +43,8 @@ public class UserLocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
     private static final String USERID = "userid";
-    public static final String LOCATION_CHANGED="LOCATION_CHANGED";
-    public static final String LOCATION="location";
+    public static final String LOCATION_CHANGED = "LOCATION_CHANGED";
+    public static final String LOCATION = "location";
     private GoogleApiClient mGoogleApiClient;
     private static Location lastLocation;
     private QBLocation qbLocation;
@@ -81,7 +81,9 @@ public class UserLocationService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        if (intent == null && userId==0) {
+            stopSelf();
+        }
         userId = intent.getIntExtra(USERID, 0);
         if (userId == 0) {
             stopSelf();
@@ -138,12 +140,12 @@ public class UserLocationService extends Service implements
         updateLocationAsync(location);
     }
 
-    private void updateLocationAsync(final Location location){
-        Intent intent=new Intent(LOCATION_CHANGED);
-        intent.putExtra("location",location);
+    private void updateLocationAsync(final Location location) {
+        Intent intent = new Intent(LOCATION_CHANGED);
+        intent.putExtra("location", location);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-        AsyncTask<Void,Void,Void> task=new AsyncTask<Void, Void, Void>() {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
 
@@ -169,7 +171,7 @@ public class UserLocationService extends Service implements
         if (qbLocation == null) {
             initUserLocation(lastLocation);
         }
-        if (qbLocation==null){
+        if (qbLocation == null) {
             stopSelf();
             return;
         }
@@ -179,7 +181,7 @@ public class UserLocationService extends Service implements
 
         try {
             QBLocations.deleteObsoleteLocations(1);
-            qbLocation=QBLocations.updateLocation(qbLocation);
+            qbLocation = QBLocations.updateLocation(qbLocation);
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
             editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
             editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
@@ -213,7 +215,7 @@ public class UserLocationService extends Service implements
                 qbLocation = QBLocations.createLocation(qbLocation);
             }
         } catch (QBResponseException e) {
-            if (e.getMessage().equals("Entity you are looking for was not found.")){
+            if (e.getMessage().equals("Entity you are looking for was not found.")) {
                 qbLocation = new QBLocation();
                 qbLocation.setUserId(userId);
 
@@ -226,31 +228,30 @@ public class UserLocationService extends Service implements
                     e1.printStackTrace();
                     Crashlytics.logException(e1);
                 }
-            }else{
+            } else {
                 e.printStackTrace();
                 Crashlytics.logException(e);
             }
         }
     }
+
     public static Location getLastLocation() {
         return lastLocation;
     }
 
 
-    public Double accuracySettings(Double location){
+    public Double accuracySettings(Double location) {
         Double loc;
         NumberFormat formatter;
-        if(Util.ACCURACY == 3) {
+        if (Util.ACCURACY == 3) {
             formatter = new DecimalFormat("#.###");
             loc = Double.valueOf(formatter.format(location));
             return loc;
-        }
-        else if(Util.ACCURACY == 1) {
+        } else if (Util.ACCURACY == 1) {
             formatter = new DecimalFormat("#.#");
             loc = Double.valueOf(formatter.format(location));
             return loc;
-        }
-        else{
+        } else {
             return location;
         }
     }

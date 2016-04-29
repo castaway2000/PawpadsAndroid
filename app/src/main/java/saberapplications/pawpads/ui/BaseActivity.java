@@ -16,6 +16,8 @@ import com.google.android.gms.location.LocationListener;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBPrivacyListsManager;
+import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.model.QBUser;
 
@@ -36,26 +38,25 @@ public abstract class BaseActivity extends AppCompatActivity
     private static int openActivitiesCount = 0;
 
 
-
     protected static boolean isLoggedIn;
     private static Integer userId;
 
-//    private Location lastLocation;
+    //    private Location lastLocation;
     private boolean isActive;
 //    protected static QBLocation qbLocation;
 
-    BroadcastReceiver locationChanged=new BroadcastReceiver() {
+    BroadcastReceiver locationChanged = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Location location=intent.getParcelableExtra(UserLocationService.LOCATION);
+            Location location = intent.getParcelableExtra(UserLocationService.LOCATION);
             onLocationChanged(location);
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Create an instance of GoogleAPIClient.
-
 
 
     }
@@ -143,6 +144,18 @@ public abstract class BaseActivity extends AppCompatActivity
         if (QBChatService.getInstance().isLoggedIn()) {
             try {
                 if (QBChatService.getInstance() != null) {
+                    QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
+                    try {
+                        QBPrivacyList list = privacyListsManager.getPrivacyList("public");
+                        if (list != null) {
+                            list.setDefaultList(true);
+                            list.setActiveList(true);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
                     onQBConnect();
                 }
             } catch (Exception e) {
@@ -195,7 +208,6 @@ public abstract class BaseActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
 
     }
-
 
 
     public synchronized void incrementActivityCount() {

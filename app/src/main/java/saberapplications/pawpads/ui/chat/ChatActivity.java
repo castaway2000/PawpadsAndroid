@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
@@ -24,6 +25,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +86,11 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
-//    private QBPrivateChat chat;
+    //    private QBPrivateChat chat;
     private Integer currentUserId;
     private int sendTo;
     private ProgressDialog progressDialog;
+    private QBPrivateChat privateChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,25 +183,24 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 // send chat message to server
-                if(!editText_chat_message.getText().toString().equals("")){
+                if (!editText_chat_message.getText().toString().equals("")) {
                     QBChatMessage msg = new QBChatMessage();
-                msg.setBody(editText_chat_message.getText().toString());
-                msg.setProperty("save_to_history", "1");
-                msg.setRecipientId(sendTo);
-                msg.setDialogId(dialog.getDialogId());
-                msg.setProperty("send_to_chat", "1");
-                QBChatService.createMessage(msg, new QBEntityCallbackImpl<QBChatMessage>() {
-                    @Override
-                    public void onSuccess(QBChatMessage result, Bundle params) {
-                        showChat(ChatObject.SENT, result.getBody());
+                    msg.setBody(editText_chat_message.getText().toString());
+                    msg.setProperty("save_to_history", "1");
+                    msg.setRecipientId(sendTo);
+                    msg.setDialogId(dialog.getDialogId());
+                    msg.setProperty("send_to_chat", "1");
+
+
+                    try {
+                        privateChat.sendMessage(msg);
+                    } catch (XMPPException e) {
+                        Util.onError(e, ChatActivity.this);
+                    } catch (SmackException.NotConnectedException e) {
+                        Util.onError(e, ChatActivity.this);
                     }
 
-                    @Override
-                    public void onError(List<String> errors) {
-                        Util.onError(errors, ChatActivity.this);
-                    }
-                });
-                editText_chat_message.setText("");
+                    editText_chat_message.setText("");
                 }
             }
         });
@@ -231,6 +235,32 @@ public class ChatActivity extends BaseActivity {
 
 
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
+        QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
+        privateChat = privateChatManager.getChat(sendTo);
+        QBMessageListener msgListener = new QBMessageListener() {
+            @Override
+            public void processMessage(QBChat qbChat, QBChatMessage qbChatMessage) {
+                showChat(ChatObject.SENT, qbChatMessage.getBody());
+            }
+
+            @Override
+            public void processError(QBChat qbChat, final QBChatException e, QBChatMessage qbChatMessage) {
+                ChatActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.onError(e, ChatActivity.this);
+                    }
+                });
+
+            }
+        };
+        if (privateChat == null) {
+            privateChat = privateChatManager.createChat(sendTo, msgListener);
+        } else {
+            privateChat.addMessageListener(msgListener);
+        }
+
+
     }
 
     private void showChat(String type, String message) {

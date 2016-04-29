@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.util.List;
+import java.util.logging.Handler;
 
 import saberapplications.pawpads.ui.BaseActivity;
 
@@ -61,6 +62,14 @@ public class Util extends BaseActivity {
         }
         new AlertDialog.Builder(context)
                 .setMessage(msg)
+                .setTitle("Error")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+    public static void onError(Exception e,Context context) {
+
+        new AlertDialog.Builder(context)
+                .setMessage(e.getLocalizedMessage())
                 .setTitle("Error")
                 .setPositiveButton("OK", null)
                 .show();

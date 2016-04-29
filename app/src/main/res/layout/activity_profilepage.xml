@@ -1,7 +1,6 @@
 <android.support.v7.widget.GridLayout
 	android:id="@+id/gridLayout"
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:ads="http://schemas.android.com/apk/res-auto"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
@@ -22,6 +21,14 @@
 		android:scaleType="centerCrop"
 		app:layout_gravity="center"
 		/>
+	<TextView
+		android:id="@+id/is_blocked"
+		android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="@string/blocked"
+	    android:visibility="gone"
+	    app:layout_gravity="center"
+		/>
 
 	<Button
 		android:id="@+id/chatBtn"
@@ -29,6 +36,7 @@
 		android:layout_height="50dp"
 		android:text="Chat Now!"
 		app:layout_gravity="bottom|center"
+	    android:visibility="gone"
 		/>
 
 	<ScrollView
@@ -51,7 +59,7 @@
 		android:id="@+id/profileAdView"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		ads:adUnitId="ca-app-pub-5883625079032168/1470784739"
-		ads:adSize="BANNER" />
+		app:adUnitId="ca-app-pub-5883625079032168/1470784739"
+		app:adSize="BANNER" />
 
 </android.support.v7.widget.GridLayout>
