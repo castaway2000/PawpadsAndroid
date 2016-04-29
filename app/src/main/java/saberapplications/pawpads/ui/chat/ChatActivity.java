@@ -248,7 +248,11 @@ public class ChatActivity extends BaseActivity {
                 ChatActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Util.onError(e, ChatActivity.this);
+                        try {
+                            Util.onError(e, ChatActivity.this);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 });
 

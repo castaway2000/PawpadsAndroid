@@ -5,14 +5,22 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
 
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
+import saberapplications.pawpads.util.Constants;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -31,7 +39,7 @@ public class GcmIntentService extends IntentService {
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
 
-        if(Util.PUSH_NOTIFICIATIONS == true) {
+        if (Util.PUSH_NOTIFICIATIONS == true) {
             if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM
@@ -51,8 +59,6 @@ public class GcmIntentService extends IntentService {
                         MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
                     String recieved_message = intent.getStringExtra("message");
-                    sendNotification("message recieved :" + recieved_message);
-
                     Intent sendIntent = new Intent("message_recieved");
                     sendIntent.putExtra("message", recieved_message);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
@@ -65,8 +71,8 @@ public class GcmIntentService extends IntentService {
                 }
             }
         }
-            // Release the wake lock provided by the WakefulBroadcastReceiver.
-            GcmBroadcastReceiver.completeWakefulIntent(intent);
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     // Put the message into a notification and post it.
@@ -95,26 +101,43 @@ public class GcmIntentService extends IntentService {
         Bundle extras = intent.getExtras();
 
         String msg = extras.getString("message");
+        String userId = extras.getString("user_id");
+        //Check blocked users
+        boolean isBlock = true;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String stringJSON = sharedPreferences.getString(Constants.BLOCKED_USERS_IDS, "");
+        if (!stringJSON.isEmpty()) {
+            JsonParser parser = new JsonParser();
+            JsonElement tradeElement = parser.parse(stringJSON);
+            JsonArray trade = tradeElement.getAsJsonArray();
+            ArrayList<String> stringsIds = new ArrayList<>();
+            for (JsonElement jsonElement : trade) {
+                stringsIds.add(jsonElement.toString());
+            }
+            isBlock = stringsIds.contains(userId);
+        }
 
-        mNotificationManager = (NotificationManager)
-                GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
-        chatIntent.putExtra(ChatActivity.RECIPIENT_ID, extras.getString("user_id"));
-        chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
-        PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
-                chatIntent, 0);
+        if (isBlock) {
+            mNotificationManager = (NotificationManager)
+                    GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
+            chatIntent.putExtra(ChatActivity.RECIPIENT_ID, userId);
+            chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
+            PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
+                    chatIntent, 0);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(GcmIntentService.this)
-                        .setSmallIcon(R.drawable.pplogo)
-                        .setAutoCancel(true)
-                        .setContentTitle("PawPads")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(msg))
-                        .setContentText(msg);
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(GcmIntentService.this)
+                            .setSmallIcon(R.drawable.pplogo)
+                            .setAutoCancel(true)
+                            .setContentTitle("PawPads")
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(msg))
+                            .setContentText(msg);
 
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-        //10672731
+            mBuilder.setContentIntent(contentIntent);
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            //10672731
+        }
     }
 }

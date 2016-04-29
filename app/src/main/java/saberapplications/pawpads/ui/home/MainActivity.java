@@ -64,6 +64,7 @@ import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
+import saberapplications.pawpads.util.Constants;
 
 
 public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -95,24 +96,24 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-							if(Util.IM_ALERT == true) {
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle("New Chat Message")
-                                        .setMessage(qbChatMessage.getBody())
-                                        .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent intent=new Intent(MainActivity.this,ChatActivity.class);
-                                                intent.putExtra(ChatActivity.DIALOG_ID,qbChatMessage.getDialogId().toString());
-                                                intent.putExtra(ChatActivity.RECIPIENT_ID,qbChatMessage.getSenderId().toString());
-                                                startActivity(intent);
-                                                ///qbChat.getDialogId()
-                                                ///qbChat.getDialogId()
-                                            }
-                                        })
-                                        .setNegativeButton("Cancel", null)
-                                        .show();
-								}
+                                if (Util.IM_ALERT == true) {
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("New Chat Message")
+                                            .setMessage(qbChatMessage.getBody())
+                                            .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                                                    intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
+                                                    intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId().toString());
+                                                    startActivity(intent);
+                                                    ///qbChat.getDialogId()
+                                                    ///qbChat.getDialogId()
+                                                }
+                                            })
+                                            .setNegativeButton("Cancel", null)
+                                            .show();
+                                }
                             }
                         });
 
@@ -143,7 +144,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");//        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "standard");
-        range= Util.getRange();
+        range = Util.getRange();
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
         String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -167,8 +168,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     protected void onStart() {
         super.onStart();
-        if (range!=Util.getRange()){
-            range=Util.getRange();
+        if (range != Util.getRange()) {
+            range = Util.getRange();
             loadAndSetNearUsers();
         }
     }
@@ -238,6 +239,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 userLocalStore = new UserLocalStore(this);
                 userLocalStore.clearUserData();
                 userLocalStore.setUserLoggedIn(false);
+
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(Constants.BLOCKED_USERS_IDS, "");
+                editor.apply();
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
                 return true;
@@ -293,7 +299,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     protected void onStop() {
         if (QBChatService.isInitialized()) {
-            if (QBChatService.getInstance()!=null && QBChatService.getInstance().getPrivateChatManager()!=null && chatListener!=null){
+            if (QBChatService.getInstance() != null && QBChatService.getInstance().getPrivateChatManager() != null && chatListener != null) {
                 QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
             }
         }
@@ -510,7 +516,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         getLocationsBuilder.setLastOnly();
         lastListUpdatedLocation = UserLocationService.getLastLocation();
         // radius in kilometers
-        if (lastListUpdatedLocation==null) return;
+        if (lastListUpdatedLocation == null) return;
 
         //included for testing reasons
         //int dRange = (int)Math.rint(Util.RANGE / 1.6755);
@@ -551,11 +557,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         super.onLocationChanged(location);
         if (lastListUpdatedLocation == null) return;
         if (location == null) return;
-        if (adapter==null) return;
-        if (lastListUpdatedLocation.distanceTo(location) >20 && lastListUpdatedLocation.distanceTo(location) < 100) {
+        if (adapter == null) return;
+        if (lastListUpdatedLocation.distanceTo(location) > 20 && lastListUpdatedLocation.distanceTo(location) < 100) {
             adapter.setLocation(location);
             adapter.notifyDataSetChanged();
-        } else if (lastListUpdatedLocation.distanceTo(location) > 100){
+        } else if (lastListUpdatedLocation.distanceTo(location) > 100) {
             loadAndSetNearUsers();
         }
     }

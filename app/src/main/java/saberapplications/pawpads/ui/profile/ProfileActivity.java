@@ -3,8 +3,10 @@ package saberapplications.pawpads.ui.profile;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +44,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.Constants;
 
 public class ProfileActivity extends BaseActivity {
     private QBDialog dialog;
@@ -117,13 +120,13 @@ public class ProfileActivity extends BaseActivity {
                         for (QBPrivacyListItem item : list.getItems()) {
                             String id = currentQbUser.getId().toString();
                             if (item.getType() == QBPrivacyListItem.Type.USER_ID &&
-                                            item.getValueForType().contains(id)
+                                    item.getValueForType().contains(id)
                                     ) {
                                 setBlockedUI(!item.isAllow());
                             }
                         }
 
-                    }else{
+                    } else {
                         setBlockedUI(false);
                     }
                 } catch (SmackException.NotConnectedException e) {
@@ -280,7 +283,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void setBlockedUI(boolean isBlocked) {
-        isUserBlocked=isBlocked;
+        isUserBlocked = isBlocked;
         if (isBlocked) {
             isBlockedView.setVisibility(View.VISIBLE);
             chatButton.setVisibility(View.GONE);
@@ -290,23 +293,22 @@ public class ProfileActivity extends BaseActivity {
         }
         invalidateOptionsMenu();
     }
-    private void saveBlockListToPreferences(QBPrivacyList list){
-        JSONArray ids=new JSONArray();
-        for (QBPrivacyListItem item : list.getItems()) {
-            String id = currentQbUser.getId().toString();
 
+    private void saveBlockListToPreferences(QBPrivacyList list) {
+        JSONArray ids = new JSONArray();
+        for (QBPrivacyListItem item : list.getItems()) {
             if (item.getType() == QBPrivacyListItem.Type.USER_ID &&
                     !item.isAllow()) {
-                Pattern p = Pattern.compile("\\d*_");
+                Pattern p = Pattern.compile("(\\d*)");
                 Matcher m = p.matcher(item.getValueForType());
-                if(m.matches()) {
+                if (m.find()) {
                     ids.put(m.group(1));
                 }
             }
         }
-
-
-
-
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constants.BLOCKED_USERS_IDS, ids.toString());
+        editor.apply();
     }
 }
