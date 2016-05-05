@@ -271,7 +271,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
 
         QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
-
+        if (chatManager==null) return;
         chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallbackImpl<QBDialog>() {
 
             @Override
