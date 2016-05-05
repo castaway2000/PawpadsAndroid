@@ -103,21 +103,20 @@ public class GcmIntentService extends IntentService {
         String msg = extras.getString("message");
         String userId = extras.getString("user_id");
         //Check blocked users
-        boolean isBlock = true;
+        boolean isBlocked = false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String stringJSON = sharedPreferences.getString(Constants.BLOCKED_USERS_IDS, "");
         if (!stringJSON.isEmpty()) {
             JsonParser parser = new JsonParser();
-            JsonElement tradeElement = parser.parse(stringJSON);
-            JsonArray trade = tradeElement.getAsJsonArray();
+            JsonArray array  = parser.parse(stringJSON).getAsJsonArray();
             ArrayList<String> stringsIds = new ArrayList<>();
-            for (JsonElement jsonElement : trade) {
-                stringsIds.add(jsonElement.toString());
+            for (JsonElement jsonElement : array) {
+                stringsIds.add(jsonElement.getAsString());
             }
-            isBlock = stringsIds.contains(userId);
+            isBlocked = stringsIds.contains(userId);
         }
 
-        if (isBlock) {
+        if (!isBlocked) {
             mNotificationManager = (NotificationManager)
                     GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
