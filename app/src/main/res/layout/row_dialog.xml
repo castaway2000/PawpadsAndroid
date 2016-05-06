@@ -8,10 +8,18 @@
 
     <ImageView
         android:id="@+id/dialog_avatar"
-        android:layout_width="0dp"
-        android:layout_weight="0.4"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_margin="5dp"
+        android:layout_weight="0.35" />
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"/>
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Small Text"
+        android:id="@+id/dialogs_username"
+        android:layout_weight="0.06" />
 
     <TextView
         android:id="@+id/dialog_last_message"
@@ -32,7 +40,7 @@
         android:textColor="#000000"
         android:id="@+id/dialog_date_last_message"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
+        android:layout_weight="0.34"
        android:layout_width="0dp"
         android:layout_margin="5dp"
         android:text="Small Text"
