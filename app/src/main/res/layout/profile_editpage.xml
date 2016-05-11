@@ -27,7 +27,7 @@
                     android:layout_gravity="left|center_vertical"
                     android:layout_margin="5dp"
                     android:scaleType="centerCrop"
-                    android:src="@android:drawable/btn_star_big_on" />
+                    android:src="@drawable/pplogo" />
 
                 <Button
                     android:id="@+id/newPicButton"

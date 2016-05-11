@@ -64,6 +64,7 @@ public class ChatActivity extends BaseActivity {
                 public void run() {
                     if (chatAdapter != null) {
                         chatAdapter.add(new ChatObject(qbChatMessage.getBody(), ChatObject.RECEIVED));
+                        //chatAdapter.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()), ChatObject.RECEIVED));
                     }
                 }
             });
@@ -122,6 +123,8 @@ public class ChatActivity extends BaseActivity {
                     recipient = QBUsers.getUser(Integer.parseInt(getIntent().getStringExtra(RECIPIENT_ID)));
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
+                    //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
+
                     Bundle bundle = new Bundle();
                     ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
                     dialog = dialogs.get(0);
@@ -174,7 +177,7 @@ public class ChatActivity extends BaseActivity {
             return;
         }
         currentUserId = getUserId();
-//        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
         if (dialog == null) return;
         editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
         listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
@@ -186,6 +189,9 @@ public class ChatActivity extends BaseActivity {
                 if (!editText_chat_message.getText().toString().equals("")) {
                     QBChatMessage msg = new QBChatMessage();
                     msg.setBody(editText_chat_message.getText().toString());
+                    //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
+                    //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
+
                     msg.setProperty("save_to_history", "1");
                     msg.setRecipientId(sendTo);
                     msg.setDialogId(dialog.getDialogId());
@@ -199,7 +205,6 @@ public class ChatActivity extends BaseActivity {
                     } catch (SmackException.NotConnectedException e) {
                         Util.onError(e, ChatActivity.this);
                     }
-
                     editText_chat_message.setText("");
                 }
             }
@@ -210,20 +215,16 @@ public class ChatActivity extends BaseActivity {
         QBChatService.getDialogMessages(dialog, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> result, Bundle params) {
-
                 progressDialog.dismiss();
                 chat_list = new ArrayList<>();
-
                 for (QBChatMessage qbChatMessage : result) {
                     String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
-                    chat_list.add(new
-                            ChatObject(qbChatMessage.getBody(), type));
-
+                    chat_list.add(new ChatObject(qbChatMessage.getBody(), type));
+                    //chat_list.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()),type));
                 }
                 chatAdapter = new ChatAdapter(ChatActivity.this, R.layout.chat_view, chat_list);
                 listView_chat_messages.setAdapter(chatAdapter);
-
-                //chatAdapter.notifyDataSetChanged();
+                chatAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -241,6 +242,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void processMessage(QBChat qbChat, QBChatMessage qbChatMessage) {
                 showChat(ChatObject.SENT, qbChatMessage.getBody());
+                //showChat(ChatObject.SENT, String.valueOf(qbChatMessage.getDateSent()));
             }
 
             @Override

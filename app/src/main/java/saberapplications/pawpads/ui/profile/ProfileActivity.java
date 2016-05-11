@@ -4,7 +4,6 @@ package saberapplications.pawpads.ui.profile;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -22,7 +21,6 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
-import com.quickblox.chat.listeners.QBPrivacyListListener;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
@@ -59,6 +57,7 @@ public class ProfileActivity extends BaseActivity {
     private Privacy privacy;
     private boolean isUserBlocked;
     private Button chatButton;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +90,14 @@ public class ProfileActivity extends BaseActivity {
         QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
+                if (qbUser.getFullName() != null) {
+                    name = qbUser.getFullName();
+                    setTitle("PawPads | " + name);
+                } else {
+                    name = qbUser.getLogin();
+                    setTitle("PawPads | " + name);
+                }
+
                 currentQbUser = qbUser;
                 if (currentQbUser.getCustomData() != null) {
                     String info = String.valueOf(currentQbUser.getCustomData());
@@ -98,10 +105,8 @@ public class ProfileActivity extends BaseActivity {
                         profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
                     }
                 }
-                if (qbUser.getFullName() != null) {
-                    setTitle("PawPads | " + qbUser.getFullName());
-                } else {
-                    setTitle("PawPads | " + qbUser.getLogin());
+                else{
+                    profileInfo.setText(name + " has not set up their profile info yet.");
                 }
 
                 if (currentQbUser.getFileId() != null) {
@@ -111,6 +116,11 @@ public class ProfileActivity extends BaseActivity {
                     AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar, size, size);
 
                 }
+//                else{
+//                    float d = getResources().getDisplayMetrics().density;
+//                    int size = Math.round(150 * d);
+//                    AvatarLoaderHelper.loadImage(R.drawable.pplogo, profileAvatar, size, size);
+//                }
                 // Check if user is blocked
 
                 QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
@@ -221,9 +231,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void addUserToBlockList() {
-
         QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
-
 
         QBPrivacyList list = new QBPrivacyList();
         list.setName("public");
@@ -253,9 +261,7 @@ public class ProfileActivity extends BaseActivity {
                             finish();
                         }
                     });
-
         }
-
     }
 
     private void removeUserFromBlockList() {

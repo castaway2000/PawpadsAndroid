@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quickblox.location.model.QBLocation;
 
@@ -25,6 +26,10 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
 
     public UserListAdapter(Context context, int resource, List<QBLocation> objects) {
         super(context, resource, objects);
+        if(objects.size() <= 1){
+            Toast.makeText(context, "make sure your range is wide enough to see others near you. \n\n check your settings.", Toast.LENGTH_LONG).show();
+            return;
+        }
     }
 
     public void setLocation(Location location) {
@@ -52,7 +57,7 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
         //,
         userLocation.setLatitude(qbLocation.getLatitude());
         userLocation.setLongitude(qbLocation.getLongitude());
-        if(Util.UNIT_OF_MEASURE.equals("standard")) {
+        if(Util.UNIT_OF_MEASURE.equals("MI")) {
             float distanceTo = location.distanceTo(userLocation) * 3.2808f;
             //gps coordinates
             TextView gps = (TextView) customView.findViewById(R.id.geoloc);
@@ -75,7 +80,6 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
             }
         }
 
-
         final ImageView blazeImage = (ImageView) customView.findViewById(R.id.blazeimageView);
         if (qbLocation.getUser().getFileId() != null) {
             int userProfilePictureID = qbLocation.getUser().getFileId(); // user - an instance of QBUser class
@@ -83,6 +87,7 @@ public class UserListAdapter extends ArrayAdapter<QBLocation> {
             int size=Math.round(80 * d);
             AvatarLoaderHelper.loadImage(userProfilePictureID,blazeImage,size,size);
         }
+
         return customView;
     }
 

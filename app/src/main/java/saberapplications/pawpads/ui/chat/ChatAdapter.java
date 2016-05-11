@@ -35,6 +35,8 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
     private class ViewHolder {
         TextView textView_left_chat;
         TextView textView_right_chat;
+        TextView CVtime_left;
+        TextView CVtime_right;
         View relative_layout;
     }
 
@@ -48,30 +50,33 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder = new ViewHolder();
             holder.textView_left_chat = (TextView) convertView.findViewById(R.id.textView_left_chat);
             holder.textView_right_chat = (TextView) convertView.findViewById(R.id.textView_right_chat);
+            holder.CVtime_left = (TextView) convertView.findViewById(R.id.CVtime_left);
+            holder.CVtime_right = (TextView) convertView.findViewById(R.id.CVtime_right);
             holder.relative_layout = convertView.findViewById(R.id.rChatLayout);
 
             convertView.setTag(holder);
         } else {
-
             holder = (ViewHolder) convertView.getTag();
-
         }
-
 
         if (chat_data.get(position).getType().equals("sent")) {
                 holder.textView_left_chat.setText(chat_data.get(position).getMessage());
+//                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
+
+                holder.CVtime_right.setVisibility(View.GONE);
                 holder.textView_right_chat.setVisibility(View.GONE);
                 holder.textView_left_chat.setVisibility(View.VISIBLE);
                 holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
-
             holder.textView_right_chat.setText(chat_data.get(position).getMessage());
+//            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
+
+            holder.CVtime_left.setVisibility(View.GONE);
             holder.textView_left_chat.setVisibility(View.GONE);
             holder.textView_right_chat.setVisibility(View.VISIBLE);
             holder.relative_layout.setBackgroundColor(000000);
         }
-
 
         return convertView;
     }

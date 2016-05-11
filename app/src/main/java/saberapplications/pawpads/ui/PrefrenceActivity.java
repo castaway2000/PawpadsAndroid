@@ -34,7 +34,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     EditText dist;
     CheckBox tbMetricBox, tbImBox, tbPushBox;
     RadioGroup rbGroup;
-    RadioButton rbHigh, rbMedium, rbLow;
+    RadioButton rbHigh, rbMedium, rbLow, rbMI, rbKM;
     int range, gRange, accuracy, gAccuracy;
     public String unit, gUnit;
     Boolean alert, push, gAlert, gPush;
@@ -46,26 +46,31 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         setTitle("PawPads | Settings");
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
         dist = (EditText) findViewById(R.id.etRange);
-        tbMetricBox = (CheckBox) findViewById(R.id.ckMetric);
         tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
         tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
         rbLow = (RadioButton) findViewById(R.id.rbLow);
         rbMedium = (RadioButton) findViewById(R.id.rbMedium);
         rbHigh = (RadioButton) findViewById(R.id.rbHigh);
+        rbMI = (RadioButton) findViewById(R.id.rbMI);
+        rbKM = (RadioButton) findViewById(R.id.rbKM);
 
         //TODO: create GUI for accuracy settings.
         gAccuracy = defaultSharedPreferences.getInt("accuracy", 6);
         gRange = defaultSharedPreferences.getInt("range", 60);
         dist.setText(String.valueOf(gRange));
 
-        gUnit = defaultSharedPreferences.getString("unit", "standard");
+        gUnit = defaultSharedPreferences.getString("unit", "KM");
         gAlert = defaultSharedPreferences.getBoolean("alert", true);
         gPush = defaultSharedPreferences.getBoolean("push", true);
 
-        //check box funtionality. defaults: standard, true, true;
-        if(gUnit.equals("standard")){
-            tbMetricBox.setChecked(false);
-        } else { tbMetricBox.setChecked(true);}
+        //check box funtionality. defaults: KM, true, true;
+        if(gUnit.equals("KM")){
+            rbMI.setChecked(false);
+            rbKM.setChecked(true);
+        } else {
+            rbKM.setChecked(false);
+            rbMI.setChecked(true);
+        }
         if(!gPush){
             tbPushBox.setChecked(false);
         } else {tbPushBox.setChecked(true);}
@@ -111,9 +116,9 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                     range = Integer.valueOf(String.valueOf(dist.getText()));
                 }else { range = 60; }
 
-                if(tbMetricBox.isChecked()){
-                    unit = "metric";
-                } else { unit = "standard"; }
+                if(rbKM.isChecked()){
+                    unit = "KM";
+                } else { unit = "MI"; }
 
                 if(tbPushBox.isChecked()){
                    push = true;
@@ -137,7 +142,13 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push ){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
         editor.putInt("accuracy", accuracy);
-        editor.putInt("range", range);
+        if(unit.equals("MI")) {
+            int rangeM = (int) Math.floor(range*1.60934);
+            editor.putInt("range", rangeM);
+        }
+        else{
+            editor.putInt("range", range);
+        }
         editor.putString("unit", unit);
         editor.putBoolean("alert", alert);
         editor.putBoolean("push", push);
@@ -147,7 +158,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         Util.PUSH_NOTIFICIATIONS = push;
         Util.IM_ALERT = alert;
         Util.UNIT_OF_MEASURE = unit;
-
+        Toast.makeText(getApplicationContext(), "settings saved", Toast.LENGTH_SHORT).show();
     }
 
     private void buildRemoveAlertDialog() {

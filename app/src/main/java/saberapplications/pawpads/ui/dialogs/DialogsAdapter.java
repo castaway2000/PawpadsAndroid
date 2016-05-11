@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 /**
  * Class {@link DialogsAdapter
@@ -57,11 +59,23 @@ public class DialogsAdapter extends BaseAdapter {
             view=convertView;
         }
         QBDialog dialog = getItem(position);
+        final ImageView avatar = (ImageView) view.findViewById(R.id.dialog_avatar);
+        TextView username = (TextView) view.findViewById(R.id.dialogs_username);
         TextView lastMessage = (TextView) view.findViewById(R.id.dialog_last_message);
         TextView lastDate = (TextView) view.findViewById(R.id.dialog_date_last_message);
         String lastDateFormat = new SimpleDateFormat("dd MMM yyyy ", Locale.getDefault()).format(dialog.getUpdatedAt());
         lastDate.setText(lastDateFormat);
         lastMessage.setText(dialog.getLastMessage());
+        username.setText(dialog.getName());
+        if (dialog.getPhoto() != null) {
+            //int userProfilePictureID = ; // user - an instance of QBUser class
+            float d= context.getResources().getDisplayMetrics().density;
+            int size=Math.round(50 * d);
+            AvatarLoaderHelper.loadImage(Integer.getInteger(dialog.getPhoto()),avatar,size,size);
+        }
+
+
+
         if (dialog.getUnreadMessageCount() > 0) {
             view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
         }

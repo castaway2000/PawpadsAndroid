@@ -69,6 +69,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialogs_list);
+        setTitle("PawPads | Chat History");
         initViews();
     }
 
@@ -118,7 +119,12 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 mSwipeRefreshLayout.setRefreshing(false);
                 qbDialogArrayList.clear();
-                qbDialogArrayList.addAll(dialogs);
+                for(int i = 0; i < dialogs.size();i++){
+                    if(dialogs.get(i).getLastMessage() != null){
+                        qbDialogArrayList.add(dialogs.get(i));
+                    }
+                }
+                //qbDialogArrayList.addAll(dialogs);
                 dialogsAdapter.notifyDataSetChanged();
             }
 

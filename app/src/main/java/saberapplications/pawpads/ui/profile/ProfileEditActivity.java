@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -150,7 +151,8 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                 });
                 if (avatarFile != null) {
                     updateAvatar(avatarFile);
-                } else {
+                }
+
                     currentQbUser.setCustomData(proDescr.getText().toString());
                     QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
                         @Override
@@ -169,7 +171,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                             Util.onError(list, ProfileEditActivity.this);
                         }
                     });
-                }
+                Toast.makeText(getApplicationContext(), "profile saved", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
