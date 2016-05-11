@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -142,12 +141,13 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");//        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "standard");
+        //String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
+        Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "MI");
         range = Util.getRange();
+
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
-        String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         adView = (AdView) this.findViewById(R.id.mainBannerAdView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -162,7 +162,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 mSwipeRefreshLayout.setRefreshing(true);
             }
         });
-        setTitle("PawPads | " + userName);
+        setTitle("PawPads | Find Furries Near you");
     }
 
     @Override
@@ -309,14 +309,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     @Override
     public void onQBConnect() throws Exception {
-
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-
         loadAndSetNearUsers();
 
         if (!isUserRegistered(context)) {
-
-
             if (checkPlayServices()) {
                 gcm = GoogleCloudMessaging.getInstance(this);
                 regid = getRegistrationId(context);
@@ -410,6 +406,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
+            Util.APP_VERSION = String.valueOf("PawPads Version: "+packageInfo.versionName +"."+ packageInfo.versionCode);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             // should never happen
@@ -518,8 +515,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         // radius in kilometers
         if (lastListUpdatedLocation == null) return;
 
-        //included for testing reasons
-        //int dRange = (int)Math.rint(Util.RANGE / 1.6755);
         getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), range);
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 

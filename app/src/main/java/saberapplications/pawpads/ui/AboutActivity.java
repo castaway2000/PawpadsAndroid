@@ -10,13 +10,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.Util;
 
 /**
  * Created by blaze on 2/25/2016.
  */
 public class AboutActivity extends AppCompatActivity implements View.OnClickListener {
-    TextView riverbreak, blazecollie, blazecollieTwitter, feedback;
+    TextView riverbreak, blazecollie, blazecollieTwitter, feedback, versionNum;
     Intent browserIntent;
+    String versionName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +28,12 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
         blazecollie = (TextView) findViewById(R.id.tvBlazeFA);
         blazecollieTwitter = (TextView) findViewById(R.id.tvBlazeTwitter);
         riverbreak = (TextView) findViewById(R.id.tvRiverbreakFA);
+        versionNum = (TextView) findViewById(R.id.tvVersionNumber);
 
         feedback = (TextView) findViewById(R.id.tvFeedback);
         feedback.setText(Html.fromHtml("<a href=\"mailto:szablya@gmail.com\">Send Feedback</a>"));
         feedback.setMovementMethod(LinkMovementMethod.getInstance());
-
+        versionNum.setText(Util.APP_VERSION);
         blazecollie.setOnClickListener(this);
         blazecollieTwitter.setOnClickListener(this);
         riverbreak.setOnClickListener(this);

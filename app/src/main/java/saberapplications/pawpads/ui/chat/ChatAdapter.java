@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
@@ -58,31 +56,27 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
 
             convertView.setTag(holder);
         } else {
-
             holder = (ViewHolder) convertView.getTag();
-
         }
-
 
         if (chat_data.get(position).getType().equals("sent")) {
                 holder.textView_left_chat.setText(chat_data.get(position).getMessage());
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
-                //holder.CVtime_left.setText(String.valueOf(sdf.format(new Date())));
+//                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
-                //holder.CVtime_right.setVisibility(View.GONE);
+                holder.CVtime_right.setVisibility(View.GONE);
                 holder.textView_right_chat.setVisibility(View.GONE);
                 holder.textView_left_chat.setVisibility(View.VISIBLE);
                 holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
             holder.textView_right_chat.setText(chat_data.get(position).getMessage());
+//            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
-            //holder.CVtime_left.setVisibility(View.GONE);
+            holder.CVtime_left.setVisibility(View.GONE);
             holder.textView_left_chat.setVisibility(View.GONE);
             holder.textView_right_chat.setVisibility(View.VISIBLE);
             holder.relative_layout.setBackgroundColor(000000);
         }
-
 
         return convertView;
     }

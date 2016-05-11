@@ -29,38 +29,48 @@
                     android:layout_width="match_parent"
                     android:layout_height="310dp">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Range in kilometers"
-                        android:id="@+id/tvRange"
-                        android:paddingTop="20dp"
-                        android:paddingLeft="5dp" />
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-                <EditText
+                    <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:ems="10"
-                        android:id="@+id/etRange" />
+                        android:text="Kilometers"
+                        android:id="@+id/rbKM"
+                        android:checked="false" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Miles"
+                        android:id="@+id/rbMI"
+                        android:checked="false" />
+                </RadioGroup>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Unit of measure"
-                        android:id="@+id/tvUnits"
-                        android:paddingLeft="5dp"
-                        android:paddingTop="10dp" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text="Range:"
+                            android:id="@+id/tvRange"
+                            android:paddingTop="20dp"
+                            android:paddingLeft="5dp" />
 
-                    <CheckBox
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Metric"
-                        android:id="@+id/ckMetric"
-                        android:paddingTop="5dp"
-                        android:paddingLeft="5dp" />
+                    <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:ems="10"
+                            android:id="@+id/etRange"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/tvRange"
+                        android:layout_toEndOf="@+id/tvRange" />
+                </RelativeLayout>
 
                 <RadioGroup
                     android:layout_width="wrap_content"

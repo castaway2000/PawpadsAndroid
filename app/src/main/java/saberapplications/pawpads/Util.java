@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.util.List;
-import java.util.logging.Handler;
 
 import saberapplications.pawpads.ui.BaseActivity;
 
@@ -17,6 +16,7 @@ import saberapplications.pawpads.ui.BaseActivity;
 public class Util extends BaseActivity {
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
+    public static String APP_VERSION = "appVersion";
     public static final String USER_NAME = "user_name";
     public static final String USER_LOCATION_LAT= "user_location_lat";
     public static final String USER_LOCATION_LONG= "user_location_long";
@@ -46,7 +46,7 @@ public class Util extends BaseActivity {
 
     public static int getRange(){
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
-        return defaultSharedPreferences.getInt("range", 60);
+            return defaultSharedPreferences.getInt("range", 60);
     }
     public static void setRange(int range){
         SharedPreferences.Editor editor= PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
