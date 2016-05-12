@@ -137,24 +137,18 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         context = getApplicationContext();
-        //gps.checkGPSEnabled();
         listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        //String userName = defaultSharedPreferences.getString(Util.USER_NAME, "");
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "MI");
         range = Util.getRange();
-
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
-        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-
         adView = (AdView) this.findViewById(R.id.mainBannerAdView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
                 .build();
         adView.loadAd(adRequest);
-
 
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
@@ -516,6 +510,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         if (lastListUpdatedLocation == null) return;
 
         getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), range);
+        getLocationsBuilder.setPerPage(100);
+        //getLocationsBuilder.setPage(2);
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
         QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
