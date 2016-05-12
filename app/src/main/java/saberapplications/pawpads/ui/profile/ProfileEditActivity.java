@@ -49,7 +49,6 @@ import saberapplications.pawpads.ui.BaseActivity;
  * Created by blaze on 10/17/2015.
  */
 public class ProfileEditActivity extends BaseActivity implements View.OnClickListener {
-    //TODO: send profile info to the database.
     private final static int SELECT_IMAGE = 1;
     private static File avatarFile;
     String selectedImagePath;
