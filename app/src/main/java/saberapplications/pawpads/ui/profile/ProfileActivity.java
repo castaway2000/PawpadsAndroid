@@ -127,14 +127,17 @@ public class ProfileActivity extends BaseActivity {
                 try {
                     QBPrivacyList list = privacyListsManager.getPrivacyList("public");
                     if (list != null) {
+
                         for (QBPrivacyListItem item : list.getItems()) {
                             String id = currentQbUser.getId().toString();
                             if (item.getType() == QBPrivacyListItem.Type.USER_ID &&
                                     item.getValueForType().contains(id)
                                     ) {
                                 setBlockedUI(!item.isAllow());
+                                return;
                             }
                         }
+                        setBlockedUI(false);
 
                     } else {
                         setBlockedUI(false);

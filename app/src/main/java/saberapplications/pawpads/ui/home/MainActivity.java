@@ -475,7 +475,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     }
 
-
     private void showGPSDisabledAlertToUser() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
@@ -504,6 +503,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
 
         QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
+        getLocationsBuilder.setPerPage(100);
         getLocationsBuilder.setLastOnly();
         lastListUpdatedLocation = UserLocationService.getLastLocation();
         // radius in kilometers

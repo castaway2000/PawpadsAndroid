@@ -40,7 +40,6 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 public class ChatActivity extends BaseActivity {
-    //TODO: 
     public static final String DIALOG = "dialog";
     public static final String RECIPIENT = "recipient";
     public static final String DIALOG_ID = "dialog_id";
@@ -63,12 +62,11 @@ public class ChatActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if (chatAdapter != null) {
-                        chatAdapter.add(new ChatObject(qbChatMessage.getBody(), ChatObject.RECEIVED));
+                        showChat(ChatObject.RECEIVED,qbChatMessage.getBody());
                         //chatAdapter.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()), ChatObject.RECEIVED));
                     }
                 }
             });
-
         }
 
         @Override
@@ -92,6 +90,7 @@ public class ChatActivity extends BaseActivity {
     private int sendTo;
     private ProgressDialog progressDialog;
     private QBPrivateChat privateChat;
+    private QBMessageListener msgListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +199,7 @@ public class ChatActivity extends BaseActivity {
 
                     try {
                         privateChat.sendMessage(msg);
+                        showChat(ChatObject.SENT, msg.getBody());
                     } catch (XMPPException e) {
                         Util.onError(e, ChatActivity.this);
                     } catch (SmackException.NotConnectedException e) {
@@ -237,12 +237,13 @@ public class ChatActivity extends BaseActivity {
 
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
         QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
+
         privateChat = privateChatManager.getChat(sendTo);
-        QBMessageListener msgListener = new QBMessageListener() {
+        msgListener = new QBMessageListener() {
+
             @Override
             public void processMessage(QBChat qbChat, QBChatMessage qbChatMessage) {
-                showChat(ChatObject.SENT, qbChatMessage.getBody());
-                //showChat(ChatObject.SENT, String.valueOf(qbChatMessage.getDateSent()));
+
             }
 
             @Override

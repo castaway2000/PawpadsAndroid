@@ -54,7 +54,6 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         rbMI = (RadioButton) findViewById(R.id.rbMI);
         rbKM = (RadioButton) findViewById(R.id.rbKM);
 
-        //TODO: create GUI for accuracy settings.
         gAccuracy = defaultSharedPreferences.getInt("accuracy", 6);
         gRange = defaultSharedPreferences.getInt("range", 60);
         dist.setText(String.valueOf(gRange));
