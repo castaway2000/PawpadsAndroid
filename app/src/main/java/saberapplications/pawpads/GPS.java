@@ -28,7 +28,7 @@ public class GPS extends Activity {
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             if(ActivityCompat.shouldShowRequestPermissionRationale(
                     (Activity)this.mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // TODO justify needing permission to use location data.
+                //justify needing permission to use location data.
                 android.util.Log.w(this.mContext.toString(), "ActivityCompat determined that a rationale should be provided for requesting ACCESS_FINE_LOCATION");
             }
             else {

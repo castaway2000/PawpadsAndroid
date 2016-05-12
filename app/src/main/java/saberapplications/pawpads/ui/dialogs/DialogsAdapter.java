@@ -67,10 +67,10 @@ public class DialogsAdapter extends BaseAdapter {
         lastDate.setText(lastDateFormat);
         lastMessage.setText(dialog.getLastMessage());
         username.setText(dialog.getName());
-        if (dialog.getPhoto() != null) {
+        if (dialog.getUserId() != null) {
             //int userProfilePictureID = ; // user - an instance of QBUser class
-            float d= context.getResources().getDisplayMetrics().density;
-            int size=Math.round(50 * d);
+            float d = context.getResources().getDisplayMetrics().density;
+            int size=Math.round(60 * d);
             AvatarLoaderHelper.loadImage(Integer.getInteger(dialog.getPhoto()),avatar,size,size);
         }
 
