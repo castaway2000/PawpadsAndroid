@@ -1,6 +1,5 @@
 package saberapplications.pawpads.ui.profile;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -27,17 +26,9 @@ import com.quickblox.users.model.QBUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import saberapplications.pawpads.R;

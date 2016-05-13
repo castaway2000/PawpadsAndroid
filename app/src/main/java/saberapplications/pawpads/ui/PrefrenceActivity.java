@@ -141,9 +141,11 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
     public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push ){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
         editor.putInt("accuracy", accuracy);
+
         if(unit.equals("MI")) {
             int rangeM = (int) Math.floor(range*1.60934);
             editor.putInt("range", rangeM);
+            //TODO: make this show what user input was not its modified value
         }
         else{
             editor.putInt("range", range);

@@ -29,8 +29,11 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
@@ -188,8 +191,8 @@ public class ChatActivity extends BaseActivity {
                 if (!editText_chat_message.getText().toString().equals("")) {
                     QBChatMessage msg = new QBChatMessage();
                     msg.setBody(editText_chat_message.getText().toString());
-                    //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
-                    //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
+                    msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
 
                     msg.setProperty("save_to_history", "1");
                     msg.setRecipientId(sendTo);
@@ -219,8 +222,10 @@ public class ChatActivity extends BaseActivity {
                 chat_list = new ArrayList<>();
                 for (QBChatMessage qbChatMessage : result) {
                     String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
-                    chat_list.add(new ChatObject(qbChatMessage.getBody(), type));
-                    //chat_list.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()),type));
+                    QBChatMessage qbc = qbChatMessage;
+                    //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
+                    //qbc.setProperty("date_sent", String.valueOf(sdf.format(qbChatMessage.getDateSent())));
+                    chat_list.add(new ChatObject(String.valueOf(qbc.getDateSent()), type));
                 }
                 chatAdapter = new ChatAdapter(ChatActivity.this, R.layout.chat_view, chat_list);
                 listView_chat_messages.setAdapter(chatAdapter);
