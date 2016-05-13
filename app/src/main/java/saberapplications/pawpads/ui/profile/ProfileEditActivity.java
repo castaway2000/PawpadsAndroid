@@ -34,6 +34,7 @@ import java.util.List;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 /**
@@ -41,7 +42,6 @@ import saberapplications.pawpads.ui.BaseActivity;
  */
 public class ProfileEditActivity extends BaseActivity implements View.OnClickListener {
     private final static int SELECT_IMAGE = 1;
-    private static File avatarFile;
     String selectedImagePath;
     ImageView img;
     EditText proDescr;
@@ -49,8 +49,8 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
     Uri avatarImagePath;
     private QBUser currentQbUser;
     private SharedPreferences defaultSharedPreferences;
-    private Bitmap bitmap;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private Runnable timeOutRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,31 +81,15 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                     proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
                 }
                 if (currentQbUser.getFileId() != null) {
-                    int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
+                    AvatarLoaderHelper.loadImage(currentQbUser.getFileId(), img,
+                            img.getWidth(), img.getHeight()
+                            , new AvatarLoaderHelper.Callback() {
+                                @Override
+                                public void imageLoaded() {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                            });
 
-                    QBContent.downloadFileTask(userProfilePictureID, new QBEntityCallback<InputStream>() {
-                        @Override
-                        public void onSuccess(InputStream inputStream, Bundle params) {
-                            new BitmapDownloader().execute(inputStream);
-                        }
-
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(List<String> list) {
-                            Util.onError(list, ProfileEditActivity.this);
-                        }
-
-
-                    }, new QBProgressCallback() {
-                        @Override
-                        public void onProgressUpdate(int progress) {
-
-                        }
-                    });
                 } else {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -136,21 +120,34 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                 break;
 
             case R.id.profileSave:
+                if (mSwipeRefreshLayout.isRefreshing()) return;
+
                 mSwipeRefreshLayout.post(new Runnable() {
                     @Override
                     public void run() {
                         mSwipeRefreshLayout.setRefreshing(true);
                     }
                 });
-                if (avatarImagePath != null) {
-                    updateAvatar();
-                }
+                 timeOutRunnable=new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getApplicationContext(), "Connection timeout", Toast.LENGTH_SHORT).show();
+                    }
+                };
+                //edit second parameter to set timeout period
+                mSwipeRefreshLayout.postDelayed(timeOutRunnable,8000);
 
                 currentQbUser.setCustomData(proDescr.getText().toString());
                 QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser user, Bundle args) {
-                        mSwipeRefreshLayout.setRefreshing(false);
+                        if (avatarImagePath != null) {
+                            updateAvatar();
+                        }else{
+                            onProfileSaved("profile saved");
+                        }
+
                     }
 
                     @Override
@@ -160,15 +157,22 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
                     @Override
                     public void onError(List<String> list) {
-                        mSwipeRefreshLayout.setRefreshing(false);
                         Util.onError(list, ProfileEditActivity.this);
+                        onProfileSaved(null);
                     }
                 });
-                Toast.makeText(getApplicationContext(), "profile saved", Toast.LENGTH_SHORT).show();
+
                 break;
         }
     }
+    private void onProfileSaved(String message){
+        if (message!=null){
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        }
+        mSwipeRefreshLayout.setRefreshing(false);
+        mSwipeRefreshLayout.removeCallbacks(timeOutRunnable);
 
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -214,14 +218,15 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                     QBContent.uploadFileTask(file, false, file.getAbsolutePath(), new QBEntityCallback<QBFile>() {
                         @Override
                         public void onSuccess(QBFile qbFile, Bundle params) {
-                            file.delete();
                             int uploadedFileID = qbFile.getId();
                             currentQbUser.setFileId(uploadedFileID);
                             currentQbUser.setCustomData(proDescr.getText().toString());
                             QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
                                 @Override
                                 public void onSuccess(QBUser user, Bundle args) {
-                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    file.delete();
+                                    avatarImagePath=null;
+                                    onProfileSaved("profile saved");
                                 }
 
                                 @Override
@@ -231,8 +236,10 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
                                 @Override
                                 public void onError(List<String> list) {
-                                    mSwipeRefreshLayout.setRefreshing(false);
                                     Util.onError(list, ProfileEditActivity.this);
+                                    file.delete();
+                                    avatarImagePath=null;
+                                    onProfileSaved("profile saved");
                                 }
                             });
                         }
@@ -244,7 +251,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
                         @Override
                         public void onError(List<String> list) {
-                            mSwipeRefreshLayout.setRefreshing(false);
+                            onProfileSaved(null);
                             Util.onError(list, ProfileEditActivity.this);
                         }
 
@@ -289,37 +296,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (avatarFile != null) {
-            avatarFile.delete();
-        }
     }
 
-    private class BitmapDownloader extends AsyncTask<InputStream, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(InputStream... params) {
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            int width_tmp = o.outWidth, height_tmp = o.outHeight;
-            int scale = 1;
-
-            while (true) {
-                if (width_tmp / 2 < 80 || height_tmp / 2 < 80)
-                    break;
-                width_tmp /= 2;
-                height_tmp /= 2;
-                scale *= 2;
-            }
-
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(params[0], null, o2);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            img.setImageBitmap(bitmap);
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
 }

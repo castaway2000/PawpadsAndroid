@@ -26,12 +26,17 @@ import saberapplications.pawpads.Util;
  */
 public class AvatarLoaderHelper {
     public static void loadImage(int fileId, final ImageView imageView, final int width, final int height){
+        loadImage(fileId,imageView,width,height,null);
+    }
+
+    public static void loadImage(int fileId, final ImageView imageView, final int width, final int height, final Callback callback){
         if (fileId==0) return;
         File CacheDir=PawPadsApplication.getInstance().getCacheDir();
         final File file=new File(CacheDir.getAbsolutePath()+"/"+fileId+".jpg");
         // Trying get image from cache
         if (file.exists()){
             Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width,height).into(imageView);
+            if (callback!=null) callback.imageLoaded();
         }
         else {
             QBContent.downloadFileTask(fileId, new QBEntityCallback<InputStream>() {
@@ -41,22 +46,6 @@ public class AvatarLoaderHelper {
 
                         @Override
                         protected Bitmap doInBackground(InputStream... params) {
-/*
-                            BitmapFactory.Options o = new BitmapFactory.Options();
-                            int width_tmp = o.outWidth, height_tmp = o.outHeight;
-                            int scale = 1;
-
-                            while (true) {
-                                if (width_tmp / 2 < 80 || height_tmp / 2 < 80)
-                                    break;
-                                width_tmp /= 2;
-                                height_tmp /= 2;
-                                scale *= 2;
-                            }
-
-                            BitmapFactory.Options o2 = new BitmapFactory.Options();
-                            o2.inSampleSize = scale;
-*/
                             return BitmapFactory.decodeStream(params[0]);
                         }
 
@@ -75,7 +64,7 @@ public class AvatarLoaderHelper {
                                 e.printStackTrace();
                             }
                             Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width,height).into(imageView);
-
+                            if (callback!=null) callback.imageLoaded();
 
                         }
                     }.execute(inputStream);
@@ -100,6 +89,11 @@ public class AvatarLoaderHelper {
             });
         }
 
+
+
+    }
+    public interface Callback{
+        void imageLoaded();
 
     }
 }
