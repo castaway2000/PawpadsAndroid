@@ -18,6 +18,7 @@ public class Util extends BaseActivity {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static String APP_VERSION = "appVersion";
     public static final String USER_NAME = "user_name";
+    public static final String IS_BLOCKED = "is_blocked";
     public static final String USER_LOCATION_LAT= "user_location_lat";
     public static final String USER_LOCATION_LONG= "user_location_long";
     public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";

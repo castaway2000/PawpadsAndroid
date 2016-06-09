@@ -87,7 +87,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 currentQbUser = qbUser;
                 if (currentQbUser.getCustomData() != null) {
-                    proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
+//                    proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
                 }
                 if (currentQbUser.getFileId() != null) {
                     AvatarLoaderHelper.loadImage(currentQbUser.getFileId(), img,
