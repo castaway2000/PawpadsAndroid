@@ -84,6 +84,10 @@ public class UserLocationService extends Service implements
         if (intent == null && userId==0) {
             stopSelf();
         }
+        if (intent==null) {
+            stopSelf();
+            return START_STICKY;
+        }
         userId = intent.getIntExtra(USERID, 0);
         if (userId == 0) {
             stopSelf();
