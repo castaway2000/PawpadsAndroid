@@ -10,4 +10,7 @@
     <string name="blocked">BLOCKED</string>
     <string name="user_added_to_block_list">User was added to your block list</string>
     <string name="user_removed_from_block_list">User was removed from your block list</string>
+    <string name="text_chat_history">CHAT HISTORY</string>
+    <string name="text_chat">CHAT</string>
+    <string name="text_you_blocked">You are blocked</string>
 </resources>

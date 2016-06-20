@@ -8,57 +8,92 @@
     tools:context="com.example.dell.myapplication.ChatActivity">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:gravity="center_vertical"
-        android:id="@+id/header"
-        >
+        android:orientation="horizontal">
+
         <ImageView
             android:id="@+id/chat_header_profile_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:scaleType="centerCrop"
-            />
+            android:scaleType="centerCrop" />
+
         <TextView
             android:id="@+id/chat_header_recipient_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
-    <EditText
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/footer_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText_chat_message"
-        android:hint="Enter Some thing"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/button_send_chat"
-        android:layout_toStartOf="@+id/button_send_chat" />
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=":3"
-        android:id="@+id/button_send_chat"
-        android:singleLine="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:textSize="20dp" />
+        <LinearLayout
+            android:id="@+id/message_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editText_chat_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/button_send_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text=":3"
+                android:textSize="20dp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/block_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/text_view_block_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You are blocked"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/button_unblock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="Unblock"
+                android:textSize="20dp" />
+        </FrameLayout>
+    </LinearLayout>
 
     <ListView
+        android:id="@+id/listView_chat_messages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listView_chat_messages"
+        android:layout_above="@+id/footer_container"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/header"
-        android:layout_above="@+id/editText_chat_message"
         android:background="@android:color/transparent"
         android:divider="@null"
         android:dividerHeight="0dp"
