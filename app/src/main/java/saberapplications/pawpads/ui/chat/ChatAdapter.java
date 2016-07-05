@@ -13,9 +13,7 @@ import java.util.List;
 import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
 
-/**
- * Created by Dell on 3/19/2015.
- */
+
 public class ChatAdapter extends ArrayAdapter<ChatObject> {
 
     List<ChatObject> chat_data;
@@ -60,17 +58,17 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
         }
 
         if (chat_data.get(position).getType().equals("sent")) {
-                holder.textView_left_chat.setText(chat_data.get(position).getMessage());
-                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
+            holder.textView_left_chat.setText(chat_data.get(position).getMessage());
+//                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
-                holder.CVtime_right.setVisibility(View.GONE);
-                holder.textView_right_chat.setVisibility(View.GONE);
-                holder.textView_left_chat.setVisibility(View.VISIBLE);
-                holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
+            holder.CVtime_right.setVisibility(View.GONE);
+            holder.textView_right_chat.setVisibility(View.GONE);
+            holder.textView_left_chat.setVisibility(View.VISIBLE);
+            holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
             holder.textView_right_chat.setText(chat_data.get(position).getMessage());
-            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
+//            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
             holder.CVtime_left.setVisibility(View.GONE);
             holder.textView_left_chat.setVisibility(View.GONE);
