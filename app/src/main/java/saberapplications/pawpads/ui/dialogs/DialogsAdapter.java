@@ -71,15 +71,11 @@ public class DialogsAdapter extends BaseAdapter {
             //int userProfilePictureID = ; // user - an instance of QBUser class
             float d = context.getResources().getDisplayMetrics().density;
             int size=Math.round(60 * d);
-<<<<<<< Updated upstream
+
             if (dialog.getPhoto()!=null) {
                 AvatarLoaderHelper.loadImage(Integer.getInteger(dialog.getPhoto()),avatar,size,size);
             }
-=======
-             if (dialog.getPhoto()!=null) {
-                 AvatarLoaderHelper.loadImage(Integer.getInteger(dialog.getPhoto()), avatar, size, size);
-             }
->>>>>>> Stashed changes
+
         }
 
 
