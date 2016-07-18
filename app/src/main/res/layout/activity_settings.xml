@@ -1,191 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
- android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#97159cc6"
-        android:orientation="vertical"
-    android:weightSum="1">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#97159cc6"
+              android:orientation="vertical"
+              android:weightSum="1">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView" >
+	<ScrollView
+		android:id="@+id/scrollView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="DISTANCE SETTINGS"
-                android:id="@+id/textView6"
-                android:textStyle="bold" />
+			<TextView
+				android:id="@+id/textView6"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="DISTANCE SETTINGS"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textStyle="bold"/>
 
-            <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="310dp">
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="310dp"
+				android:orientation="vertical">
 
-                <RadioGroup
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+				<RadioGroup
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content">
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Kilometers"
-                        android:id="@+id/rbKM"
-                        android:checked="false" />
+					<RadioButton
+						android:id="@+id/rbKM"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:checked="false"
+						android:text="Kilometers"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Miles"
-                        android:id="@+id/rbMI"
-                        android:checked="false" />
-                </RadioGroup>
+					<RadioButton
+						android:id="@+id/rbMI"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:checked="false"
+						android:text="Miles"/>
+				</RadioGroup>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp">
+				<RelativeLayout
+					android:layout_width="match_parent"
+					android:layout_height="72dp">
 
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text="Range:"
-                            android:id="@+id/tvRange"
-                            android:paddingTop="20dp"
-                            android:paddingLeft="5dp" />
+					<TextView
+						android:id="@+id/tvRange"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingLeft="5dp"
+						android:paddingTop="20dp"
+						android:text="Range:"
+						android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-                    <EditText
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:ems="10"
-                            android:id="@+id/etRange"
-                        android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/tvRange"
-                        android:layout_toEndOf="@+id/tvRange" />
-                </RelativeLayout>
+					<EditText
+						android:id="@+id/etRange"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
+						android:layout_toEndOf="@+id/tvRange"
+						android:layout_toRightOf="@+id/tvRange"
+						android:ems="10"
+						android:inputType="number"/>
+				</RelativeLayout>
 
-                <RadioGroup
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_marginTop="10dp"
-                    android:id="@+id/rgGpsSettings">
+				<RadioGroup
+					android:id="@+id/rgGpsSettings"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginTop="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="GPS Accuracy"
-                        android:id="@+id/textView9" />
+					<TextView
+						android:id="@+id/textView9"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="GPS Accuracy"
+						android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="High"
-                        android:id="@+id/rbHigh"
-                        android:checked="true" />
+					<RadioButton
+						android:id="@+id/rbHigh"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="High"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Medum"
-                        android:id="@+id/rbMedium" />
+					<RadioButton
+						android:id="@+id/rbMedium"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Medum"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Low"
-                        android:id="@+id/rbLow"
-                        android:checked="false" />
+					<RadioButton
+						android:id="@+id/rbLow"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:checked="false"
+						android:text="Low"/>
 
-                </RadioGroup>
+				</RadioGroup>
 
-            </LinearLayout>
+			</LinearLayout>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="98dp">
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="98dp"
+				android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="NOTIFICATION SETTINGS"
-                    android:id="@+id/NotificationSetting"
-                    android:textStyle="bold" />
+				<TextView
+					android:id="@+id/NotificationSetting"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="NOTIFICATION SETTINGS"
+					android:textAppearance="?android:attr/textAppearanceLarge"
+					android:textStyle="bold"/>
 
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Toggle Push Notifications"
-                    android:id="@+id/ckPushNotifications"
-                    android:enabled="true"
-                    android:checked="false" />
+				<CheckBox
+					android:id="@+id/ckPushNotifications"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:checked="false"
+					android:enabled="true"
+					android:text="Toggle Push Notifications"/>
 
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Toggle Messaging Popups"
-                    android:id="@+id/ckImNotification"
-                    android:checked="false"
-                    android:enabled="true" />
-            </LinearLayout>
+				<CheckBox
+					android:id="@+id/ckImNotification"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:checked="false"
+					android:enabled="true"
+					android:text="Toggle Messaging Popups"/>
+			</LinearLayout>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="1"
-                android:layout_weight="0.25">
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="0.25"
+				android:orientation="vertical"
+				android:weightSum="1">
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="ACCOUNT SETTINGS"
-                    android:id="@+id/textView8"
-                    android:textStyle="bold" />
+				<TextView
+					android:id="@+id/textView8"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="ACCOUNT SETTINGS"
+					android:textAppearance="?android:attr/textAppearanceLarge"
+					android:textStyle="bold"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Permenently Delete Profile"
-                    android:id="@+id/tvRemoveProfile"
-                    android:paddingTop="20dp"
-                    android:paddingLeft="5dp" />
+				<TextView
+					android:id="@+id/tvRemoveProfile"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="5dp"
+					android:paddingTop="20dp"
+					android:text="Permenently Delete Profile"
+					android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <FrameLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="125dp">
+				<FrameLayout
+					android:layout_width="fill_parent"
+					android:layout_height="125dp">
 
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Delete account"
-                        android:padding="5dp"
-                        android:id="@+id/btRmProfile" />
+					<Button
+						android:id="@+id/btRmProfile"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="5dp"
+						android:text="Delete account"/>
 
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Save"
-                        android:id="@+id/btProfSave"
-                        android:layout_gravity="center_horizontal|bottom" />
+					<Button
+						android:id="@+id/btProfSave"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_horizontal|bottom"
+						android:text="Save"/>
 
-                </FrameLayout>
+				</FrameLayout>
 
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+			</LinearLayout>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/app_version"
+				android:layout_gravity="center"/>
+		</LinearLayout>
+	</ScrollView>
 
 </LinearLayout>

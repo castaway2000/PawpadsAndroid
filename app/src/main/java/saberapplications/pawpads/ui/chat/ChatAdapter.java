@@ -57,8 +57,9 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (chat_data.get(position).getType().equals("sent")) {
-            holder.textView_left_chat.setText(chat_data.get(position).getMessage());
+        ChatObject data = chat_data.get(position);
+        if (data.getType().equals("sent")) {
+            holder.textView_left_chat.setText(data.getMessage());
 //                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
             holder.CVtime_right.setVisibility(View.GONE);
@@ -67,10 +68,10 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
-            holder.textView_right_chat.setText(chat_data.get(position).getMessage());
+            holder.textView_right_chat.setText(data.getMessage());
 //            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
             holder.CVtime_left.setVisibility(View.GONE);
-            holder.CVtime_right.setVisibility(View.GONE);
+
             holder.textView_left_chat.setVisibility(View.GONE);
             holder.textView_right_chat.setVisibility(View.VISIBLE);
             holder.relative_layout.setBackgroundColor(000000);

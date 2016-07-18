@@ -14,4 +14,5 @@
     <string name="text_chat">CHAT</string>
     <string name="text_you_blocked">You are blocked</string>
     <string name="loading_data">Loading data</string>
+    <string name="version">Version:</string>
 </resources>
