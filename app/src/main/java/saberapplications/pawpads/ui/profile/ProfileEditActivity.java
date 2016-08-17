@@ -21,6 +21,7 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBProgressCallback;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.squareup.picasso.Picasso;
@@ -97,14 +98,10 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
             }
 
             @Override
-            public void onSuccess() {
-
+            public void onError(QBResponseException e) {
+                Util.onError(e, ProfileEditActivity.this);
             }
 
-            @Override
-            public void onError(List<String> list) {
-                Util.onError(list, ProfileEditActivity.this);
-            }
         });
     }
 
@@ -151,15 +148,11 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                     }
 
                     @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError(List<String> list) {
-                        Util.onError(list, ProfileEditActivity.this);
+                    public void onError(QBResponseException e) {
+                        Util.onError(e, ProfileEditActivity.this);
                         onProfileSaved(null);
                     }
+
                 });
 
                 break;
@@ -230,30 +223,24 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                                 }
 
                                 @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(List<String> list) {
-                                    Util.onError(list, ProfileEditActivity.this);
+                                public void onError(QBResponseException e) {
+                                    Util.onError(e, ProfileEditActivity.this);
                                     file.delete();
                                     avatarImagePath=null;
                                     onProfileSaved("profile saved");
                                 }
+
                             });
                         }
 
                         @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(List<String> list) {
+                        public void onError(QBResponseException e) {
                             onProfileSaved(null);
-                            Util.onError(list, ProfileEditActivity.this);
+                            Util.onError(e, ProfileEditActivity.this);
+
                         }
+
+
 
                     }, new QBProgressCallback() {
                         @Override

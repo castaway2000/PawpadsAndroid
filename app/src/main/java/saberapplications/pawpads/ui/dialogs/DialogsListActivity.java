@@ -15,7 +15,9 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.model.QBLocation;
 import com.quickblox.users.QBUsers;
@@ -88,7 +90,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
 
                 final QBDialog dialog = qbDialogArrayList.get(position);
                 Integer userId = dialog.getUserId().equals(getUserId())?dialog.getRecipientId():dialog.getUserId();
-                QBUsers.getUser(userId, new QBEntityCallbackImpl<QBUser>() {
+                QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser result, Bundle params) {
                         Intent intent = new Intent(DialogsListActivity.this, ChatActivity.class);
@@ -96,10 +98,12 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
                         intent.putExtra(ChatActivity.RECIPIENT, result);
                         startActivity(intent);
                     }
+
                     @Override
-                    public void onError(List<String> errors) {
-                        Util.onError(errors, DialogsListActivity.this);
+                    public void onError(QBResponseException e) {
+                        Util.onError(e, DialogsListActivity.this);
                     }
+
                 });
 
             }
@@ -116,7 +120,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setPagesLimit(100);
 
-        QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
+        QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -133,9 +137,11 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
             }
 
             @Override
-            public void onError(List<String> errors) {
+            public void onError(QBResponseException e) {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
+
+
         });
     }
 

@@ -10,7 +10,9 @@ import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 
 import java.util.List;
@@ -71,14 +73,24 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle params) {
-                QBUsers.resetPassword(email, new QBEntityCallbackImpl<QBUsers>());
+                QBUsers.resetPassword(email, new QBEntityCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid, Bundle bundle) {
 
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+
+                    }
+                });
             }
 
             @Override
-            public void onError(List<String> errors) {
-                Util.onError(errors, ForgotPasswordActivity.this);
+            public void onError(QBResponseException responseException) {
+                Util.onError(responseException, ForgotPasswordActivity.this);
             }
+
         });
     }
 }

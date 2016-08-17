@@ -34,7 +34,9 @@ import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
@@ -266,7 +268,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
         QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
         if (chatManager==null) return;
-        chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallbackImpl<QBDialog>() {
+        chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallback<QBDialog>() {
 
             @Override
             public void onSuccess(QBDialog result, Bundle params) {
@@ -274,9 +276,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
 
             @Override
-            public void onError(List<String> errors) {
-                Util.onError(errors, MainActivity.this);
+            public void onError(QBResponseException e) {
+                Util.onError(e, MainActivity.this);
             }
+
         });
 
 
@@ -438,9 +441,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
 
             @Override
-            public void onError(List<String> errors) {
-                Util.onError(errors, MainActivity.this);
+            public void onError(QBResponseException responseException) {
+                Util.onError(responseException, MainActivity.this);
             }
+
+
         });
     }
 
@@ -514,7 +519,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         //getLocationsBuilder.setPage(2);
         getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
 
-        QBLocations.getLocations(getLocationsBuilder, new QBEntityCallbackImpl<ArrayList<QBLocation>>() {
+        QBLocations.getLocations(getLocationsBuilder, new QBEntityCallback<ArrayList<QBLocation>>() {
             @Override
             public void onSuccess(ArrayList<QBLocation> locations, Bundle params) {
                 for (QBLocation qbLocation : locations) {
@@ -536,10 +541,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
 
             @Override
-            public void onError(List<String> errors) {
+            public void onError(QBResponseException e) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                Util.onError(errors, MainActivity.this);
+                Util.onError(e, MainActivity.this);
+
             }
+
         });
     }
 

@@ -19,7 +19,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -144,7 +146,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void done(final User returnedUser) {
 
-                QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
+                QBAuth.createSession(new QBEntityCallback<QBSession>() {
 
                     @Override
                     public void onSuccess(QBSession session, Bundle params) {
@@ -152,24 +154,26 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         //qbUser.setExternalId(returnedUser.regid);
                         qbUser.setEmail(user.email);
 
-                        QBUsers.signUp(qbUser, new QBEntityCallbackImpl<QBUser>() {
+                        QBUsers.signUp(qbUser, new QBEntityCallback<QBUser>() {
                             @Override
                             public void onSuccess(QBUser user, Bundle args) {
                                 finish();
                             }
 
                             @Override
-                            public void onError(List<String> errors) {
-                                Util.onError(errors, RegisterActivity.this);
+                            public void onError(QBResponseException e) {
+                                Util.onError(e, RegisterActivity.this);
                             }
+
                         });
 
                     }
 
                     @Override
-                    public void onError(List<String> errors) {
-                        Util.onError(errors, RegisterActivity.this);
+                    public void onError(QBResponseException responseException) {
+                        Util.onError(responseException, RegisterActivity.this);
                     }
+
                 });
 
 

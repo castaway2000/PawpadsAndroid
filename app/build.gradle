@@ -12,6 +12,7 @@ apply plugin: 'io.fabric'
 repositories {
     maven { url 'http://maven.stickerpipe.com/artifactory/stickerfactory' }
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/" }
 }
 android {
     compileSdkVersion 23
@@ -48,12 +49,14 @@ android {
 dependencies {
     compile files('libs/volley.jar')
     compile files('libs/universal-image-loader-1.9.4.jar')
-    compile files('libs/quickblox-android-sdk-core-2.4.jar')
-    compile files('libs/quickblox-android-sdk-chat-2.4.jar')
-    compile files('libs/quickblox-android-sdk-messages-2.4.jar')
-    compile files('libs/quickblox-android-sdk-location-2.4.jar')
-    compile files('libs/quickblox-android-sdk-content-2.4.jar')
-    compile files('libs/quickblox-android-sdk-customobjects-2.4.jar')
+
+    compile("com.quickblox:quickblox-android-sdk-core:2.6.1")
+    compile("com.quickblox:quickblox-android-sdk-chat:2.6.1")
+    compile("com.quickblox:quickblox-android-sdk-messages:2.6.1")
+    compile("com.quickblox:quickblox-android-sdk-location:2.6.1")
+    compile("com.quickblox:quickblox-android-sdk-content:2.6.1")
+    compile("com.quickblox:quickblox-android-sdk-customobjects:2.6.1")
+
     compile('com.crashlytics.sdk.android:crashlytics:2.6.0@aar') {
         transitive = true;
     }

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.quickblox.core.exception.QBResponseException;
+
 import java.util.List;
 
 import saberapplications.pawpads.ui.BaseActivity;
@@ -68,6 +70,14 @@ public class Util extends BaseActivity {
                 .show();
     }
     public static void onError(Exception e,Context context) {
+
+        new AlertDialog.Builder(context)
+                .setMessage(e.getLocalizedMessage())
+                .setTitle("Error")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+    public static void onError(QBResponseException e, Context context) {
 
         new AlertDialog.Builder(context)
                 .setMessage(e.getLocalizedMessage())

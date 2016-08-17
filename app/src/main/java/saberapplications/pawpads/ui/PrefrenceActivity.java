@@ -19,7 +19,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 
 import java.util.List;
@@ -189,10 +191,10 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(Util.QB_PASSWORD, ""))) {
-                            QBUsers.deleteUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallbackImpl() {
+                            QBUsers.deleteUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallback() {
 
                                 @Override
-                                public void onSuccess() {
+                                public void onSuccess(Object o, Bundle bundle) {
                                     Toast.makeText(PrefrenceActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
                                     Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
                                     startActivity(myIntent1);
@@ -200,9 +202,10 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                                 }
 
                                 @Override
-                                public void onError(List errors) {
-                                    Util.onError(errors, PrefrenceActivity.this);
+                                public void onError(QBResponseException e) {
+                                    Util.onError(e, PrefrenceActivity.this);
                                 }
+
                             });
                         } else {
                             Toast.makeText(PrefrenceActivity.this, "Wrong password", Toast.LENGTH_LONG).show();

@@ -131,12 +131,7 @@ public class ChatActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError(List<String> list) {
+                    public void onError(QBResponseException e) {
 
                     }
 
@@ -273,9 +268,9 @@ public class ChatActivity extends BaseActivity {
                             chatMessage.setBody(filePhoto.getName());
                             try {
                                 privateChat.sendMessage(chatMessage);
-                            } catch (XMPPException e) {
+                            }  catch (SmackException.NotConnectedException e) {
                                 e.printStackTrace();
-                            } catch (SmackException.NotConnectedException e) {
+                            } catch (Exception e){
                                 e.printStackTrace();
                             }
                             // send a message
@@ -283,14 +278,11 @@ public class ChatActivity extends BaseActivity {
                         }
 
                         @Override
-                        public void onSuccess() {
+                        public void onError(QBResponseException e) {
 
                         }
 
-                        @Override
-                        public void onError(List<String> list) {
 
-                        }
 
                     });
                 } catch (URISyntaxException e) {
@@ -347,9 +339,9 @@ public class ChatActivity extends BaseActivity {
                     try {
                         privateChat.sendMessage(msg);
                         showChat(ChatObject.SENT, msg.getBody());
-                    } catch (XMPPException e) {
-                        Util.onError(e, ChatActivity.this);
                     } catch (SmackException.NotConnectedException e) {
+                        Util.onError(e, ChatActivity.this);
+                    } catch (Exception e) {
                         Util.onError(e, ChatActivity.this);
                     }
                     editText_chat_message.setText("");
@@ -503,10 +495,12 @@ public class ChatActivity extends BaseActivity {
             }
 
             @Override
-            public void onError(List<String> errors) {
+            public void onError(QBResponseException responseException) {
                 progressDialog.dismiss();
-                Util.onError(errors, ChatActivity.this);
+                Util.onError(responseException, ChatActivity.this);
+
             }
+
         });
 
 
@@ -652,15 +646,11 @@ public class ChatActivity extends BaseActivity {
             }
 
             @Override
-            public void onSuccess() {
+            public void onError(QBResponseException e) {
 
             }
 
-            @Override
-            public void onError(List<String> list) {
-                Util.onError(list, ChatActivity.this);
 
-            }
         });
 
     }

@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -71,7 +73,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         qbUser.setLogin(username);
                         qbUser.setPassword(password);
 
-                        QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
+                        QBUsers.signIn(qbUser, new QBEntityCallback<QBUser>() {
                             @Override
                             public void onSuccess(final QBUser user, Bundle params) {
 
@@ -88,16 +90,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }
 
                             @Override
-                            public void onError(List<String> errors) {
-                                Util.onError(errors, LoginActivity.this);
+                            public void onError(QBResponseException e) {
+                                Util.onError(e, LoginActivity.this);
                             }
+
+
                         });
                     }
 
                     @Override
-                    public void onError(List<String> errors) {
-                        Util.onError(errors, LoginActivity.this);
+                    public void onError(QBResponseException responseException) {
+                        Util.onError(responseException, LoginActivity.this);
                     }
+
                 });
 
 

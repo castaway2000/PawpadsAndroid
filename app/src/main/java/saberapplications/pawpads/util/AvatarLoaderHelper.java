@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBProgressCallback;
+import com.quickblox.core.exception.QBResponseException;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -71,14 +72,11 @@ public class AvatarLoaderHelper {
                 }
 
                 @Override
-                public void onSuccess() {
-
+                public void onError(QBResponseException e) {
+                    Util.onError(e, PawPadsApplication.getInstance().getApplicationContext());
                 }
 
-                @Override
-                public void onError(List<String> list) {
-                    Util.onError(list, PawPadsApplication.getInstance().getApplicationContext());
-                }
+
 
 
             }, new QBProgressCallback() {

@@ -18,7 +18,9 @@ import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.model.QBPrivacyList;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -125,11 +127,11 @@ public abstract class BaseActivity extends AppCompatActivity
                     }
 
                     @Override
-                    public void onError(List<String> errors) {
+                    public void onError(QBResponseException responseException) {
                         startActivity(new Intent(getBaseContext(), LoginActivity.class));
                         finish();
-
                     }
+
                 });
 
     }
@@ -164,11 +166,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
         } else
 
-        {
-            QBChatService.getInstance().login(qbUser, new QBEntityCallbackImpl() {
+
+            QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
                 @Override
-                public void onSuccess() {
-                    try {
+                public void onSuccess(Object o, Bundle bundle) {
                         QBChatService.getInstance().startAutoSendPresence(60);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -182,21 +183,16 @@ public abstract class BaseActivity extends AppCompatActivity
                                 }
                             }
                         });
-
-
-                    } catch (SmackException.NotLoggedInException e) {
-                        e.printStackTrace();
-                    }
                 }
 
                 @Override
-                public void onError(List errors) {
-                    Util.onError(errors, getBaseContext());
+                public void onError(QBResponseException e) {
+                    Util.onError(e, getBaseContext());
                 }
-            });
+            } );
         }
 
-    }
+
 
 
     public void onQBConnect() throws Exception {
