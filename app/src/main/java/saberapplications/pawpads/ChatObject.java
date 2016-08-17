@@ -27,4 +27,12 @@ public class ChatObject {
     public String getMessage() {
         return message;
     }
+
+    public Date getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
+    }
 }

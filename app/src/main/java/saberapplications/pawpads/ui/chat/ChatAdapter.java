@@ -2,12 +2,16 @@ package saberapplications.pawpads.ui.chat;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import saberapplications.pawpads.ChatObject;
@@ -60,6 +64,12 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
         ChatObject data = chat_data.get(position);
         if (data.getType().equals("sent")) {
             holder.textView_left_chat.setText(data.getMessage());
+            if (DateUtils.isToday(data.getDateTime().getTime())) {
+                String time = DateFormat.format("HH:mm", data.getDateTime()) + " today";
+                holder.CVtime_left.setText(time);
+            }else  {
+                holder.CVtime_left.setText(DateFormat.format("HH:mm dd MMM yyyy", data.getDateTime()));
+            }
 //                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
             holder.CVtime_right.setVisibility(View.GONE);
@@ -68,6 +78,12 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
+            if (DateUtils.isToday(data.getDateTime().getTime())) {
+                String time = DateFormat.format("HH:mm", data.getDateTime()) + " today";
+                holder.CVtime_right.setText(time);
+            }else {
+                holder.CVtime_right.setText(DateFormat.format("HH:mm dd MMM yyyy", data.getDateTime()));
+            }
             holder.textView_right_chat.setText(data.getMessage());
 //            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
             holder.CVtime_left.setVisibility(View.GONE);
