@@ -113,9 +113,9 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
         switch (v.getId()) {
             case R.id.newPicButton:
-                Intent intent = new Intent();
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, SELECT_IMAGE);
                 break;
 
