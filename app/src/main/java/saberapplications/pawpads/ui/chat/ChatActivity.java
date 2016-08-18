@@ -3,7 +3,6 @@ package saberapplications.pawpads.ui.chat;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
@@ -50,18 +47,12 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.util.FileUtils;
 import org.json.JSONArray;
-import org.w3c.dom.Text;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -100,16 +91,22 @@ public class ChatActivity extends BaseActivity {
     private TextView blockStatus;
     private ImageView sendFile;
 
-    private QBMessageListener messageListener = new QBMessageListener() {
+    private  QBMessageListener<QBPrivateChat> messageListener = new QBMessageListener<QBPrivateChat>() {
         @Override
-        public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
+        public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
             ChatActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (chatAdapter != null) {
-                        showChat(ChatObject.RECEIVED, qbChatMessage.getBody());
-                        //chatAdapter.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()), ChatObject.RECEIVED));
+                    if (qbChatMessage.getProperties().containsKey("blocked")){
+                        if (qbChatMessage.getProperty("blocked").equals("1")){
+                            onBlocked();
+                        }else if (qbChatMessage.getProperty("blocked").equals("0")){
+                            onUnBlocked();
+                        }
+                    }else {
+                        displayChatMessage(ChatObject.RECEIVED, qbChatMessage);
                     }
+
                 }
             });
             for (final QBAttachment attachment : qbChatMessage.getAttachments()) {
@@ -140,9 +137,10 @@ public class ChatActivity extends BaseActivity {
         }
 
         @Override
-        public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
-
+        public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
+            Util.onError(e,ChatActivity.this);
         }
+
 
     };
 
@@ -160,7 +158,7 @@ public class ChatActivity extends BaseActivity {
     private int sendTo;
     private ProgressDialog progressDialog;
     private QBPrivateChat privateChat;
-    private QBMessageListener msgListener;
+
     private boolean isBlocked;
     public QBUser currentUser;
 
@@ -338,7 +336,7 @@ public class ChatActivity extends BaseActivity {
 
                     try {
                         privateChat.sendMessage(msg);
-                        showChat(ChatObject.SENT, msg.getBody());
+                        displayChatMessage(ChatObject.SENT, msg);
                     } catch (SmackException.NotConnectedException e) {
                         Util.onError(e, ChatActivity.this);
                     } catch (Exception e) {
@@ -508,39 +506,19 @@ public class ChatActivity extends BaseActivity {
         QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
         privateChat = privateChatManager.getChat(sendTo);
-        msgListener = new QBMessageListener() {
 
-            @Override
-            public void processMessage(QBChat qbChat, QBChatMessage qbChatMessage) {
-
-            }
-
-            @Override
-            public void processError(QBChat qbChat, final QBChatException e, QBChatMessage qbChatMessage) {
-                ChatActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Util.onError(e, ChatActivity.this);
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                });
-
-            }
-        };
         if (privateChat == null) {
-            privateChat = privateChatManager.createChat(sendTo, msgListener);
+            privateChat = privateChatManager.createChat(sendTo, messageListener);
         } else {
-            privateChat.addMessageListener(msgListener);
+            privateChat.addMessageListener(messageListener);
         }
 
 
     }
 
-    private void showChat(String type, String message) {
-        chatAdapter.add(new ChatObject(message, type, new Date()));
+    private void displayChatMessage(String type,QBChatMessage message) {
+        Date dt=new Date(message.getDateSent());
+        chatAdapter.add(new ChatObject(message.getBody(), type, dt));
         chatAdapter.notifyDataSetChanged();
 
     }
@@ -682,5 +660,14 @@ public class ChatActivity extends BaseActivity {
 
         return null;
     }
-
+    private void onBlocked(){
+        Toast.makeText(this,getString(R.string.text_you_blocked),Toast.LENGTH_LONG).show();
+        messageContainer.setVisibility(View.GONE);
+        blockedContainer.setVisibility(View.VISIBLE);
+    }
+    private void onUnBlocked(){
+        Toast.makeText(this,getString(R.string.text_you_unblocked),Toast.LENGTH_LONG).show();
+        messageContainer.setVisibility(View.VISIBLE);
+        blockedContainer.setVisibility(View.GONE);
+    }
 }

@@ -37,6 +37,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.Utils;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
@@ -90,10 +91,12 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         @Override
         public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
             if (!createdLocally) {
-                qbPrivateChat.addMessageListener(new QBMessageListener() {
+                qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
                     @Override
-                    public void processMessage(final QBChat qbChat, final QBChatMessage qbChatMessage) {
-
+                    public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        if (qbChatMessage.getProperties().containsKey("blocked")) {
+                            return;
+                        }
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -108,8 +111,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                                     intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
                                                     intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId().toString());
                                                     startActivity(intent);
-                                                    ///qbChat.getDialogId()
-                                                    ///qbChat.getDialogId()
                                                 }
                                             })
                                             .setNegativeButton("Cancel", null)
@@ -117,13 +118,13 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                                 }
                             }
                         });
-
                     }
 
                     @Override
-                    public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
-
+                    public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
+                        Util.onError(e, MainActivity.this);
                     }
+
                 });
             }
         }
@@ -267,7 +268,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
 
         QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
-        if (chatManager==null) return;
+        if (chatManager == null) return;
         chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallback<QBDialog>() {
 
             @Override
@@ -403,7 +404,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
-            Util.APP_VERSION = String.valueOf("PawPads Version: "+packageInfo.versionName +"."+ packageInfo.versionCode);
+            Util.APP_VERSION = String.valueOf("PawPads Version: " + packageInfo.versionName + "." + packageInfo.versionCode);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             // should never happen

@@ -15,4 +15,6 @@
     <string name="text_you_blocked">You are blocked</string>
     <string name="loading_data">Loading data</string>
     <string name="version">Version:</string>
+    <string name="you_are_blocked">You are blocked</string>
+    <string name="text_you_unblocked">You are unblocked</string>
 </resources>

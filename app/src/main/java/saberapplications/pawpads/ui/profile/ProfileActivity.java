@@ -23,6 +23,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
+import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
@@ -267,6 +269,13 @@ public class ProfileActivity extends BaseActivity {
                     object.setClassName("BlockList");
                     QBCustomObjects.createObject(object);
 
+                    QBPrivateChat privatChat = QBChatService.getInstance().getPrivateChatManager().getChat(currentQbUser.getId());
+                    if (privatChat==null){
+                       privatChat=QBChatService.getInstance().getPrivateChatManager().createChat(currentQbUser.getId(),null);
+                    }
+                    QBChatMessage message=new QBChatMessage();
+                    message.setProperty("blocked","1");
+                    privatChat.sendMessage(message);
 
                 } catch (Exception e) {
                     error = e.getLocalizedMessage();
@@ -329,6 +338,14 @@ public class ProfileActivity extends BaseActivity {
                     privacyListsManager.setPrivacyList(list);
 
                     saveBlockListToPreferences(list);
+                    QBPrivateChat privatChat = QBChatService.getInstance().getPrivateChatManager().getChat(currentQbUser.getId());
+                    if (privatChat==null){
+                        privatChat=QBChatService.getInstance().getPrivateChatManager().createChat(currentQbUser.getId(),null);
+                    }
+                    QBChatMessage message=new QBChatMessage();
+                    message.setProperty("blocked","0");
+                    privatChat.sendMessage(message);
+
 
                 } catch (Exception e) {
                     e.printStackTrace();

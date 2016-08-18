@@ -111,8 +111,9 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void recreateSession() {
         if (isLoggedIn) return;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
-                new QBEntityCallbackImpl<QBSession>() {
+                new QBEntityCallback<QBSession>() {
                     @Override
                     public void onSuccess(final QBSession result, Bundle params) {
                         try {
@@ -165,7 +166,6 @@ public abstract class BaseActivity extends AppCompatActivity
             }
 
         } else
-
 
             QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
                 @Override

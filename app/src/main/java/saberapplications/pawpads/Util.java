@@ -35,6 +35,7 @@ public class Util extends BaseActivity {
     public static final String QB_APPID="35252";
     public static final String QB_AUTH_KEY="GHHUHJMGTcGN8EY";
     public static final String QB_AUTH_SECRET="NNSa7QQZDUzRvpB";
+    public static final String QB_ACCOUNT_KEY="S6mqpsBsKxfbSqZxGY4X";
     public static final String QB_USER="qb_user";
     public static final String QB_PASSWORD="qb_password";
     public static final String QB_USERID ="qb_userid" ;

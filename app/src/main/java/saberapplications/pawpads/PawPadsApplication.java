@@ -20,7 +20,9 @@ public class PawPadsApplication extends Application {
         super.onCreate();
         instance=this;
         Fabric.with(this, new Crashlytics());
-        QBSettings.getInstance().fastConfigInit(Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
+        QBSettings.getInstance().init(this,Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
+        QBSettings.getInstance().setAccountKey(Util.QB_ACCOUNT_KEY);
+
 //      StickersManager.initialize(Util.STICKERS_API_KEY, this);
     }
 
