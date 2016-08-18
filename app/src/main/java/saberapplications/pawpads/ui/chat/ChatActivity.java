@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
@@ -80,7 +81,7 @@ public class ChatActivity extends BaseActivity {
     EditText editText_chat_message;
     ListView listView_chat_messages;
     Button button_send_chat;
-    private List<ChatObject> chat_list;
+    private ArrayList<ChatObject> chat_list;
 //    BroadcastReceiver recieve_chat;
     private QBDialog dialog;
     private QBUser recipient;
@@ -90,6 +91,8 @@ public class ChatActivity extends BaseActivity {
     private Button unblock;
     private TextView blockStatus;
     private ImageView sendFile;
+    private ArrayList<QBChatMessage> chatMessages;
+    Bundle savedInstanceState;
 
     private  QBMessageListener<QBPrivateChat> messageListener = new QBMessageListener<QBPrivateChat>() {
         @Override
@@ -183,6 +186,18 @@ public class ChatActivity extends BaseActivity {
         if (recipient != null && dialog != null) {
             init();
         }
+        this.savedInstanceState=savedInstanceState;
+
+        editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
+        listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
+        button_send_chat = (Button) findViewById(R.id.button_send_chat);
+        blockedContainer = (FrameLayout) findViewById(R.id.block_container);
+        messageContainer = (LinearLayout) findViewById(R.id.message_container);
+        unblock = (Button) findViewById(R.id.button_unblock);
+        sendFile = (ImageView) findViewById(R.id.imageViewSendFile);
+        blockStatus = (TextView) findViewById(R.id.text_view_block_status);
+
+
     }
 
     private void loadDataById() {
@@ -207,7 +222,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Boolean result) {
-                progressDialog.dismiss();
+                if (progressDialog!=null) progressDialog.dismiss();
                 if (result) {
                     init();
                     onQBConnect();
@@ -304,53 +319,22 @@ public class ChatActivity extends BaseActivity {
         currentUserId = getUserId();
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
         if (dialog == null) return;
-        editText_chat_message = (EditText) findViewById(R.id.editText_chat_message);
-        listView_chat_messages = (ListView) findViewById(R.id.listView_chat_messages);
-        button_send_chat = (Button) findViewById(R.id.button_send_chat);
-        blockedContainer = (FrameLayout) findViewById(R.id.block_container);
-        messageContainer = (LinearLayout) findViewById(R.id.message_container);
-        unblock = (Button) findViewById(R.id.button_unblock);
-        sendFile = (ImageView) findViewById(R.id.imageViewSendFile);
-        blockStatus = (TextView) findViewById(R.id.text_view_block_status);
-        sendFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadFile();
-            }
-        });
-        button_send_chat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // send chat message to server
-                if (!editText_chat_message.getText().toString().equals("")) {
-                    QBChatMessage msg = new QBChatMessage();
-                    msg.setBody(editText_chat_message.getText().toString());
-                    //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
-                    //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
 
-                    msg.setProperty("save_to_history", "1");
-                    msg.setRecipientId(sendTo);
-                    msg.setDialogId(dialog.getDialogId());
-                    msg.setProperty("send_to_chat", "1");
+        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
+        QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
+        privateChat = privateChatManager.getChat(sendTo);
 
-                    try {
-                        privateChat.sendMessage(msg);
-                        displayChatMessage(ChatObject.SENT, msg);
-                    } catch (SmackException.NotConnectedException e) {
-                        Util.onError(e, ChatActivity.this);
-                    } catch (Exception e) {
-                        Util.onError(e, ChatActivity.this);
-                    }
-                    editText_chat_message.setText("");
-                }
-            }
-        });
+        if (privateChat == null) {
+            privateChat = privateChatManager.createChat(sendTo, messageListener);
+        } else {
+            privateChat.addMessageListener(messageListener);
+        }
 
-
+        if (chatMessages!=null) return;
         // Detect blocked state
         new AsyncTask<Void, Void, Void>() {
-            public ArrayList<QBChatMessage> chatMessages;
+
             String error;
             boolean isBlockedByMe;
             boolean isIBlockedByOther;
@@ -376,40 +360,25 @@ public class ChatActivity extends BaseActivity {
 
                     requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.setPagesLimit(100);
-                    chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
+                    if (savedInstanceState!=null && savedInstanceState.containsKey("chat")){
+                        chatMessages= (ArrayList<QBChatMessage>) savedInstanceState.getSerializable("chat");
+                    }else {
+                        chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
+                    }
                     for (QBChatMessage qbChatMessage:chatMessages) {
                         for (final QBAttachment attachment : qbChatMessage.getAttachments()) {
                             Integer fileId = Integer.valueOf(attachment.getId());
-
-                            // download a file
-                            try {
-                                InputStream inputStream = QBContent.downloadFileTask(fileId, new Bundle());
-                                try {
-                                    File targetFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), attachment.getName());
-                                    OutputStream output = new FileOutputStream(targetFile);
-                                    try {
-                                        try {
-                                            byte[] buffer = new byte[10 * 1024]; // or other buffer size
-                                            int read;
-
-                                            while ((read = inputStream.read(buffer)) != -1) {
-                                                output.write(buffer, 0, read);
-                                            }
-                                            output.flush();
-                                        } finally {
-                                            output.close();
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace(); // handle exception, define IOException and others
-                                    }
-                                } finally {
-                                    inputStream.close();
-                                }
-                            } catch (QBResponseException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
+
+                    // Fill chatdata
+                    chat_list = new ArrayList<>();
+                    for (QBChatMessage qbChatMessage : chatMessages) {
+                        String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
+                        chat_list.add(new ChatObject(qbChatMessage.getBody(), type, new Date(qbChatMessage.getDateSent()*1000)));
+                        //chat_list.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()),type));
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     error = e.getLocalizedMessage();
@@ -452,13 +421,7 @@ public class ChatActivity extends BaseActivity {
                 } else {
                     unblock.setVisibility(View.GONE);
                 }
-// Fill chatdata
-                chat_list = new ArrayList<>();
-                for (QBChatMessage qbChatMessage : chatMessages) {
-                    String type = currentUserId.equals(qbChatMessage.getRecipientId()) ? ChatObject.RECEIVED : ChatObject.SENT;
-                    chat_list.add(new ChatObject(qbChatMessage.getBody(), type, new Date(qbChatMessage.getDateSent()*1000)));
-                    //chat_list.add(new ChatObject(String.valueOf(qbChatMessage.getDateSent()),type));
-                }
+
                 chatAdapter = new ChatAdapter(ChatActivity.this, R.layout.chat_view, chat_list);
                 listView_chat_messages.setAdapter(chatAdapter);
                 chatAdapter.notifyDataSetChanged();
@@ -502,17 +465,6 @@ public class ChatActivity extends BaseActivity {
         });
 
 
-        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
-        QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
-
-        privateChat = privateChatManager.getChat(sendTo);
-
-        if (privateChat == null) {
-            privateChat = privateChatManager.createChat(sendTo, messageListener);
-        } else {
-            privateChat.addMessageListener(messageListener);
-        }
-
 
     }
 
@@ -535,16 +487,18 @@ public class ChatActivity extends BaseActivity {
         outState.putSerializable(DIALOG, dialog);
         outState.putSerializable(RECIPIENT, recipient);
         outState.putInt(CURRENT_USER_ID, currentUserId);
+        outState.putSerializable("chat",chatMessages);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Loading data");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
+        if(chatMessages==null){
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Loading data");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
     }
 
     private void removeUserFromBlockList() {
@@ -633,12 +587,8 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    private void uploadFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("file/*");
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
 
-    }
+
 
     public static String getPath(Context context, Uri uri) throws URISyntaxException {
         if ("content".equalsIgnoreCase(uri.getScheme())) {
@@ -670,4 +620,37 @@ public class ChatActivity extends BaseActivity {
         messageContainer.setVisibility(View.VISIBLE);
         blockedContainer.setVisibility(View.GONE);
     }
+
+    public void sendChatMessage(View v) {
+        // send chat message to server
+        if (!editText_chat_message.getText().toString().equals("")) {
+            QBChatMessage msg = new QBChatMessage();
+            msg.setBody(editText_chat_message.getText().toString());
+            //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy/MM/dd", Locale.US);
+            //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
+
+            msg.setProperty("save_to_history", "1");
+            msg.setRecipientId(sendTo);
+            msg.setDialogId(dialog.getDialogId());
+            msg.setProperty("send_to_chat", "1");
+
+
+            try {
+                privateChat.sendMessage(msg);
+                displayChatMessage(ChatObject.SENT, msg);
+            } catch (SmackException.NotConnectedException e) {
+                Util.onError(e, ChatActivity.this);
+            } catch (Exception e) {
+                Util.onError(e, ChatActivity.this);
+            }
+            editText_chat_message.setText("");
+        }
+    }
+    public void uploadFile(View view) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("file/*");
+        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+
+    }
+
 }

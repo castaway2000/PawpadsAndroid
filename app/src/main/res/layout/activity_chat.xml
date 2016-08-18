@@ -47,7 +47,8 @@
     android:id="@+id/imageViewSendFile"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:src="@drawable/ic_media_play"/>
+    android:src="@drawable/ic_media_play"
+    android:onClick="uploadFile"/>
             <EditText
                 android:id="@+id/editText_chat_message"
                 android:layout_width="0dp"
@@ -60,7 +61,8 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text=":3"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:onClick="sendChatMessage"/>
         </LinearLayout>
 
         <FrameLayout

@@ -10,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,12 +22,12 @@ import saberapplications.pawpads.R;
 
 public class ChatAdapter extends ArrayAdapter<ChatObject> {
 
-    List<ChatObject> chat_data;
+    ArrayList<ChatObject> chat_data;
     Context context;
     int resource;
 
 
-    public ChatAdapter(Context context, int resource, List<ChatObject> chat_data) {
+    public ChatAdapter(Context context, int resource, ArrayList<ChatObject> chat_data) {
         super(context, resource, chat_data);
 
         this.chat_data = chat_data;
@@ -94,5 +96,8 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
         }
 
         return convertView;
+    }
+    public ArrayList<ChatObject> getChatItems() {
+        return chat_data;
     }
 }
