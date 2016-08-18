@@ -60,39 +60,46 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         rbKM = (RadioButton) findViewById(R.id.rbKM);
 
         gAccuracy = defaultSharedPreferences.getInt("accuracy", 6);
-        gRange = defaultSharedPreferences.getInt("range", 60);
-        dist.setText(String.valueOf(gRange));
+
 
         gUnit = defaultSharedPreferences.getString("unit", "KM");
+
+
+        gRange = defaultSharedPreferences.getInt("range", 60);
+
+        dist.setText(String.valueOf(gRange));
+
         gAlert = defaultSharedPreferences.getBoolean("alert", true);
         gPush = defaultSharedPreferences.getBoolean("push", true);
 
         //check box funtionality. defaults: KM, true, true;
-        if(gUnit.equals("KM")){
+        if (gUnit.equals("KM")) {
             rbMI.setChecked(false);
             rbKM.setChecked(true);
         } else {
             rbKM.setChecked(false);
             rbMI.setChecked(true);
         }
-        if(!gPush){
+        if (!gPush) {
             tbPushBox.setChecked(false);
-        } else {tbPushBox.setChecked(true);}
-        if(!gAlert){
+        } else {
+            tbPushBox.setChecked(true);
+        }
+        if (!gAlert) {
             tbImBox.setChecked(false);
-        } else { tbImBox.setChecked(true); }
-        if(gAccuracy == 1){
+        } else {
+            tbImBox.setChecked(true);
+        }
+        if (gAccuracy == 1) {
             rbLow.setChecked(true);
             rbMedium.setChecked(false);
             rbHigh.setChecked(false);
 
-        }
-        else if(gAccuracy == 3){
+        } else if (gAccuracy == 3) {
             rbLow.setChecked(false);
             rbMedium.setChecked(true);
             rbHigh.setChecked(false);
-        }
-        else{
+        } else {
             rbLow.setChecked(false);
             rbMedium.setChecked(false);
             rbHigh.setChecked(true);
@@ -109,11 +116,11 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                                              }
                                          }
         );
-        TextView appVersion=(TextView)findViewById(R.id.app_version);
+        TextView appVersion = (TextView) findViewById(R.id.app_version);
         PackageInfo pInfo = null;
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            appVersion.setText(getString(R.string.version)+String.format("%s(%d)",pInfo.versionName,pInfo.versionCode));
+            appVersion.setText(getString(R.string.version) + String.format("%s(%d)", pInfo.versionName, pInfo.versionCode));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -123,47 +130,57 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btProfSave:
-                if(dist.getText().length() > 0){
+                if (dist.getText().length() > 0) {
                     range = Integer.valueOf(String.valueOf(dist.getText()));
-                }else { range = 60; }
-
-                if(rbKM.isChecked()){
-                    unit = "KM";
-                } else { unit = "MI"; }
-
-                if(tbPushBox.isChecked()){
-                   push = true;
-                } else { push = false; }
-
-                if (tbImBox.isChecked()){
-                    alert = true;
-                } else { alert = false; }
-                if(rbLow.isChecked()){
-                    accuracy = 1;
+                } else {
+                    range = 60;
                 }
-                else if (rbMedium.isChecked()){
+
+                if (rbKM.isChecked()) {
+                    unit = "KM";
+                } else {
+                    unit = "MI";
+                }
+
+                if (tbPushBox.isChecked()) {
+                    push = true;
+                } else {
+                    push = false;
+                }
+
+                if (tbImBox.isChecked()) {
+                    alert = true;
+                } else {
+                    alert = false;
+                }
+                if (rbLow.isChecked()) {
+                    accuracy = 1;
+                } else if (rbMedium.isChecked()) {
                     accuracy = 3;
-                }else{ accuracy = 6; }
+                } else {
+                    accuracy = 6;
+                }
 
                 saveSettings(accuracy, range, unit, alert, push);
                 break;
         }
     }
 
-    public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push ){
+    public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
         editor.putInt("accuracy", accuracy);
 
-        if(unit.equals("MI")) {
-            int rangeM = (int) Math.floor(range*1.60934);
-            editor.putInt("range", rangeM);
+        if (unit.equals("MI")) {
+            int rangeM = (int) Math.floor(range * 1.60934);
+            editor.putInt("range_km", rangeM);
             //TODO: make this show what user input was not its modified value
+        } else {
+            editor.putInt("range_km", range);
         }
-        else{
-            editor.putInt("range", range);
-        }
+        editor.putInt("range", range);
+        editor.putInt("dsp_range", range);
         editor.putString("unit", unit);
         editor.putBoolean("alert", alert);
         editor.putBoolean("push", push);

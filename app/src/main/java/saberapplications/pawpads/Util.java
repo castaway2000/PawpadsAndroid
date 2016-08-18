@@ -50,7 +50,7 @@ public class Util extends BaseActivity {
 
     public static int getRange(){
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
-            return defaultSharedPreferences.getInt("range", 60);
+            return defaultSharedPreferences.getInt("range_km", 60);
     }
     public static void setRange(int range){
         SharedPreferences.Editor editor= PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
