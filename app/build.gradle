@@ -6,13 +6,16 @@ buildscript {
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
     }
+
+
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+
 repositories {
     maven { url 'http://maven.stickerpipe.com/artifactory/stickerfactory' }
-    maven { url 'https://maven.fabric.io/public' }
     maven { url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/" }
+    maven { url 'https://maven.fabric.io/public' }
 }
 android {
     compileSdkVersion 23
@@ -57,7 +60,8 @@ dependencies {
     compile("com.quickblox:quickblox-android-sdk-content:2.6.1")
     compile("com.quickblox:quickblox-android-sdk-customobjects:2.6.1")
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.0@aar') {
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
     compile 'com.android.support:appcompat-v7:23.3.0'

@@ -39,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity
         implements LocationListener {
     private static int openActivitiesCount = 0;
 
-
+    protected boolean isExternalDialogOpened;
     protected static boolean isLoggedIn;
     private static Integer userId;
 
@@ -212,7 +212,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public synchronized void decrementActivityCount() {
-
+        if (isExternalDialogOpened) return;
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

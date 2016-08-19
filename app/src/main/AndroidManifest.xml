@@ -5,8 +5,8 @@
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 	<uses-permission android:name="com.google.android.c2dm.permission.SEND"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -35,11 +35,13 @@
 		android:icon="@drawable/pplogo"
 		android:label="@string/app_name"
 		android:theme="@style/AppTheme">
+		<activity
+			android:name="com.google.android.gms.ads.AdActivity"
+			android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
-		<activity android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        <meta-data android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version"/>
+		<meta-data
+			android:name="com.google.android.gms.version"
+			android:value="@integer/google_play_services_version"/>
 
 		<activity
 			android:name=".ui.home.MainActivity"
@@ -70,7 +72,8 @@
 		</activity>
 		<activity
 			android:name=".ui.chat.ChatActivity"
-			android:label="Chat">
+			android:label="Chat"
+			android:screenOrientation="portrait">
 		</activity>
 		<activity
 			android:name=".ui.dialogs.DialogsListActivity"
@@ -128,14 +131,19 @@
 		<meta-data
 			android:name="com.google.android.maps.v2.API_KEY"
 			android:value="AIzaSyAdM4oHjDSaAPHZ5liLJ0uSSGeW2g24Mkc"/>
+
+		<service
+			android:name=".service.UserLocationService"
+			android:enabled="true">
+		</service>
+
 		<meta-data
 			android:name="io.fabric.ApiKey"
 			android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e"/>
 
 		<service
-			android:name=".service.UserLocationService"
-			android:enabled="true"
-			>
+			android:name=".service.FileDownloadService"
+			android:exported="false">
 		</service>
 	</application>
 

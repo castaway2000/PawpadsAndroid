@@ -10,29 +10,32 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.users.model.QBUser;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import saberapplications.pawpads.ChatObject;
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.service.FileDownloadService;
 
 
-public class ChatAdapter extends ArrayAdapter<ChatObject> {
+public class ChatAdapter extends ArrayAdapter<QBChatMessage> {
 
-    ArrayList<ChatObject> chat_data;
+    ArrayList<QBChatMessage> chat_data;
+    QBUser currentUser;
     Context context;
     int resource;
 
 
-    public ChatAdapter(Context context, int resource, ArrayList<ChatObject> chat_data) {
+    public ChatAdapter(Context context, int resource, ArrayList<QBChatMessage> chat_data,QBUser currentUser) {
         super(context, resource, chat_data);
 
         this.chat_data = chat_data;
         this.context = context;
         this.resource = resource;
+        this.currentUser=currentUser;
     }
 
 
@@ -42,6 +45,7 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
         TextView CVtime_left;
         TextView CVtime_right;
         View relative_layout;
+        public TextView attachment;
     }
 
     @Override
@@ -57,20 +61,23 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder.CVtime_left = (TextView) convertView.findViewById(R.id.CVtime_left);
             holder.CVtime_right = (TextView) convertView.findViewById(R.id.CVtime_right);
             holder.relative_layout = convertView.findViewById(R.id.rChatLayout);
-
+            holder.attachment=(TextView) convertView.findViewById(R.id.attachment);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        ChatObject data = chat_data.get(position);
-        if (data.getType().equals("sent")) {
-            holder.textView_left_chat.setText(data.getMessage());
-            if (DateUtils.isToday(data.getDateTime().getTime())) {
-                String time = DateFormat.format("HH:mm", data.getDateTime()) + " today";
+        QBChatMessage message = chat_data.get(position);
+        Date sentDate=new Date(message.getDateSent()*1000);
+        String type = currentUser.getId().equals(message.getRecipientId()) ?"received": "sent";
+        if (type.equals("sent")) {
+            holder.textView_left_chat.setText(message.getBody());
+
+            if (DateUtils.isToday(sentDate.getTime())) {
+                String time = DateFormat.format("HH:mm", sentDate) + " today";
                 holder.CVtime_left.setText(time);
             }else  {
-                holder.CVtime_left.setText(DateFormat.format("HH:mm dd MMM yyyy", data.getDateTime()));
+                holder.CVtime_left.setText(DateFormat.format("HH:mm dd MMM yyyy", sentDate));
             }
 //                holder.CVtime_left.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
 
@@ -80,13 +87,13 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder.relative_layout.setBackgroundColor(Color.parseColor("#97159cc6"));
 
         } else {
-            if (DateUtils.isToday(data.getDateTime().getTime())) {
-                String time = DateFormat.format("HH:mm", data.getDateTime()) + " today";
+            if (DateUtils.isToday(sentDate.getTime())) {
+                String time = DateFormat.format("HH:mm", sentDate) + " today";
                 holder.CVtime_right.setText(time);
             }else {
-                holder.CVtime_right.setText(DateFormat.format("HH:mm dd MMM yyyy", data.getDateTime()));
+                holder.CVtime_right.setText(DateFormat.format("HH:mm dd MMM yyyy", sentDate));
             }
-            holder.textView_right_chat.setText(data.getMessage());
+            holder.textView_right_chat.setText(message.getBody());
 //            holder.CVtime_right.setText(String.valueOf(chat_data.get(position).getType().equals("date_sent")));
             holder.CVtime_left.setVisibility(View.GONE);
 
@@ -95,9 +102,26 @@ public class ChatAdapter extends ArrayAdapter<ChatObject> {
             holder.relative_layout.setBackgroundColor(000000);
         }
 
+        if (message.getAttachments().size()>0){
+            final QBAttachment attachment=message.getAttachments().iterator().next();
+            holder.attachment.setText(attachment.getName());
+            holder.attachment.setVisibility(View.VISIBLE);
+            holder.attachment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FileDownloadService.startService(context,attachment);
+                }
+            });
+        }else {
+            holder.attachment.setVisibility(View.GONE);
+        }
+
+
         return convertView;
     }
-    public ArrayList<ChatObject> getChatItems() {
+    public ArrayList<QBChatMessage> getChatItems() {
         return chat_data;
     }
+
+
 }

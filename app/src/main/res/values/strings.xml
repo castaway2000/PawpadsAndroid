@@ -17,4 +17,6 @@
     <string name="version">Version:</string>
     <string name="you_are_blocked">You are blocked</string>
     <string name="text_you_unblocked">You are unblocked</string>
+    <string name="file_downloaded">File was downloaded</string>
+    <string name="download_started">File download started</string>
 </resources>
