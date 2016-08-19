@@ -16,7 +16,6 @@ import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.model.QBLocation;
@@ -24,7 +23,6 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
@@ -81,7 +79,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
         listView = (ListView) findViewById(R.id.dialog_listview);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        dialogsAdapter = new DialogsAdapter(qbDialogArrayList, this);
+        dialogsAdapter = new DialogsAdapter(qbDialogArrayList,getUserId(), this);
         listView.setAdapter(dialogsAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

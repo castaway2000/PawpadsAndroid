@@ -1,6 +1,7 @@
 package saberapplications.pawpads.ui.dialogs;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,12 +31,17 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
  */
 public class DialogsAdapter extends BaseAdapter {
 
+    private final int size;
     private ArrayList<QBDialog> dialogs;
     private Context context;
+    private int currentUserId;
 
-    public DialogsAdapter(ArrayList<QBDialog> dialogs, Context context) {
+    public DialogsAdapter(ArrayList<QBDialog> dialogs,int currentUserId, Context context) {
         this.dialogs = dialogs;
         this.context = context;
+        this.currentUserId=currentUserId;
+        float d = context.getResources().getDisplayMetrics().density;
+        size=Math.round(60 * d);
     }
 
     @Override
@@ -59,6 +69,7 @@ public class DialogsAdapter extends BaseAdapter {
             view=convertView;
         }
         QBDialog dialog = getItem(position);
+
         final ImageView avatar = (ImageView) view.findViewById(R.id.dialog_avatar);
         TextView username = (TextView) view.findViewById(R.id.dialogs_username);
         TextView lastMessage = (TextView) view.findViewById(R.id.dialog_last_message);
@@ -67,16 +78,25 @@ public class DialogsAdapter extends BaseAdapter {
         lastDate.setText(lastDateFormat);
         lastMessage.setText(dialog.getLastMessage());
         username.setText(dialog.getName());
-        if (dialog.getUserId() != null) {
-            //int userProfilePictureID = ; // user - an instance of QBUser class
-            float d = context.getResources().getDisplayMetrics().density;
-            int size=Math.round(60 * d);
-
-            if (dialog.getPhoto()!=null) {
-                AvatarLoaderHelper.loadImage(Integer.getInteger(dialog.getPhoto()),avatar,size,size);
+        int userId=0;
+        for(int uid:dialog.getOccupants()){
+            if (uid!=currentUserId){
+                userId=uid;
             }
-
         }
+
+        QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                if (qbUser.getFileId()!=null){
+                    AvatarLoaderHelper.loadImage(qbUser.getFileId(), avatar, size, size);
+                }
+            }
+            @Override
+            public void onError(QBResponseException e) {
+
+            }
+        });
 
 
 

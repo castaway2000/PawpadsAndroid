@@ -313,10 +313,7 @@ public class ChatActivity extends BaseActivity {
         }
 
         if (chatMessages!=null) return;
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Loading data");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+
         // Detect blocked state
         new AsyncTask<Void, Void, Void>() {
 
@@ -400,7 +397,6 @@ public class ChatActivity extends BaseActivity {
 
                 chatAdapter = new ChatAdapter(ChatActivity.this, R.layout.chat_view, chatMessages,currentUser);
                 listView_chat_messages.setAdapter(chatAdapter);
-                chatAdapter.notifyDataSetChanged();
                 progressDialog.dismiss();
 
             }
