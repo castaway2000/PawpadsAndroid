@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -125,9 +127,11 @@ public class GcmIntentService extends IntentService {
             PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
                     chatIntent, 0);
 
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pplogo);
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(GcmIntentService.this)
                             .setSmallIcon(R.drawable.pplogo)
+                            .setLargeIcon(bitmap)
                             .setAutoCancel(true)
                             .setContentTitle("PawPads")
                             .setStyle(new NotificationCompat.BigTextStyle()

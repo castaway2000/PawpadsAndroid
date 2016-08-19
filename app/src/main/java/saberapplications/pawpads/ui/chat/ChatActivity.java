@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
@@ -40,7 +39,6 @@ import com.quickblox.chat.model.QBPrivacyListItem;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
@@ -52,10 +50,6 @@ import org.jivesoftware.smack.SmackException;
 import org.json.JSONArray;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -172,7 +166,7 @@ public class ChatActivity extends BaseActivity {
         unblock = (Button) findViewById(R.id.button_unblock);
         sendFile = (ImageView) findViewById(R.id.imageViewSendFile);
         blockStatus = (TextView) findViewById(R.id.text_view_block_status);
-        isExternalDialogOpened=true;
+
 
     }
 
@@ -181,7 +175,6 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    recipient = QBUsers.getUser(Integer.parseInt(getIntent().getStringExtra(RECIPIENT_ID)));
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
                     //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
@@ -189,6 +182,16 @@ public class ChatActivity extends BaseActivity {
                     Bundle bundle = new Bundle();
                     ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
                     dialog = dialogs.get(0);
+                    Integer recipientId=0;
+                    for (Integer uid:dialog.getOccupants()){
+                        if (uid!=currentUserId){
+                            recipientId=uid;
+                        }
+
+                    }
+
+                    recipient = QBUsers.getUser(recipientId);
+
                 } catch (QBResponseException e) {
                     e.printStackTrace();
                     return false;
@@ -232,7 +235,7 @@ public class ChatActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        isExternalDialogOpened=false;
         if (resultCode == Activity.RESULT_OK) {
 
             if (requestCode == PICKFILE_REQUEST_CODE) {
@@ -287,13 +290,14 @@ public class ChatActivity extends BaseActivity {
     @Override
     public void onQBConnect() {
         // init recipient and dialog if intent contains only their ids
+        currentUserId = getUserId();
         if (getIntent().hasExtra(DIALOG_ID) && dialog == null) {
             loadDataById();
             return;
         }
 
 
-        currentUserId = getUserId();
+
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
         if (dialog == null) return;
 
@@ -309,6 +313,10 @@ public class ChatActivity extends BaseActivity {
         }
 
         if (chatMessages!=null) return;
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading data");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         // Detect blocked state
         new AsyncTask<Void, Void, Void>() {
 
