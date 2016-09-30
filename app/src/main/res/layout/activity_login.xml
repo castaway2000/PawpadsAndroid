@@ -1,70 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:background="#97159cc6"
-    android:padding="10dp"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout>
 
-    <ImageView
-        android:layout_width="195dp"
-        android:layout_height="195dp"
-        android:id="@+id/imageView"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="20dp"
-        android:src="@drawable/pplogo" />
+    <data>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:text="Username"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/etUsername"
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.login.LoginActivity" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        tools:context=".ui.login.LoginActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:text="Password"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:inputType="textPassword"
-        android:layout_height="wrap_content" />
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/bLogin"
-        android:text="Login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/splash" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:orientation="vertical"
+                android:paddingLeft="48dp"
+                android:paddingRight="48dp">
 
-        <TextView
-            android:id="@+id/tvRegisterLink"
-            android:layout_width="186dp"
-            android:text="Click Here to Register"
-            android:textStyle="bold"
-            android:padding="15dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:gravity="left" />
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="30dp"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:text="@string/app_name"
+                    android:textColor="#ffffff"
+                    android:textSize="35sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/bg"
+                    app:layout_constraintTop_toTopOf="@+id/guideline2"
+                    app:typefaceAsset="Bellota_BoldItalic.otf" />
 
-        <TextView
-            android:id="@+id/tvForgottenPassLink"
-            android:layout_width="fill_parent"
-            android:text="Forgotten Password?"
-            android:textStyle="bold"
-            android:layout_gravity="right"
-            android:padding="15dp"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:clickable="false" />
-    </LinearLayout>
+                <saberapplications.pawpads.views.FontEditText
+                    android:id="@+id/etUsername"
+                    style="@style/login_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:hint="@string/login" />
 
-</LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <saberapplications.pawpads.views.FontEditText
+                        android:id="@+id/etPassword"
+                        style="@style/login_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:hint="@string/password"
+                        android:inputType="textPassword" />
+                    <saberapplications.pawpads.views.FontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="\?"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="15dp"
+                        android:textSize="15dp"
+                        android:textColor="#444444"
+                        android:gravity="center"
+                        android:onClick="@{ () -> activity.restorePassword() }"
+                        />
+                </RelativeLayout>
+
+                <saberapplications.pawpads.views.FontButton
+                    android:id="@+id/bLogin"
+                    style="@style/transparent_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginStart="3dp"
+                    android:onClick="@{ () -> activity.emailLogin() }"
+                    android:text="@string/log_in" />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/tvRegisterLink"
+                    style="@style/hint_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:onClick="@{ () -> activity.register() }"
+                    android:text="@string/dont_have_account_register" />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/tvForgottenPassLink"
+                    style="@style/hint_text"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="20dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:onClick="@{ () -> activity.restorePassword() }"
+                    android:text="Forgotten Password?" />
+
+                <saberapplications.pawpads.views.FontTextView
+                    style="@style/hint_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:text="@string/login_with" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="50dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/facebook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:onClick="@{ () -> activity.facebookLogin() }"
+                        android:src="@drawable/facebookicon" />
+
+                    <ImageView
+                        android:id="@+id/twitter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{ () -> activity.twitterLogin() }"
+                        android:src="@drawable/twitter" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

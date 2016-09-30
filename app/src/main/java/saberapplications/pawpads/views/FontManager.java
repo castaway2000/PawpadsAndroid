@@ -29,6 +29,7 @@ public class FontManager {
     }
 
     public static FontManager getInstance() {
+
         return instance;
     }
 

@@ -1,10 +1,12 @@
 <resources>
+    <string name="facebook_app_id">1810530139192224</string>
+
     <string name="app_name">PawPads</string>
     <string name="action_settings">Settings</string>
     <string name="action_profile">Edit Profile</string>
     <string name="title_activity_profilepage">Profile Page</string>
     <string name="title_activity_chat">PawPads Chat</string>
-    <string name="profile"/>
+    <string name="profile" />
     <string name="show_dialogs">Chat History</string>
     <string name="About">About</string>
     <string name="blocked">BLOCKED</string>
@@ -19,4 +21,12 @@
     <string name="text_you_unblocked">You are unblocked</string>
     <string name="file_downloaded">File was downloaded</string>
     <string name="download_started">File download started</string>
+    <string name="chat_with_furies_near_you">Chat with furies near you</string>
+    <string name="pawpads_intro">PawPads Intro</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="log_in">Log In</string>
+    <string name="dont_have_account_register"><![CDATA[Don’t have an account?<font color="#ffffff"><b> Register</b></font>]]></string>
+    <string name="login_with">Login with</string>
+    <string name="twitter_app_required">You need to install Twitter App first</string>
 </resources>

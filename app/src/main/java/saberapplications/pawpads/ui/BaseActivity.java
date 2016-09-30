@@ -19,13 +19,14 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 
-import java.util.List;
+import java.util.Date;
 
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
@@ -40,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity
     private static int openActivitiesCount = 0;
 
     protected boolean isExternalDialogOpened;
-    protected static boolean isLoggedIn;
+
     private static Integer userId;
 
     //    private Location lastLocation;
@@ -66,7 +67,7 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if (isLoggedIn) {
+        if (isLoggedIn()) {
             try {
                 onQBConnect();
             } catch (Exception e) {
@@ -101,7 +102,7 @@ public abstract class BaseActivity extends AppCompatActivity
         if (QBChatService.isInitialized()) {
             try {
                 QBChatService.getInstance().logout();
-                isLoggedIn = false;
+
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
             }
@@ -109,8 +110,9 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     protected void recreateSession() {
-        if (isLoggedIn) return;
+        if (isLoggedIn()) return;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
                 new QBEntityCallback<QBSession>() {
@@ -118,7 +120,6 @@ public abstract class BaseActivity extends AppCompatActivity
                     public void onSuccess(final QBSession result, Bundle params) {
                         try {
                             userId = result.getUserId();
-                            isLoggedIn = true;
                             loginToChat();
                             UserLocationService.startService(userId);
                         } catch (Exception e) {
@@ -233,5 +234,17 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected boolean isActive() {
         return isActive;
+    }
+
+    public boolean isLoggedIn(){
+        try {
+            Date expDate=QBUsers.getBaseService().getTokenExpirationDate();
+            if (expDate==null) return false;
+            return  expDate.getTime()>System.currentTimeMillis();
+        } catch (BaseServiceException e) {
+            e.printStackTrace();
+            return false;
+        }
+
     }
 }

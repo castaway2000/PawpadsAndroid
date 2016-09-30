@@ -1,150 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="saberapplications.pawpads"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="saberapplications.pawpads">
 
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-	<uses-permission android:name="com.google.android.c2dm.permission.SEND"/>
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-	<uses-permission android:name="android.permission.WAKE_LOCK"/>
-	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.SEND" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
-	<permission
-		android:name="saberapplications.pawpads.permission.C2D_MESSAGE"
-		android:protectionLevel="signature"/>
+    <permission
+        android:name="saberapplications.pawpads.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
 
-	<uses-permission android:name="saberapplications.pawpads.permission.C2D_MESSAGE"/>
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<!--
+    <uses-permission android:name="saberapplications.pawpads.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--
 		 To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
 		 option is required to comply with the Google+ Sign-In developer policies
     -->
-	<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-	<!-- To auto-complete the email text field in the login form with the user's emails -->
-	<uses-permission android:name="android.permission.READ_PROFILE"/>
-	<uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-	<application
-		android:name=".PawPadsApplication"
-		android:allowBackup="true"
-		android:icon="@drawable/pplogo"
-		android:label="@string/app_name"
-		android:theme="@style/AppTheme">
-		<activity
-			android:name="com.google.android.gms.ads.AdActivity"
-			android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+    <application
+        android:name=".PawPadsApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/pplogo"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
 
-		<meta-data
-			android:name="com.google.android.gms.version"
-			android:value="@integer/google_play_services_version"/>
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
-		<activity
-			android:name=".ui.home.MainActivity"
-			android:label="@string/app_name">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".ui.profile.ProfileActivity"
-			android:label="PawPads">
-			<intent-filter>
-				<action android:name="android.intent.action.profilepage"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-				<category android:name="android.intent.category.DEFAULT"/>
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".ui.login.LoginActivity"
-			android:label="PawPads">
-			<intent-filter>
-				<action android:name="android.intent.action.Login"/>
+        <activity
+            android:name=".ui.home.MainActivity"
+            android:label="@string/app_name">
 
-				<category android:name="android.intent.category.DEFAULT"/>
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".ui.chat.ChatActivity"
-			android:label="Chat"
-			android:screenOrientation="portrait">
-		</activity>
-		<activity
-			android:name=".ui.dialogs.DialogsListActivity"
-			android:label="DialogsList">
-		</activity>
-		<activity
-			android:name=".ui.profile.ProfileEditActivity"
-			android:label="PawPads">
-			<intent-filter>
-				<action android:name="android.intent.action.profileEditPage"/>
+        </activity>
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:label="PawPads">
+            <intent-filter>
+                <action android:name="android.intent.action.profilepage" />
 
-				<category android:name="android.intent.category.DEFAULT"/>
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".ui.register.RegisterActivity"
-			android:label="Register">
-		</activity>
-		<activity
-			android:name=".ui.login.ForgotPasswordActivity"
-			android:label="ForgotPass">
-		</activity>
-		<activity
-			android:name=".ui.PrefrenceActivity"
-			android:label="PrefrenceActivity">
-		</activity>
-		<activity
-			android:name=".ui.AboutActivity"
-			android:label="@string/About">
-		</activity>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.Login" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.chat.ChatActivity"
+            android:label="Chat"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ui.dialogs.DialogsListActivity"
+            android:label="DialogsList"></activity>
+        <activity
+            android:name=".ui.profile.ProfileEditActivity"
+            android:label="PawPads">
+            <intent-filter>
+                <action android:name="android.intent.action.profileEditPage" />
 
-		<receiver
-			android:name=".GcmBroadcastReceiver"
-			android:exported="true"
-			android:permission="com.google.android.c2dm.permission.SEND">
-			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
-				<action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.register.RegisterActivity"
+            android:label="Register"></activity>
+        <activity
+            android:name=".ui.login.ForgotPasswordActivity"
+            android:label="ForgotPass"></activity>
+        <activity
+            android:name=".ui.PrefrenceActivity"
+            android:label="PrefrenceActivity"></activity>
+        <activity
+            android:name=".ui.AboutActivity"
+            android:label="@string/About"></activity>
 
-				<category android:name="saberapplications.pawpads"/>
-			</intent-filter>
-		</receiver>
+        <receiver
+            android:name=".GcmBroadcastReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-		<service
-			android:name=".GcmIntentService"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-			</intent-filter>
-		</service>
+                <category android:name="saberapplications.pawpads" />
+            </intent-filter>
+        </receiver>
 
-		<meta-data
-			android:name="com.google.android.gms.version"
-			android:value="@integer/google_play_services_version"/>
-		<meta-data
-			android:name="com.google.android.maps.v2.API_KEY"
-			android:value="AIzaSyAdM4oHjDSaAPHZ5liLJ0uSSGeW2g24Mkc"/>
+        <service
+            android:name=".GcmIntentService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
 
-		<service
-			android:name=".service.UserLocationService"
-			android:enabled="true">
-		</service>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAdM4oHjDSaAPHZ5liLJ0uSSGeW2g24Mkc" />
 
-		<meta-data
-			android:name="io.fabric.ApiKey"
-			android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e"/>
+        <service
+            android:name=".service.UserLocationService"
+            android:enabled="true"></service>
 
-		<service
-			android:name=".service.FileDownloadService"
-			android:exported="false">
-		</service>
-	</application>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e" />
+
+        <service
+            android:name=".service.FileDownloadService"
+            android:exported="false"></service>
+
+        <activity android:name=".ui.home.SplashActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+    </application>
 
 </manifest>

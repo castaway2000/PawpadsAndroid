@@ -5,9 +5,14 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.quickblox.core.QBSettings;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
 
 import io.fabric.sdk.android.Fabric;
+import saberapplications.pawpads.views.FontManager;
 
 
 /**
@@ -19,11 +24,18 @@ public class PawPadsApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance=this;
-        Fabric.with(this, new Crashlytics());
+
         QBSettings.getInstance().init(this,Util.QB_APPID, Util.QB_AUTH_KEY, Util.QB_AUTH_SECRET);
         QBSettings.getInstance().setAccountKey(Util.QB_ACCOUNT_KEY);
-
+        FontManager.init(getAssets());
 //      StickersManager.initialize(Util.STICKERS_API_KEY, this);
+        TwitterAuthConfig authConfig =
+                new TwitterAuthConfig("DWklCqoxRFvYiwBKhjD1x1JZE", "7aH4WTwaclaN9GaV3TgA3TVgd93FgS1EOHGRPy2zjOsM8XrvoC");
+        Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
+
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
     }
 
     @Override

@@ -5,7 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.EditText;
+import android.widget.Button;
 
 import com.quickblox.core.helper.StringUtils;
 
@@ -15,7 +15,7 @@ import saberapplications.pawpads.R;
  * Created by Stanislav Volnjanskij on 28.09.16.
  */
 
-public class FontButton extends EditText {
+public class FontButton extends Button {
     public FontButton(Context context) {
         this(context, null);
     }

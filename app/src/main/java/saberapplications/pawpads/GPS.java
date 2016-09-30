@@ -18,7 +18,7 @@ import android.support.v4.content.ContextCompat;
 public class GPS extends Activity {
     Context mContext;
 
-    public final static int PermissionRequestId = 100000;
+    public final static int PermissionRequestId = 1000;
 
     public GPS(Context context) {
         this.mContext = context;

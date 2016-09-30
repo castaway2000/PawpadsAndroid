@@ -35,7 +35,7 @@ public class FontTextView extends TextView {
         if (ta != null) {
             String fontAsset = ta.getString(R.styleable.FontText_typefaceAsset);
 
-            if (!StringUtils.isEmpty(fontAsset)) {
+            if (fontAsset!=null && !StringUtils.isEmpty(fontAsset)) {
                 Typeface tf = FontManager.getInstance().getFont(fontAsset);
                 int style = Typeface.NORMAL;
                 float size = getTextSize();

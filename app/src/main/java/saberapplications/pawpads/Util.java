@@ -10,12 +10,10 @@ import com.quickblox.core.exception.QBResponseException;
 
 import java.util.List;
 
-import saberapplications.pawpads.ui.BaseActivity;
-
 /**
  * Created by blaze on 9/7/2015.
  */
-public class Util extends BaseActivity {
+public class Util {
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static String APP_VERSION = "appVersion";
@@ -86,4 +84,6 @@ public class Util extends BaseActivity {
                 .setPositiveButton("OK", null)
                 .show();
     }
+
+
 }
