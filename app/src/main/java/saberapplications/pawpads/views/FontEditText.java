@@ -50,4 +50,16 @@ public class FontEditText extends EditText {
             }
         }
     }
+
+    @Override
+    public void setError(CharSequence error) {
+        String value=this.getText().toString();
+        if (value==null || value.equals("")){
+            this.setHintTextColor(getResources().getColor(R.color.error));
+            this.setHint(error);
+        }else {
+            super.setError(error);
+        }
+
+    }
 }

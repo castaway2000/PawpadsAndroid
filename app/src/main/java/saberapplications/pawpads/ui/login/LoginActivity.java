@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.databinding.ObservableBoolean;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,6 +62,7 @@ public class LoginActivity extends AppCompatActivity  {
     private LocationManager locationManager;
     private CallbackManager callbackManager;
     private TwitterAuthClient twitterAuthClient;
+    public final ObservableBoolean isBusy=new ObservableBoolean(false);
     ActivityLoginBinding binding;
 
     @Override
@@ -94,6 +96,7 @@ public class LoginActivity extends AppCompatActivity  {
                             QBAuth.createSession();
                             QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
                             onSuccessLogin(user,null,loginResult.getAccessToken().getToken(),null);
+                            isBusy.set(false);
                         } catch (QBResponseException e) {
                             e.printStackTrace();
                         }
@@ -105,7 +108,7 @@ public class LoginActivity extends AppCompatActivity  {
 
             @Override
             public void onCancel() {
-
+                isBusy.set(false);
             }
 
             @Override
@@ -167,6 +170,7 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
     public void facebookLogin(){
+        isBusy.set(true);
         LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile"));
     }
     public void twitterLogin(){
@@ -177,6 +181,7 @@ public class LoginActivity extends AppCompatActivity  {
             snackbar.show();
             return;
         }
+        isBusy.set(true);
         twitterAuthClient = new TwitterAuthClient();
 
         TwitterLoginButton button;
@@ -189,9 +194,11 @@ public class LoginActivity extends AppCompatActivity  {
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
+
                             QBAuth.createSession();
                             QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.TWITTER, sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
                             onSuccessLogin(user,null,sessionData.getAuthToken().token,sessionData.getAuthToken().secret);
+
                         } catch (QBResponseException e) {
                             e.printStackTrace();
                             exception=e;
@@ -201,6 +208,7 @@ public class LoginActivity extends AppCompatActivity  {
 
                     @Override
                     protected void onPostExecute(Void aVoid) {
+                        isBusy.set(false);
                         if (exception!=null){
                             Util.onError(exception, LoginActivity.this);
                         }
@@ -220,7 +228,15 @@ public class LoginActivity extends AppCompatActivity  {
     public void emailLogin(){
         final String username = etUsername.getText().toString();
         final String password = etPassword.getText().toString();
-
+        if (username==null || username.equals("")){
+            binding.etUsername.setError(getString(R.string.login_required));
+            return;
+        }
+        if (password==null || password.equals("")){
+            binding.etPassword.setError(getString(R.string.password_required));
+            return;
+        }
+        isBusy.set(true);
         QBAuth.createSession(new QBEntityCallback<QBSession>() {
 
             @Override
@@ -234,11 +250,13 @@ public class LoginActivity extends AppCompatActivity  {
                     @Override
                     public void onSuccess(final QBUser user, Bundle params) {
                         onSuccessLogin(user,password,null,null);
+                        isBusy.set(false);
                     }
 
                     @Override
                     public void onError(QBResponseException e) {
                         Util.onError(e, LoginActivity.this);
+                        isBusy.set(false);
                     }
 
 
@@ -248,6 +266,7 @@ public class LoginActivity extends AppCompatActivity  {
             @Override
             public void onError(QBResponseException responseException) {
                 Util.onError(responseException, LoginActivity.this);
+                isBusy.set(false);
             }
 
         });

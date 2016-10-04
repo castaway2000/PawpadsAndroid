@@ -88,16 +88,17 @@
         </activity>
         <activity
             android:name=".ui.register.RegisterActivity"
-            android:label="Register"></activity>
+            android:theme="@style/AppTheme"
+            />
         <activity
             android:name=".ui.login.ForgotPasswordActivity"
-            android:label="ForgotPass"></activity>
+            android:label="ForgotPass"/>
         <activity
             android:name=".ui.PrefrenceActivity"
-            android:label="PrefrenceActivity"></activity>
+            android:label="PrefrenceActivity"/>
         <activity
             android:name=".ui.AboutActivity"
-            android:label="@string/About"></activity>
+            android:label="@string/About"/>
 
         <receiver
             android:name=".GcmBroadcastReceiver"

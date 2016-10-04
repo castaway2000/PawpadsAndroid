@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="activity"
             type="saberapplications.pawpads.ui.login.LoginActivity" />
+
+        <import
+            alias="View"
+            type="android.view.View" />
     </data>
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -56,7 +60,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:hint="@string/login" />
+                    android:hint="@string/login"
+                    android:enabled="@{!activity.isBusy}"
+                    />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -69,18 +75,22 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
                         android:hint="@string/password"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:enabled="@{!activity.isBusy}"
+                        />
+
                     <saberapplications.pawpads.views.FontTextView
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
-                        android:text="\?"
                         android:layout_alignParentRight="true"
-                        android:layout_marginTop="7dp"
                         android:layout_marginRight="15dp"
-                        android:textSize="15dp"
-                        android:textColor="#444444"
+                        android:layout_marginTop="7dp"
                         android:gravity="center"
                         android:onClick="@{ () -> activity.restorePassword() }"
+                        android:text="\?"
+                        android:textColor="#666666"
+                        android:textSize="15dp"
+
                         />
                 </RelativeLayout>
 
@@ -93,7 +103,8 @@
                     android:layout_marginEnd="3dp"
                     android:layout_marginStart="3dp"
                     android:onClick="@{ () -> activity.emailLogin() }"
-                    android:text="@string/log_in" />
+                    android:text="@string/log_in"
+                    android:enabled="@{!activity.isBusy}"/>
 
                 <saberapplications.pawpads.views.FontTextView
                     android:id="@+id/tvRegisterLink"
@@ -141,18 +152,31 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:onClick="@{ () -> activity.facebookLogin() }"
-                        android:src="@drawable/facebookicon" />
+                        android:src="@drawable/facebookicon"
+                        android:clickable="@{!activity.isBusy}"
+                        />
 
                     <ImageView
                         android:id="@+id/twitter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="@{ () -> activity.twitterLogin() }"
-                        android:src="@drawable/twitter" />
+                        android:src="@drawable/twitter"
+                        android:clickable="@{!activity.isBusy}"
+                        />
                 </LinearLayout>
 
 
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="@{activity.isBusy ? View.VISIBLE : View.GONE}" />
         </RelativeLayout>
+
     </android.support.design.widget.CoordinatorLayout>
 </layout>

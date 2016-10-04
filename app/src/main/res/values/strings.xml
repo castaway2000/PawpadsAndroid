@@ -1,6 +1,6 @@
 <resources>
     <string name="facebook_app_id">1810530139192224</string>
-
+    <item name="BIND_ID" type="id" />
     <string name="app_name">PawPads</string>
     <string name="action_settings">Settings</string>
     <string name="action_profile">Edit Profile</string>
@@ -29,4 +29,15 @@
     <string name="dont_have_account_register"><![CDATA[Don’t have an account?<font color="#ffffff"><b> Register</b></font>]]></string>
     <string name="login_with">Login with</string>
     <string name="twitter_app_required">You need to install Twitter App first</string>
+    <string name="login_required">Login is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="registration">Registration</string>
+    <string name="sign_up">Sign up</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="name_required">Name is required</string>
+    <string name="email_required">Email is required</string>
+    <string name="invalid_email">Email is not valid</string>
+    <string name="password_to_short">Password is to short ( minimum 8 characters)</string>
+    <string name="password_not_match">Passwords do not match</string>
+    <string name="wrong_email_format">Wrong email format</string>
 </resources>

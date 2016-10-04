@@ -41,7 +41,7 @@ public class ServerRequests{
     }
 
     public void storeUserDataInBackground(User user, final GetUserCallback userCallback){
-        progressDialog.show();
+
         RestAdapter restAdapter= new RestAdapter.Builder()
                 .setEndpoint(SERVER_ADDRESS)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
@@ -53,13 +53,13 @@ public class ServerRequests{
             @Override
             public void success(JsonElement element, Response response) {
                 userCallback.done(null);
-                progressDialog.dismiss();
+
             }
 
             @Override
             public void failure(RetrofitError error) {
                 userCallback.done(null);
-                progressDialog.dismiss();
+
 
             }
         });

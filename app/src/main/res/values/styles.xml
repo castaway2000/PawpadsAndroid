@@ -5,8 +5,16 @@
     </declare-styleable>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:screenOrientation">portrait</item>
+        <!-- Main theme colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorAccent">@color/primary</item>
+
+
     </style>
 
     <style name="login_edit_text" parent="Widget.AppCompat.EditText">
