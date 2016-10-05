@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_register);
         binding.setActivity(this);
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
         getSupportActionBar().setTitle(R.string.registration);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -232,9 +233,7 @@ public class RegisterActivity extends AppCompatActivity
         snackbar.show();
     }
 
-    boolean isEmailValid(CharSequence email) {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
+
 
     public void register() {
         // validation
@@ -258,7 +257,7 @@ public class RegisterActivity extends AppCompatActivity
         }
         if (fieldsEmpty) return;
 
-        if (!isEmailValid(email.get())) {
+        if (!Util.isEmailValid(email.get())) {
             showSnack(R.string.wrong_email_format);
             return;
         }

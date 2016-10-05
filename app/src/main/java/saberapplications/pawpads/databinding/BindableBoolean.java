@@ -3,11 +3,18 @@ package saberapplications.pawpads.databinding;
 import android.databinding.BaseObservable;
 import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 public class BindableBoolean extends BaseObservable {
+    private boolean isNot;
     private Boolean value = new Boolean(false);
+
+    // oposite value
+    // user var.not instead of !var
+    public  BindableBoolean not;
+
 
     public Boolean get() {
         return value;
@@ -16,17 +23,27 @@ public class BindableBoolean extends BaseObservable {
     public void set(Boolean value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = value;
+            if (not!=null) this.not.set(!value.booleanValue());
             notifyChange();
         }
     }
 
     public BindableBoolean(Boolean value) {
-        super();
-        this.value = value;
+        this();
+        set(value);
+
     }
+    private BindableBoolean(Boolean value,Boolean isNot){
+        super();
+        this.isNot=isNot;
+        set(value);
+        not=null;
+    }
+
 
     public BindableBoolean() {
         super();
+        not=new BindableBoolean(true,true);
     }
 
     @BindingConversion
@@ -52,5 +69,16 @@ public class BindableBoolean extends BaseObservable {
             view.setChecked(newValue);
         }
     }
+    @BindingAdapter({"android:visibility"})
+    public static  void bindVisibility(View view,BindableBoolean bindableBoolean){
+        if (bindableBoolean.get()) {
+            view.setVisibility(View.VISIBLE);
+        }else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+
+
 
 }

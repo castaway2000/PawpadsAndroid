@@ -84,6 +84,9 @@ public class Util {
                 .setPositiveButton("OK", null)
                 .show();
     }
+    public  static boolean isEmailValid(CharSequence email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
 
 
 }

@@ -88,10 +88,12 @@
         </activity>
         <activity
             android:name=".ui.register.RegisterActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             />
         <activity
             android:name=".ui.login.ForgotPasswordActivity"
+            android:screenOrientation="portrait"
             android:label="ForgotPass"/>
         <activity
             android:name=".ui.PrefrenceActivity"

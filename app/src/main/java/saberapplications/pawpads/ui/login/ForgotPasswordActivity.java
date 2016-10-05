@@ -1,42 +1,54 @@
 package saberapplications.pawpads.ui.login;
 
-import android.content.Intent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 
-import java.util.List;
-
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.BindableString;
+import saberapplications.pawpads.databinding.ForgotpassActivityBinding;
 
 
 /**
  * Created by blaze on 3/24/2016.
  */
-public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
+public class ForgotPasswordActivity extends AppCompatActivity {
     //private static final int PERMISSION_REQUEST = 10000;
     Button buForgotpass;
     EditText etEmail;
+    ForgotpassActivityBinding binding;
+    public  final BindableBoolean isBusy=new BindableBoolean(false);
+    public final BindableString email = new BindableString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.forgotpass_activity);
-        setTitle("PawPads | Reset Password");
-        etEmail = (EditText) findViewById(R.id.etEmail);
-        buForgotpass = (Button) findViewById(R.id.bForgotpass);
-        buForgotpass.setOnClickListener(this);
+        binding = DataBindingUtil.setContentView(this, R.layout.forgotpass_activity);
+        binding.setActivity(this);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setTitle(R.string.password_recovery);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
     }
 
     @Override
@@ -49,39 +61,58 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         super.onStop();
     }
 
+
+
+
+
     @Override
-    public void onClick(View v) {
-        final String email = etEmail.getText().toString();
-        switch (v.getId()) {
-            case R.id.bForgotpass:
-                if (!email.contains("@")) {
-                    Toast toast = Toast.makeText(this, "Please input valid email", Toast.LENGTH_SHORT);
-                    toast.show();
-                    break;
-                } else {
-                    getNewPass(email);
-                    startActivity(new Intent(this, LoginActivity.class));
-                    Toast toast = Toast.makeText(this, "if you entered your email correctly " +
-                            "you should receive an email shortly", Toast.LENGTH_LONG);
-                    toast.show();
-                    break;
-                }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+
     }
 
-    void getNewPass(final String email) {
-        QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
+    public void recover() {
+        hideSoftKeyboard();
+        if (email.isEmpty()) {
+            binding.etEmail.setError(getString(R.string.email_required));
+            return;
+        }
+
+        if (!Util.isEmailValid(email.get())) {
+            showSnack(R.string.wrong_email_format);
+            return;
+        }
+        isBusy.set(true);
+        QBAuth.createSession(new QBEntityCallback<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle params) {
-                QBUsers.resetPassword(email, new QBEntityCallback<Void>() {
+                QBUsers.resetPassword(email.get(), new QBEntityCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid, Bundle bundle) {
+                        isBusy.set(false);
+                        new AlertDialog.Builder(ForgotPasswordActivity.this)
+                                .setMessage("if you entered your email correctly you should receive an email shortly")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        finish();
+                                    }
+                                })
+                                .show();
 
                     }
 
                     @Override
                     public void onError(QBResponseException e) {
-
+                        isBusy.set(false);
+                        Util.onError(e,ForgotPasswordActivity.this);
                     }
                 });
             }
@@ -92,6 +123,21 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             }
 
         });
+
+
+
+    }
+    public void showSnack(int textId) {
+        Snackbar snackbar = Snackbar
+                .make(binding.coordinatorLayout, textId, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+    private void hideSoftKeyboard(){
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
 

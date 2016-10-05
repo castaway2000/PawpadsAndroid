@@ -25,7 +25,6 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
@@ -37,7 +36,6 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.Utils;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
@@ -51,8 +49,8 @@ import com.quickblox.users.model.QBUser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
@@ -66,7 +64,6 @@ import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
-import saberapplications.pawpads.util.Constants;
 
 
 public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -239,7 +236,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(Constants.BLOCKED_USERS_IDS, "");
+                editor.putString(C.BLOCKED_USERS_IDS, "");
                 editor.apply();
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();

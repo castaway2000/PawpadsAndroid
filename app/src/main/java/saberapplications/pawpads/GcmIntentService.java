@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
-import saberapplications.pawpads.util.Constants;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -107,7 +106,7 @@ public class GcmIntentService extends IntentService {
         //Check blocked users
         boolean isBlocked = false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String stringJSON = sharedPreferences.getString(Constants.BLOCKED_USERS_IDS, "");
+        String stringJSON = sharedPreferences.getString(C.BLOCKED_USERS_IDS, "");
         if (!stringJSON.isEmpty()) {
             JsonParser parser = new JsonParser();
             JsonArray array  = parser.parse(stringJSON).getAsJsonArray();

@@ -40,4 +40,7 @@
     <string name="password_to_short">Password is to short ( minimum 8 characters)</string>
     <string name="password_not_match">Passwords do not match</string>
     <string name="wrong_email_format">Wrong email format</string>
+    <string name="password_recovery">Password recovery</string>
+    <string name="recovery_instructions">Send us your email and we will send you a code to reset your password</string>
+    <string name="recover">Recover</string>
 </resources>

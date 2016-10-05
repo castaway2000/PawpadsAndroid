@@ -28,17 +28,13 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.model.QBEntity;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
 import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -46,12 +42,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
-import saberapplications.pawpads.util.Constants;
 
 public class ProfileActivity extends BaseActivity {
     private QBDialog dialog;
@@ -413,7 +409,7 @@ public class ProfileActivity extends BaseActivity {
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Constants.BLOCKED_USERS_IDS, ids.toString());
+        editor.putString(C.BLOCKED_USERS_IDS, ids.toString());
         editor.apply();
 
     }

@@ -58,11 +58,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
-import saberapplications.pawpads.util.Constants;
 
 
 public class ChatActivity extends BaseActivity {
@@ -503,7 +503,7 @@ public class ChatActivity extends BaseActivity {
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Constants.BLOCKED_USERS_IDS, ids.toString());
+        editor.putString(C.BLOCKED_USERS_IDS, ids.toString());
         editor.apply();
         currentUser.setCustomData(ids.toString());
         QBUsers.updateUser(currentUser, new QBEntityCallback<QBUser>() {
