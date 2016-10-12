@@ -13,6 +13,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -36,11 +39,7 @@ import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.location.QBLocations;
 import com.quickblox.location.model.QBLocation;
-import com.quickblox.location.request.QBLocationRequestBuilder;
-import com.quickblox.location.request.SortField;
-import com.quickblox.location.request.SortOrder;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
@@ -55,7 +54,6 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityMainBinding;
-import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.PrefrenceActivity;
@@ -66,7 +64,7 @@ import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
 
 
-public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity {
 
     String TAG = "MAIN";
     GoogleCloudMessaging gcm;
@@ -77,7 +75,7 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     int range;
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
-
+    NearByFragment chatsFragment;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -176,7 +174,10 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
 
         nearByFragment=new NearByFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.MainLayout,nearByFragment).commit();
+        chatsFragment=new NearByFragment();
+        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
+
 
     }
 
@@ -189,10 +190,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     protected void onStart() {
         super.onStart();
-        if (range != Util.getRange()) {
-            range = Util.getRange();
-            loadAndSetNearUsers();
-        }
     }
 
     private boolean checkPlayServices() {
@@ -357,10 +354,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     }
 
-    @Override
-    public void onRefresh() {
-        loadAndSetNearUsers();
-    }
 
 
     /**
@@ -523,67 +516,42 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         alert.show();
     }
 
-    private void loadAndSetNearUsers() {
 
-        final int currentUserId = prefs.getInt(Util.QB_USERID, 0);
-        final ArrayList<QBLocation> nearLocations = new ArrayList<>();
+    private class ViewPagerAdapter extends FragmentPagerAdapter{
 
-        QBLocationRequestBuilder getLocationsBuilder = new QBLocationRequestBuilder();
-        getLocationsBuilder.setPerPage(100);
-        getLocationsBuilder.setLastOnly();
-        lastListUpdatedLocation = UserLocationService.getLastLocation();
-        // radius in kilometers
-        if (lastListUpdatedLocation == null) return;
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-        getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), range);
-        getLocationsBuilder.setPerPage(100);
-        //getLocationsBuilder.setPage(2);
-        getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
-
-        QBLocations.getLocations(getLocationsBuilder, new QBEntityCallback<ArrayList<QBLocation>>() {
-            @Override
-            public void onSuccess(ArrayList<QBLocation> locations, Bundle params) {
-                for (QBLocation qbLocation : locations) {
-                    boolean isContain = false;
-                    for (QBLocation location : nearLocations) {
-                        if (location.getUserId().equals(qbLocation.getUserId())) {
-                            isContain = true;
-                            break;
-                        }
-                    }
-                    if (qbLocation.getUser().getId() != currentUserId && !isContain) {
-                        nearLocations.add(qbLocation);
-                    }
-                }
-                adapter = new UserListAdapter(context, 0, nearLocations);
-                adapter.setLocation(UserLocationService.getLastLocation());
-                listView.setAdapter(adapter);
-                mSwipeRefreshLayout.setRefreshing(false);
+        @Override
+        public Fragment getItem(int position) {
+            if (position==0){
+                return nearByFragment;
+            }else {
+                return chatsFragment;
             }
 
-            @Override
-            public void onError(QBResponseException e) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                Util.onError(e, MainActivity.this);
+        }
 
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position==0){
+                return getString(R.string.near_by);
+            }else {
+                return getString(R.string.chats);
             }
-
-        });
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        super.onLocationChanged(location);
-        if (lastListUpdatedLocation == null) return;
-        if (location == null) return;
-        if (adapter == null) return;
-        if (lastListUpdatedLocation.distanceTo(location) > 20 && lastListUpdatedLocation.distanceTo(location) < 100) {
-            adapter.setLocation(location);
-            adapter.notifyDataSetChanged();
-        } else if (lastListUpdatedLocation.distanceTo(location) > 100) {
-            loadAndSetNearUsers();
         }
     }
+
+
+
+
 
 }
 
