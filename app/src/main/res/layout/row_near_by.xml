@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="location"
+            type="com.quickblox.location.model.QBLocation" />
+
+        <variable
+            name="lastMessage"
+            type="String" />
+        <variable
+            name="distance"
+            type="String" />
+        <import type="android.view.View" alias="View"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:scaleType="fitCenter"
+            app:riv_border_color="#333333"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            app:riv_tile_mode="repeat"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_toEndOf="@id/avatar"
+            android:orientation="vertical">
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{location.user.login,default=USERNAME}"
+                style="@style/list_title"/>
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/last_message_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text='@{lastMessage,default="28 AUG" }'
+                style="@style/list_details"
+                android:visibility='@{lastMessage.equals("")?View.GONE:View.VISIBLE}'
+                android:drawableLeft="@drawable/message_icon"
+                android:drawablePadding="5dp"
+
+                />
+
+        </LinearLayout>
+
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:text='@{distance,default="150 feet" }'
+            style="@style/list_details" />
+
+    </RelativeLayout>
+</layout>

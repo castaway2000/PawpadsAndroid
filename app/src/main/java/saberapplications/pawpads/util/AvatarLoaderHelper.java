@@ -8,7 +8,6 @@ import android.widget.ImageView;
 
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBProgressCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.squareup.picasso.Picasso;
 
@@ -17,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import saberapplications.pawpads.PawPadsApplication;
 import saberapplications.pawpads.Util;
@@ -40,6 +38,7 @@ public class AvatarLoaderHelper {
             if (callback!=null) callback.imageLoaded();
         }
         else {
+
             QBContent.downloadFileTask(fileId, new QBEntityCallback<InputStream>() {
                 @Override
                 public void onSuccess(InputStream inputStream, Bundle params) {
@@ -79,11 +78,6 @@ public class AvatarLoaderHelper {
 
 
 
-            }, new QBProgressCallback() {
-                @Override
-                public void onProgressUpdate(int progress) {
-
-                }
             });
         }
 

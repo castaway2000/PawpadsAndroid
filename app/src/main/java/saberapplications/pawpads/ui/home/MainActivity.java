@@ -7,21 +7,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -55,6 +54,7 @@ import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.ActivityMainBinding;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
@@ -75,8 +75,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     String regid;
     String msg;
     int range;
+    ActivityMainBinding binding;
+    NearByFragment nearByFragment;
 
-    private AdView adView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -126,37 +127,63 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
         }
     };
+    private ActionBarDrawerToggle mDrawerToggle;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        binding= DataBindingUtil.setContentView(this,R.layout.activity_main);
+
+        setSupportActionBar(binding.toolbar);
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                binding.navigationDrawer,
+                binding.toolbar,
+                R.string.open,
+                R.string.close
+        ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+            }
+        };
+        binding.navigationDrawer.addDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle(null);
         gps = new GPS(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+      //  mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
+      //  mSwipeRefreshLayout.setOnRefreshListener(this);
         context = getApplicationContext();
-        listView = (ListView) findViewById(R.id.listView);
+        //listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "MI");
         range = Util.getRange();
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
-        adView = (AdView) this.findViewById(R.id.mainBannerAdView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
-                .build();
-        adView.loadAd(adRequest);
 
-        mSwipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
-        });
-        setTitle("PawPads | Find Furries Near you");
+        nearByFragment=new NearByFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.MainLayout,nearByFragment).commit();
+
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -223,6 +250,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
             case R.id.action_profileID:
                 Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
@@ -304,8 +334,9 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     @Override
     public void onQBConnect() throws Exception {
-        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-        loadAndSetNearUsers();
+//        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+      //  loadAndSetNearUsers();
+        nearByFragment.loadData();
 
         if (!isUserRegistered(context)) {
             if (checkPlayServices()) {
@@ -323,14 +354,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
                 Log.i("MAIN", "No valid Google Play Services APK found.");
             }
         }
-        listView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        performClickAction(position);
-                    }
-                }
-        );
 
     }
 

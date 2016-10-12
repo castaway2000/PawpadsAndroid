@@ -50,7 +50,7 @@ android {
     dexOptions {
         javaMaxHeapSize "2g"
     }
-    dataBinding{
+    dataBinding {
         enabled true
     }
 }
@@ -59,33 +59,35 @@ dependencies {
     compile files('libs/volley.jar')
     compile files('libs/universal-image-loader-1.9.4.jar')
 
-    compile("com.quickblox:quickblox-android-sdk-core:2.6.1")
-    compile("com.quickblox:quickblox-android-sdk-chat:2.6.1")
-    compile("com.quickblox:quickblox-android-sdk-messages:2.6.1")
-    compile("com.quickblox:quickblox-android-sdk-location:2.6.1")
-    compile("com.quickblox:quickblox-android-sdk-content:2.6.1")
-    compile("com.quickblox:quickblox-android-sdk-customobjects:2.6.1")
 
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:gridlayout-v7:23.3.0'
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.google.android.gms:play-services:8.4.0'
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
-    compile 'com.google.android.gms:play-services-identity:8.4.0'
-    compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.google.android.gms:play-services-ads:8.4.0'
 
-    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile('com.twitter.sdk.android:twitter-core:2.0.0@aar') {
         transitive = true;
     }
+    compile 'com.quickblox:quickblox-android-sdk-core:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-chat:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-messages:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-location:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-content:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-customobjects:2.6.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:gridlayout-v7:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.google.android.gms:play-services:9.6.1'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    compile 'com.google.android.gms:play-services-identity:9.6.1'
+    compile 'com.google.android.gms:play-services-gcm:9.6.1'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+
+    compile 'com.makeramen:roundedimageview:2.2.1'
 }

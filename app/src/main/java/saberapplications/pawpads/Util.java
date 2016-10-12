@@ -19,25 +19,25 @@ public class Util {
     public static String APP_VERSION = "appVersion";
     public static final String USER_NAME = "user_name";
     public static final String IS_BLOCKED = "is_blocked";
-    public static final String USER_LOCATION_LAT= "user_location_lat";
-    public static final String USER_LOCATION_LONG= "user_location_long";
+    public static final String USER_LOCATION_LAT = "user_location_lat";
+    public static final String USER_LOCATION_LONG = "user_location_long";
     public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";
 
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "325095426674";
     public static String GCMREGID = "nothing yet";
-      //notes: chat implemented with quickblox. these are my own not the contractors
+    //notes: chat implemented with quickblox. these are my own not the contractors
 //    public static final String QB_APPID="33547";
 //    public static final String QB_AUTH_KEY="w8YNQSmstbNJ6AJ";
 //    public static final String QB_AUTH_SECRET="ckSWjeEkjgNpdJ-";
-    public static final String QB_APPID="35252";
-    public static final String QB_AUTH_KEY="GHHUHJMGTcGN8EY";
-    public static final String QB_AUTH_SECRET="NNSa7QQZDUzRvpB";
-    public static final String QB_ACCOUNT_KEY="S6mqpsBsKxfbSqZxGY4X";
-    public static final String QB_USER="qb_user";
-    public static final String QB_PASSWORD="qb_password";
-    public static final String QB_USERID ="qb_userid" ;
-    public static final String STICKERS_API_KEY="94c58fc501b259bc84282c44cd278fdf";
+    public static final String QB_APPID = "35252";
+    public static final String QB_AUTH_KEY = "GHHUHJMGTcGN8EY";
+    public static final String QB_AUTH_SECRET = "NNSa7QQZDUzRvpB";
+    public static final String QB_ACCOUNT_KEY = "S6mqpsBsKxfbSqZxGY4X";
+    public static final String QB_USER = "qb_user";
+    public static final String QB_PASSWORD = "qb_password";
+    public static final String QB_USERID = "qb_userid";
+    public static final String STICKERS_API_KEY = "94c58fc501b259bc84282c44cd278fdf";
 
     public static int ACCURACY;
     public static int RANGE;
@@ -46,21 +46,22 @@ public class Util {
     public static boolean IM_ALERT;
     public static String UNIT_OF_MEASURE;
 
-    public static int getRange(){
+    public static int getRange() {
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
-            return defaultSharedPreferences.getInt("range_km", 60);
+        return defaultSharedPreferences.getInt("range_km", 60);
     }
-    public static void setRange(int range){
-        SharedPreferences.Editor editor= PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
-        editor.putInt("range",range);
+
+    public static void setRange(int range) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putInt("range", range);
         editor.commit();
     }
 
 
-    public static void onError(List<String> errors,Context context) {
-        String msg="";
-        for(String error:errors){
-            msg=msg+error+"\n";
+    public static void onError(List<String> errors, Context context) {
+        String msg = "";
+        for (String error : errors) {
+            msg = msg + error + "\n";
         }
         new AlertDialog.Builder(context)
                 .setMessage(msg)
@@ -68,7 +69,8 @@ public class Util {
                 .setPositiveButton("OK", null)
                 .show();
     }
-    public static void onError(Exception e,Context context) {
+
+    public static void onError(Exception e, Context context) {
 
         new AlertDialog.Builder(context)
                 .setMessage(e.getLocalizedMessage())
@@ -76,6 +78,7 @@ public class Util {
                 .setPositiveButton("OK", null)
                 .show();
     }
+
     public static void onError(QBResponseException e, Context context) {
 
         new AlertDialog.Builder(context)
@@ -84,8 +87,33 @@ public class Util {
                 .setPositiveButton("OK", null)
                 .show();
     }
-    public  static boolean isEmailValid(CharSequence email) {
+
+    public static boolean isEmailValid(CharSequence email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+
+    public static  String formatDistance(float distanceTo) {
+
+        if (Util.UNIT_OF_MEASURE.equals("MI")) {
+            distanceTo = distanceTo * 3.2808f;
+            //gps coordinates
+
+            if (distanceTo > 5280) {
+                return String.format("%.2f miles", distanceTo / 5280);
+            } else {
+                distanceTo = Math.round(distanceTo);
+                return String.format("%.0f feet", distanceTo);
+            }
+        } else {
+            //gps coordinates
+            if (distanceTo > 1000) {
+                return String.format("%.2f km", distanceTo / 1000);
+            } else {
+                distanceTo = Math.round(distanceTo);
+                return String.format("%.0f meters", distanceTo);
+            }
+        }
     }
 
 

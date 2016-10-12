@@ -142,6 +142,7 @@ public abstract class BaseActivity extends AppCompatActivity
         if (!QBChatService.isInitialized()) {
             QBChatService.init(getBaseContext());
         }
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""));
         qbUser.setId(prefs.getInt(Util.QB_USERID, 0));

@@ -118,6 +118,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setPagesLimit(100);
 
+
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {

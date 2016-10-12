@@ -43,4 +43,12 @@
     <string name="password_recovery">Password recovery</string>
     <string name="recovery_instructions">Send us your email and we will send you a code to reset your password</string>
     <string name="recover">Recover</string>
+    <string name="near_by">Near by</string>
+    <string name="chats">Chats</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loading">Loading</string>
 </resources>
