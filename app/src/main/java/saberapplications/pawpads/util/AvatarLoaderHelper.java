@@ -58,6 +58,7 @@ public class AvatarLoaderHelper {
                                 bitmap.compress(Bitmap.CompressFormat.JPEG,90,stream);
                                 stream.close();
                                 bitmap.recycle();
+                                bitmap=null;
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             } catch (IOException e) {

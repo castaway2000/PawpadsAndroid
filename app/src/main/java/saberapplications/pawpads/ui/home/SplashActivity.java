@@ -98,14 +98,15 @@ public class SplashActivity extends AppCompatActivity {
 
                         UserLocationService.startService(userId);
                         startActivity(new Intent(getBaseContext(), MainActivity.class));
+                        finish();
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Util.onError(e,this);
                     }
 
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Util.onError(e,this);
             }
 
         } else
@@ -121,13 +122,13 @@ public class SplashActivity extends AppCompatActivity {
                                         if (QBChatService.getInstance() != null)
                                             UserLocationService.startService(userId);
                                         startActivity(new Intent(getBaseContext(), MainActivity.class));
-
+                                        finish();
                                     } catch (
                                             Exception e
                                             )
 
                                     {
-                                        e.printStackTrace();
+                                        Util.onError(e,SplashActivity.this);
                                     }
 
                                 }

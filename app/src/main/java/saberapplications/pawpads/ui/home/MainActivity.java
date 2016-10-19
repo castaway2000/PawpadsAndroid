@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +44,7 @@ import com.quickblox.location.model.QBLocation;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.io.IOException;
@@ -58,10 +60,10 @@ import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.PrefrenceActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
-import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 
 public class MainActivity extends BaseActivity {
@@ -75,7 +77,7 @@ public class MainActivity extends BaseActivity {
     int range;
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
-    NearByFragment chatsFragment;
+    ChatsFragment chatsFragment;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
     UserLocalStore userLocalStore;
@@ -133,7 +135,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         binding= DataBindingUtil.setContentView(this,R.layout.activity_main);
-
+        binding.setActivity(this);
         setSupportActionBar(binding.toolbar);
 
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -174,9 +176,10 @@ public class MainActivity extends BaseActivity {
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
 
         nearByFragment=new NearByFragment();
-        chatsFragment=new NearByFragment();
+        chatsFragment=new ChatsFragment();
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
+
 
 
     }
@@ -240,7 +243,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -250,36 +253,7 @@ public class MainActivity extends BaseActivity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        switch (item.getItemId()) {
-            case R.id.action_profileID:
-                Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
-                startActivity(i);
-                return true;
-
-            case R.id.action_logout:
-                userLocalStore = new UserLocalStore(this);
-                userLocalStore.clearUserData();
-                userLocalStore.setUserLoggedIn(false);
-
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(C.BLOCKED_USERS_IDS, "");
-                editor.apply();
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
-                return true;
-            case R.id.action_dialogs_activity:
-                startActivity(new Intent(this, DialogsListActivity.class));
-                return true;
-            case R.id.action_about_devs:
-                startActivity(new Intent(this, AboutActivity.class));
-                return true;
-            case R.id.action_settings:
-                startActivity(new Intent(this, PrefrenceActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -333,7 +307,25 @@ public class MainActivity extends BaseActivity {
     public void onQBConnect() throws Exception {
 //        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
       //  loadAndSetNearUsers();
-        nearByFragment.loadData();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final int currentUserId = prefs.getInt(C.QB_USERID, 0);
+        QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser user, Bundle bundle) {
+                if (user.getFileId()!=null){
+                    float d=getResources().getDisplayMetrics().density;
+                    int size=Math.round(d*80);
+                    AvatarLoaderHelper.loadImage(user.getFileId(),binding.currentUserAvatar,size,size);
+                    binding.setUsername(Util.getUserName(user));
+                }
+
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Util.onError(e,MainActivity.this);
+            }
+        });
 
         if (!isUserRegistered(context)) {
             if (checkPlayServices()) {
@@ -351,6 +343,7 @@ public class MainActivity extends BaseActivity {
                 Log.i("MAIN", "No valid Google Play Services APK found.");
             }
         }
+
 
     }
 
@@ -547,11 +540,41 @@ public class MainActivity extends BaseActivity {
                 return getString(R.string.chats);
             }
         }
+
     }
 
 
 
+    public void editProfile(){
+        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
+        Intent intent=new Intent(this,ProfileEditActivity.class);
+        startActivity(intent);
 
+    }
+    public void openSettings(){
+        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
+        startActivity(new Intent(this, PrefrenceActivity.class));
+    }
+
+    public void openAbout(){
+        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
+        startActivity(new Intent(this, AboutActivity.class));
+
+    }
+
+    public void logout(){
+        userLocalStore = new UserLocalStore(this);
+        userLocalStore.clearUserData();
+        userLocalStore.setUserLoggedIn(false);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
+
+    }
 
 }
 

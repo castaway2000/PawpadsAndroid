@@ -17,10 +17,17 @@ import saberapplications.pawpads.R;
  */
 
 public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    protected static final int DATA_ITEM = 2;
+    protected static final int LOADMORE_ITEM = 1;
+    protected static final int INITIAL_LOAD_ITEM = 3;
+    protected static final int EMPTY_STATE_ITEM = 4;
+    protected boolean showInitialLoad = true;
+    private boolean loadMoreEnabled = true;
+    boolean isBusy = true;
 
-    public static class DataItem<T>{
-        public final ObservableField<T> model=new ObservableField<>();
-        public final ObservableField<Boolean> selected= new ObservableField<Boolean>(false);
+    public static class DataItem<T> {
+        public final ObservableField<T> model = new ObservableField<>();
+        public final ObservableField<Boolean> selected = new ObservableField<Boolean>(false);
 
         public DataItem(T item) {
             model.set(item);
@@ -30,22 +37,23 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
         }
     }
+
     public interface Callback<T> {
         void onLoadMore();
+
         void onItemClick(T item);
-        void onSelectMode(boolean selectMode);
     }
 
 
     ArrayList<DataItem<T>> items = new ArrayList<>();
-    private boolean loadMoreEnabled = true;
+
     public final ObservableField<Boolean> selectMode = new ObservableField<>(false);
 
     public void removeItem(T removedItem) {
         Iterator<DataItem<T>> iterator = items.iterator();
-        while (iterator.hasNext()){
-            DataItem<T> item=iterator.next();
-            if (item.model.get().equals(removedItem)){
+        while (iterator.hasNext()) {
+            DataItem<T> item = iterator.next();
+            if (item.model.get().equals(removedItem)) {
                 iterator.remove();
             }
         }
@@ -54,9 +62,9 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public void updateItem(T updatedItem) {
         Iterator<DataItem<T>> iterator = items.iterator();
-        while (iterator.hasNext()){
-            DataItem<T> item=iterator.next();
-            if (item.model.get().equals(updatedItem)){
+        while (iterator.hasNext()) {
+            DataItem<T> item = iterator.next();
+            if (item.model.get().equals(updatedItem)) {
                 item.model.set(updatedItem);
             }
         }
@@ -64,36 +72,39 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     }
 
 
-
-
-
-
     private Callback callback;
-    boolean isBusy = false;
+
 
     public abstract DataHolder<T> getItemHolder(ViewGroup parent);
 
 
-    public abstract static class DataHolder<T> extends RecyclerView.ViewHolder{
+    public abstract static class DataHolder<T> extends RecyclerView.ViewHolder {
 
         protected View view;
         protected DataItem<T> data;
+        protected BaseListAdapter<T> adapter;
 
-        public DataHolder(View v, final BaseListAdapter<T> adapter){
+        public DataHolder(View v, final BaseListAdapter<T> adapter) {
             super(v);
-            this.view=v;
-            final Callback<T> callback=adapter.getCallback();
-            v.setOnClickListener(new View.OnClickListener() {
+            this.view = v;
+            this.adapter = adapter;
+            bindEvents();
+        }
+
+        protected void bindEvents() {
+            final Callback<T> callback = adapter.getCallback();
+            view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(callback!=null && data!=null ){
+                    if (callback != null && data != null) {
                         callback.onItemClick(data.model.get());
                     }
                 }
             });
         }
-        public void setData(DataItem<T> data){
-            this.data=data;
+
+        public void setData(DataItem<T> data) {
+            this.data = data;
         }
 
         public abstract void showData(DataItem<T> model);
@@ -105,39 +116,64 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
+    public static class InitialLoadHolder extends RecyclerView.ViewHolder {
+        public InitialLoadHolder(View itemView) {
+            super(itemView);
+        }
+    }
 
-
+    public static class EmptyStateHolder extends RecyclerView.ViewHolder {
+        public EmptyStateHolder(View itemView) {
+            super(itemView);
+        }
+    }
 
     @Override
     public int getItemViewType(int position) {
-        if (position < items.size()) {
-            return 1;
+        if (items.size() == 0) {
+            if (loadMoreEnabled && showInitialLoad) return INITIAL_LOAD_ITEM;
+            else if (!isBusy) return EMPTY_STATE_ITEM;
         } else {
-            return 2;
+            if (position < items.size()) {
+                return DATA_ITEM;
+            } else {
+                return LOADMORE_ITEM;
+            }
         }
+        return EMPTY_STATE_ITEM;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == 1) {
-            return getItemHolder(parent);
-        } else {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.load_more, parent, false);
-            return new LoadMoreHolder(v);
+        switch (viewType) {
+            case DATA_ITEM:
+                return getItemHolder(parent);
+            case LOADMORE_ITEM:
+                View v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.load_more, parent, false);
+                return new LoadMoreHolder(v);
+            case INITIAL_LOAD_ITEM:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.initial_load, parent, false);
+                return new InitialLoadHolder(v);
+            case EMPTY_STATE_ITEM:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.empty_state, parent, false);
+                return new EmptyStateHolder(v);
         }
+        return null;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof LoadMoreHolder){
+        if (holder instanceof LoadMoreHolder) {
             if (callback != null && !isBusy && loadMoreEnabled) {
                 isBusy = true;
                 callback.onLoadMore();
             }
-        }else{
-            DataHolder<T> dataholder=(DataHolder<T>)holder;
-            DataItem<T> item=items.get(position);
+        } else if (holder instanceof DataHolder) {
+            DataHolder<T> dataholder = (DataHolder<T>) holder;
+            DataItem<T> item = items.get(position);
             dataholder.setData(item);
             dataholder.showData(item);
 
@@ -147,10 +183,14 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemCount() {
-        if (!loadMoreEnabled || callback==null || items.size()==0) {
-            return items.size();
-        } else {
+        if(items.size()==0) return 1;
+        if (isBusy && !showInitialLoad){
+            return 0;
+        }
+        if (loadMoreEnabled) {
             return items.size() + 1;
+        }else{
+            return items.size();
         }
     }
 
@@ -163,40 +203,41 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     }
 
     public void addItems(List<T> items) {
-        for(T item:items){
-            DataItem<T> dataItem=new DataItem<>();
+        for (T item : items) {
+            DataItem<T> dataItem = new DataItem<>();
             dataItem.model.set(item);
             this.items.add(dataItem);
         }
-        isBusy=false;
+        isBusy = false;
         notifyDataSetChanged();
     }
 
     public void addItem(T data) {
-        DataItem<T> item=new DataItem<>();
+        DataItem<T> item = new DataItem<>();
         item.model.set(data);
         this.items.add(item);
-        isBusy=false;
+        isBusy = false;
         //Collections.sort(items, Collections.<Jogging>reverseOrder());
         notifyDataSetChanged();
 
     }
 
-    public void disableLoadMore(){
-        loadMoreEnabled =false;
-        isBusy=false;
+    public void disableLoadMore() {
+        loadMoreEnabled = false;
+        isBusy = false;
         notifyDataSetChanged();
     }
 
-    public ArrayList<T> getSelected(){
-        ArrayList<T> out=new ArrayList<>();
-        for(DataItem<T> item:items){
-            if (item.selected.get()){
+    public ArrayList<T> getSelected() {
+        ArrayList<T> out = new ArrayList<>();
+        for (DataItem<T> item : items) {
+            if (item.selected.get()) {
                 out.add(item.model.get());
             }
         }
         return out;
     }
+
     public void clear() {
         items.clear();
         loadMoreEnabled = true;
@@ -205,9 +246,9 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public void removeSelected() {
         Iterator<DataItem<T>> iterator = items.iterator();
-        while (iterator.hasNext()){
-            DataItem<T> item=iterator.next();
-            if(item.selected.get()){
+        while (iterator.hasNext()) {
+            DataItem<T> item = iterator.next();
+            if (item.selected.get()) {
                 iterator.remove();
             }
 
@@ -217,5 +258,13 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public Callback<T> getCallback() {
         return callback;
+    }
+
+    public boolean isShowInitialLoad() {
+        return showInitialLoad;
+    }
+
+    public void setShowInitialLoad(boolean showInitialLoad) {
+        this.showInitialLoad = showInitialLoad;
     }
 }

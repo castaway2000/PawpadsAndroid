@@ -5,14 +5,14 @@
     <data>
 
         <variable
-            name="location"
-            type="com.quickblox.location.model.QBLocation" />
+            name="username"
+            type="String" />
 
         <variable
             name="lastMessage"
             type="String" />
         <variable
-            name="distance"
+            name="lastMessageDate"
             type="String" />
         <import type="android.view.View" alias="View"/>
     </data>
@@ -20,8 +20,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:background="@drawable/list_item_bg"
-        android:clickable="true">
+        >
 
         <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/avatar"
@@ -47,32 +48,28 @@
                 android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{location.user.login,default=USERNAME}"
+                android:text="@{username,default=USERNAME}"
                 style="@style/list_title"/>
 
             <saberapplications.pawpads.views.FontTextView
-                android:id="@+id/last_message_date"
+                android:id="@+id/last_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:text='@{lastMessage,default="28 AUG" }'
                 style="@style/list_details"
-                android:visibility='@{lastMessage.equals("")?View.GONE:View.VISIBLE}'
-                android:drawableLeft="@drawable/message_icon"
-                android:drawablePadding="5dp"
-
+                app:typefaceAsset="Proxima_Nova_Regular_Italic.otf"
                 />
 
         </LinearLayout>
 
         <saberapplications.pawpads.views.FontTextView
-            android:id="@+id/distance"
+            android:id="@+id/last_message_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
-            android:text='@{distance,default="150 feet" }'
+            android:text='@{lastMessageDate,default="7 JUL" }'
             style="@style/list_details" />
 
     </RelativeLayout>

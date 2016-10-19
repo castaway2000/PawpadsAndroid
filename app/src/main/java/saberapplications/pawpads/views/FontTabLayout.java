@@ -32,7 +32,8 @@ public class FontTabLayout extends TabLayout {
     public FontTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FontText);
-
+        if (isInEditMode())
+            return;
         if (ta != null) {
             String fontAsset = ta.getString(R.styleable.FontText_typefaceAsset);
 

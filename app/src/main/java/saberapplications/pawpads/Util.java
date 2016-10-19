@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
@@ -117,4 +118,8 @@ public class Util {
     }
 
 
+    public static String getUserName(QBUser user) {
+
+        return user.getFullName()!=null ? user.getFullName() : user.getLogin();
+    }
 }

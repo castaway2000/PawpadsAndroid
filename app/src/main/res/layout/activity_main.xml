@@ -3,6 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.MainActivity">
 
+    <data>
+
+        <variable
+            name="username"
+            type="String" />
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.home.MainActivity" />
+    </data>
+
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/navigation_drawer"
         android:layout_width="match_parent"
@@ -45,7 +56,6 @@
                     app:typefaceAsset="Proxima_Nova_Semibold.otf">
 
 
-
                 </saberapplications.pawpads.views.FontTabLayout>
             </android.support.design.widget.AppBarLayout>
 
@@ -57,14 +67,110 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
+        </android.support.design.widget.CoordinatorLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+        <RelativeLayout
+            android:id="@+id/left_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/accent"
+            android:padding="0dp"
+            android:clickable="true">
 
-    <RelativeLayout
-        android:id="@+id/left_drawer"
-        android:layout_width="150dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/app_bar_bg" />
 
-    </RelativeLayout>
-</android.support.v4.widget.DrawerLayout></layout>
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/current_user_avatar"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="fitCenter"
+                app:riv_border_color="#333333"
+                app:riv_mutate_background="true"
+                app:riv_oval="true"
+                app:riv_tile_mode="repeat" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_user_avatar"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="20dp"
+                android:text="@{username}"
+                android:textColor="@color/accent"
+                android:textSize="30sp"
+                app:typefaceAsset="Proxima_Nova_Semibold.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:onClick="@{() -> activity.editProfile()}"
+                android:text="@string/edit"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <android.support.v7.widget.GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="170dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="6dp"
+                app:columnCount="2">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/settings_icon"
+                    app:layout_gravity="center"/>
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/action_settings"
+                        style="@style/navigation_item"
+                        android:onClick="@{ () -> activity.openSettings()}"
+                        />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/about_icon"
+                    app:layout_gravity="center"/>
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/About"
+                    style="@style/navigation_item"
+                    android:onClick="@{ () -> activity.openAbout()}"
+                    />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height ="wrap_content"
+                    android:src="@drawable/logout_icon"
+                    app:layout_gravity="center"
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logout"
+                    style="@style/navigation_item"
+                    android:onClick="@{ () -> activity.logout()}"
+
+                    />
+            </android.support.v7.widget.GridLayout>
+        </RelativeLayout>
+    </android.support.v4.widget.DrawerLayout>
+</layout>

@@ -109,6 +109,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                 adapter.clear();
                 currentPage=1;
                 loadData();
+                binding.swipelayout.setRefreshing(false);
             }
         });
         adapter.setCallback(this);
@@ -241,12 +242,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             }
 
         });
-    }
-
-    @Override
-    public void onSelectMode(boolean selectMode) {
 
     }
+
 
     private void openProfile(QBDialog dialog, QBUser user) {
 
