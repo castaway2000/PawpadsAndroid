@@ -17,8 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
@@ -78,7 +76,7 @@ public class ProfileActivity extends BaseActivity {
         interAd = new InterstitialAd(this);
         interAd.setAdUnitId(Util.AD_UNIT_ID);
         //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        adView = (AdView) this.findViewById(R.id.profileAdView);
+        /*
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
                 .build();
@@ -91,7 +89,7 @@ public class ProfileActivity extends BaseActivity {
                 displayInterAd();
             }
         });
-
+*/
         dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
         chatButton = (Button) findViewById(R.id.chatBtn);
         progressDialog = new ProgressDialog(this);

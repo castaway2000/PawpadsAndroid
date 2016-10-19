@@ -1,65 +1,85 @@
-<android.support.v7.widget.GridLayout
-	android:id="@+id/gridLayout"
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="#97159cc6"
-	android:paddingBottom="@dimen/activity_vertical_margin"
-	android:paddingLeft="@dimen/activity_horizontal_margin"
-	android:paddingRight="@dimen/activity_horizontal_margin"
-	android:paddingTop="@dimen/activity_vertical_margin"
-	app:columnCount="1"
-	tools:context=".ui.profile.ProfileActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.profile.ProfileActivity" />
+    </data>
+<android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/app_bar_bg"/>
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:src="@drawable/user_placeholder"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#97159cc6"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:columnCount="1"
+        tools:context=".ui.profile.ProfileActivity">
 
 
-	<ImageView
-		android:id="@+id/profilepic"
-		android:layout_width="150dp"
-		android:layout_height="150dp"
-		android:scaleType="centerCrop"
-		app:layout_gravity="center"
-		android:src="@drawable/pplogo" />
-	<TextView
-		android:id="@+id/is_blocked"
-		android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="@string/blocked"
-	    android:visibility="gone"
-	    app:layout_gravity="center"
-		/>
+        <ImageView
+            android:id="@+id/profilepic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pplogo"
+            app:layout_gravity="center" />
 
-	<Button
-		android:id="@+id/chatBtn"
-		android:layout_width="wrap_content"
-		android:layout_height="50dp"
-		android:text="Chat"
-		app:layout_gravity="bottom|center"
-	    android:visibility="gone"
-		/>
+        <TextView
+            android:id="@+id/is_blocked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/blocked"
+            android:visibility="gone"
+            app:layout_gravity="center" />
 
-	<ScrollView
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		app:layout_rowWeight="1">
+        <Button
+            android:id="@+id/chatBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Chat"
+            android:visibility="gone"
+            app:layout_gravity="bottom|center" />
 
-		<TextView
-			android:id="@+id/profileinfo"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/profile"
-			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:foreground="#ffffff"
-			android:background="#ffffff" />
-	</ScrollView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_rowWeight="1">
+
+            <TextView
+                android:id="@+id/profileinfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:foreground="#ffffff"
+                android:text="@string/profile"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </ScrollView>
 
 
-	<com.google.android.gms.ads.AdView
-		android:id="@+id/profileAdView"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		app:adUnitId="ca-app-pub-5883625079032168/1470784739"
-		app:adSize="BANNER" />
-
-</android.support.v7.widget.GridLayout>
+    </android.support.v7.widget.GridLayout>
+</android.support.design.widget.CoordinatorLayout>
+</layout>

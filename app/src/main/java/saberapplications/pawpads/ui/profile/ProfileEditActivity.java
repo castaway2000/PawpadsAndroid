@@ -2,6 +2,7 @@ package saberapplications.pawpads.ui.profile;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -31,6 +32,9 @@ import java.io.FileOutputStream;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.ProfileEditpageBinding;
+import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 
@@ -46,14 +50,23 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
     Button saveBtn, getimgbtn;
     Uri avatarImagePath;
     private QBUser currentQbUser;
+    private UserProfile profile;
     private SharedPreferences defaultSharedPreferences;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Runnable timeOutRunnable;
+    public final BindableBoolean isBusy = new BindableBoolean();
+
+    private ProfileEditpageBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile_editpage);
+        binding = DataBindingUtil.setContentView(this, R.layout.profile_editpage);
+        binding.setActivity(this);
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setTitle(R.string.password_recovery);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle("PawPads | Edit Profile");
 
         img = (ImageView) findViewById(R.id.editImageView);
@@ -70,13 +83,22 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
         });
         getimgbtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
+        loadUserData();
+    }
+
+    private void loadUserData() {
+        isBusy.set(true);
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(ProfileEditActivity.this);
         QBUsers.getUser(defaultSharedPreferences.getInt(C.QB_USERID, -1), new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
+
                 currentQbUser = qbUser;
                 if (currentQbUser.getCustomData() != null) {
 //                    proDescr.setText(String.valueOf(currentQbUser.getCustomData()));
+                    profile = UserProfile.createFromJson(currentQbUser.getCustomData());
+                } else {
+                    profile = new UserProfile();
                 }
                 if (currentQbUser.getFileId() != null) {
                     AvatarLoaderHelper.loadImage(currentQbUser.getFileId(), img,
@@ -84,23 +106,25 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                             , new AvatarLoaderHelper.Callback() {
                                 @Override
                                 public void imageLoaded() {
-                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    isBusy.set(false);
                                 }
                             });
 
                 } else {
-                    mSwipeRefreshLayout.setRefreshing(false);
+                    isBusy.set(false);
                 }
 
             }
 
             @Override
             public void onError(QBResponseException e) {
+                isBusy.set(false);
                 Util.onError(e, ProfileEditActivity.this);
             }
 
         });
     }
+
 
     @Override
     public void onClick(View v) {
@@ -122,7 +146,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                         mSwipeRefreshLayout.setRefreshing(true);
                     }
                 });
-                 timeOutRunnable=new Runnable() {
+                timeOutRunnable = new Runnable() {
                     @Override
                     public void run() {
                         mSwipeRefreshLayout.setRefreshing(false);
@@ -130,7 +154,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                     }
                 };
                 //edit second parameter to set timeout period
-                mSwipeRefreshLayout.postDelayed(timeOutRunnable,8000);
+                mSwipeRefreshLayout.postDelayed(timeOutRunnable, 8000);
 
                 currentQbUser.setCustomData(proDescr.getText().toString());
                 QBUsers.updateUser(currentQbUser, new QBEntityCallback<QBUser>() {
@@ -138,7 +162,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                     public void onSuccess(QBUser user, Bundle args) {
                         if (avatarImagePath != null) {
                             updateAvatar();
-                        }else{
+                        } else {
                             onProfileSaved("profile saved");
                         }
 
@@ -155,14 +179,16 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                 break;
         }
     }
-    private void onProfileSaved(String message){
-        if (message!=null){
+
+    private void onProfileSaved(String message) {
+        if (message != null) {
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         }
         mSwipeRefreshLayout.setRefreshing(false);
         mSwipeRefreshLayout.removeCallbacks(timeOutRunnable);
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -199,7 +225,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 FileOutputStream out = null;
                 try {
-                    final File file = File.createTempFile("avatar",".jpg",getCacheDir());
+                    final File file = File.createTempFile("avatar", ".jpg", getCacheDir());
                     out = new FileOutputStream(file);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
                     out.close();
@@ -215,7 +241,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                                 @Override
                                 public void onSuccess(QBUser user, Bundle args) {
                                     file.delete();
-                                    avatarImagePath=null;
+                                    avatarImagePath = null;
                                     onProfileSaved("profile saved");
                                 }
 
@@ -223,7 +249,7 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                                 public void onError(QBResponseException e) {
                                     Util.onError(e, ProfileEditActivity.this);
                                     file.delete();
-                                    avatarImagePath=null;
+                                    avatarImagePath = null;
                                     onProfileSaved("profile saved");
                                 }
 
@@ -236,7 +262,6 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
                             Util.onError(e, ProfileEditActivity.this);
 
                         }
-
 
 
                     }, new QBProgressCallback() {
@@ -276,6 +301,13 @@ public class ProfileEditActivity extends BaseActivity implements View.OnClickLis
 
     }
 
+    public void changeProfilePicture() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent, SELECT_IMAGE);
+
+    }
 
     @Override
     protected void onDestroy() {
