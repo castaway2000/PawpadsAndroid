@@ -53,4 +53,17 @@
     <string name="loading">Loading</string>
     <string name="edit">Edit</string>
     <string name="logout">Logout</string>
+    <string name="save">Save</string>
+    <string name="full_name">Full name</string>
+    <string name="age">Age</string>
+    <string name="gender">Gender</string>
+    <string name="select_gender">Select gender</string>
+    <string name="cancel">Cancel</string>
+    <string name="hobby">Hobby</string>
+    <string name="write_something_about_you">Write something about you</string>
+    <string name="saving">Saving</string>
+    <array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+    </array>
 </resources>

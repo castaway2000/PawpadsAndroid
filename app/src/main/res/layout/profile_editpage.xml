@@ -11,100 +11,106 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        >
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="150dp"
-            android:weightSum="1"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="180dp"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/full_name"
+                    android:inputType="textCapWords"
+                    app:binding2way="@{activity.fullName}" />
 
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal">
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/age"
+                    android:inputType="number"
+                    app:binding2way="@{activity.age}" />
 
-                        <ImageView
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/gender"
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableRight="@drawable/grey_arrow_down"
+                    android:onClick="@{() -> activity.selectGender()}"
+                    android:text="@{ activity.gender }"
+                    android:textColor="@color/hint" />
 
-                            android:layout_width="112dp"
-                            android:layout_height="112dp"
-                            android:layout_gravity="left|center_vertical"
-                            android:layout_margin="5dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/pplogo" />
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hobby"
+                    android:inputType="text"
+                    app:binding2way="@{activity.hobby}" />
 
-                        <Button
-                            android:id="@+id/newPicButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="New profile pic" />
-
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_weight="0.12"
-                        android:orientation="vertical"
-                        android:weightSum="1">
-
-                        <TextView
-                            android:id="@+id/aboutYou"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="left|top"
-                            android:layout_margin="5dp"
-                            android:text="About you:"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                        <EditText
-                            android:id="@+id/editProfileText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="0.78"
-                            android:background="#ffffff"
-                            android:gravity="start"
-                            android:padding="10dp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="97dp"
-                            android:layout_gravity="center_horizontal">
-
-                            <Button
-                                android:id="@+id/profileSave"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal|top"
-                                android:text="Save" />
-                        </FrameLayout>
-                    </LinearLayout>
-
-                </LinearLayout>
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/write_something_about_you"
+                    android:inputType="textMultiLine"
+                    app:binding2way="@{activity.about}" />
 
 
-        </LinearLayout>
+            </LinearLayout>
+
+
+        </ScrollView>
 
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88ffffff"
+            android:visibility="@{activity.isBusy}">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/textView"
+                    style="@style/list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:indeterminate="true"
+                    android:text="@{activity.progressMessage}"
+                    android:textColor="@color/title" />
+            </LinearLayout>
+        </RelativeLayout>
+        <!-- Header !-->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="100dp">
+
             <ImageView
                 android:id="@+id/user_background"
                 android:layout_width="match_parent"
@@ -114,35 +120,59 @@
                 android:layout_alignParentTop="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/app_bar_bg" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:onClick="@{ () -> activity.save()}"
+                android:padding="16dp"
+                android:text="@string/save"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/save"
+                android:clickable="true"
+                android:onClick="@{ () -> activity.changeProfileBackgound()}"
+                android:paddingBottom="16dp"
+                android:paddingRight="5dp"
+                android:paddingTop="19dp"
+                android:src="@drawable/camera_white_icon" />
         </RelativeLayout>
 
         <com.makeramen.roundedimageview.RoundedImageView
-            android:id="@+id/editImageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            app:riv_oval="true"
-            app:riv_mutate_background="true"
+            android:id="@+id/userAvatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="60dp"
-            android:src="@drawable/user_placeholder"
-            android:scaleType="centerCrop"
-            app:borderWidth="0dp"
+            android:layout_marginTop="50dp"
             android:clickable="true"
             android:onClick="@{ () -> activity.changeProfilePicture()}"
-            />
+            android:scaleType="centerCrop"
+            android:src="@drawable/user_placeholder"
+            app:borderWidth="0dp"
+            app:riv_mutate_background="true"
+            app:riv_oval="true" />
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/camera_grey_icon"
+            android:layout_below="@id/userAvatar"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/editImageView"
             android:layout_marginTop="-5dp"
             android:clickable="true"
             android:onClick="@{ () -> activity.changeProfilePicture()}"
+            android:src="@drawable/camera_grey_icon"
 
             />
 

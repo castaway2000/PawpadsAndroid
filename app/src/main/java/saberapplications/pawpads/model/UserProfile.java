@@ -10,11 +10,17 @@ public class UserProfile {
     int age;
     String gender;
     String hobby;
-    int backgroundId;
+    int backgroundId=-1;
+    private String about;
 
     public static UserProfile createFromJson(String json){
         Gson gson = new Gson();
-        return  gson.fromJson(json, UserProfile.class);
+
+        UserProfile out=gson.fromJson(json, UserProfile.class);
+        if (out==null){
+            out=new UserProfile();
+        }
+        return out;
     }
 
     public int getAge() {
@@ -47,5 +53,13 @@ public class UserProfile {
 
     public void setBackgroundId(int backgroundId) {
         this.backgroundId = backgroundId;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }
