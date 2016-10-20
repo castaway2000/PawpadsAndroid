@@ -259,8 +259,7 @@ public class ProfileEditActivity extends BaseActivity {
                             QBContent.deleteFile(profile.getBackgroundId());
                         }
                         Bitmap bg =  MediaStore.Images.Media.getBitmap(getContentResolver(),backgoundImagePath);
-                                //BitmapFactory.decodeU(backgoundImagePath.toString());
-                        bg = ThumbnailUtils.extractThumbnail(bg, 1080, 500);
+                        bg = ThumbnailUtils.extractThumbnail(bg, 1080, 540);
                         final File file = File.createTempFile("avatar_bg", ".jpg", getCacheDir());
                         FileOutputStream out = new FileOutputStream(file);
                         bg.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -293,6 +292,7 @@ public class ProfileEditActivity extends BaseActivity {
                     QBUsers.updateUser(currentQbUser);
                     return true;
                 }catch (Exception e) {
+                    this.e=e;
                     return false;
                 }
 
