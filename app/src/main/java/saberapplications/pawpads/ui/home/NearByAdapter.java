@@ -82,7 +82,7 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
 
             binding.setLocation(data.model.get().getLocation());
             binding.setLastMessage(data.model.get().getLastMessageDateFmt());
-
+            binding.setUsername(Util.getUserName(data.model.get().location.getUser()));
             binding.setDistance(getDistance(data.model.get().getLocation()));
 
             QBUser user=data.model.get().getLocation().getUser();
@@ -92,7 +92,7 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
                 int size=Math.round(60 * d);
                 AvatarLoaderHelper.loadImage(userProfilePictureID,binding.avatar,size,size);
             }else {
-                binding.avatar.setImageBitmap(null);
+                binding.avatar.setImageResource(R.drawable.user_placeholder);
             }
         }
 

@@ -29,11 +29,11 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="16dp"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             app:riv_border_color="#333333"
             app:riv_mutate_background="true"
             app:riv_oval="true"
-            app:riv_tile_mode="repeat"
+            android:src="@drawable/user_placeholder"
             android:layout_centerVertical="true"/>
 
         <LinearLayout

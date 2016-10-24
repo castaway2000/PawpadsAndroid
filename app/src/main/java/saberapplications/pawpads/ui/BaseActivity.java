@@ -28,6 +28,7 @@ import org.jivesoftware.smack.SmackException;
 
 import java.util.Date;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.login.LoginActivity;
@@ -145,7 +146,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""));
-        qbUser.setId(prefs.getInt(Util.QB_USERID, 0));
+        qbUser.setId(prefs.getInt(C.QB_USERID, 0));
         if (QBChatService.getInstance().isLoggedIn()) {
             try {
                 if (QBChatService.getInstance() != null) {

@@ -1,31 +1,31 @@
 package saberapplications.pawpads.ui.profile;
 
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
@@ -43,80 +43,97 @@ import java.util.regex.Pattern;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.ActivityProfilepageBinding;
+import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.BindableString;
+import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 public class ProfileActivity extends BaseActivity {
-    private QBDialog dialog;
+
     private QBUser currentQbUser;
 
-    private AdView adView, largeAdView;
     private InterstitialAd interAd;
-    private TextView profileInfo;
-    private TextView isBlockedView;
-    private ImageView profileAvatar;
-    private Privacy privacy;
-    private Button chatButton;
-    String name;
-    private QBUser currentUser;
-    private boolean isBlockedByOther;
-    private boolean isBlockedByMe;
-    private ProgressDialog progressDialog;
 
+    private TextView isBlockedView;
+
+    private QBUser qbUser;
+    public final BindableBoolean isBlockedByOther=new BindableBoolean();
+    public final BindableBoolean isBlockedByMe=new BindableBoolean();
+    public final BindableBoolean isBusy=new BindableBoolean();
+    public final BindableString progressMessage=new BindableString();
+
+    UserProfile profile;
+    ActivityProfilepageBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profilepage);
-        profileAvatar = (ImageView) findViewById(R.id.profilepic);
-        profileInfo = (TextView) findViewById(R.id.profileinfo);
+        binding=DataBindingUtil.setContentView(this,R.layout.activity_profilepage);
+        binding.setActivity(this);
+
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(null);
+
+
+        progressMessage.set(getString(R.string.loading));
         isBlockedView = (TextView) findViewById(R.id.is_blocked);
-        privacy = new Privacy();
+
 
         interAd = new InterstitialAd(this);
         interAd.setAdUnitId(Util.AD_UNIT_ID);
-        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        /*
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        adView.loadAd(adRequest);
+       // dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
 
-        interAd.loadAd(adRequest);
-        interAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                displayInterAd();
-            }
-        });
-*/
-        dialog = (QBDialog) getIntent().getSerializableExtra(ChatActivity.DIALOG);
-        chatButton = (Button) findViewById(R.id.chatBtn);
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.loading_data));
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        isBusy.set(true);
         new AsyncTask<Void, Void, Void>() {
-            String error = null;
-
+            Exception e;
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    currentQbUser = QBUsers.getUser(getIntent().getExtras().getInt(Util.QB_USERID, -1));
-                    currentUser = QBUsers.getUser(PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this).getInt(Util.QB_USERID, -1));
+                    qbUser = QBUsers.getUser(getIntent().getExtras().getInt(C.QB_USERID, -1));
+                    currentQbUser = QBUsers.getUser(PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this).getInt(C.QB_USERID, -1));
+                    if (qbUser.getFullName()==null){
+                        qbUser.setFullName(qbUser.getLogin());
+                    }
+                    binding.setUser(qbUser);
 
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", currentQbUser.getId());
-                    requestBuilder.eq("blocked_user", currentUser.getId());
+                    requestBuilder.eq("blocked_user", qbUser.getId());
                     ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByOther = blocks.size() > 0;
+                    isBlockedByOther.set( blocks.size() > 0);
                     requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("source_user", currentUser.getId());
+                    requestBuilder.eq("source_user", qbUser.getId());
                     requestBuilder.eq("blocked_user", currentQbUser.getId());
                     blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByMe = blocks.size() > 0;
+                    isBlockedByMe.set(blocks.size() > 0);
+
+                    profile = UserProfile.createFromJson(qbUser.getCustomData());
+                    float density=getResources().getDisplayMetrics().density;
+
+                    if (qbUser.getFileId()!=null){
+                        AvatarLoaderHelper.loadImageSync(qbUser.getFileId(), binding.userAvatar,
+                                Math.round(density*100), Math.round(density*100));
+                    }
+
+                    int width=getResources().getDisplayMetrics().widthPixels;
+                    if (profile.getBackgroundId()>0){
+                        int height=Math.round(density*147);
+                        AvatarLoaderHelper.loadImageSync(profile.getBackgroundId(), binding.userBackground,
+                                width,height);
+                    }
+                    binding.setProfile(profile);
+
+
+
+
                 } catch (QBResponseException e) {
                     e.printStackTrace();
+                    this.e=e;
+
                 }
                 return null;
 
@@ -124,58 +141,32 @@ public class ProfileActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                progressDialog.dismiss();
-                if (error != null) {
-                    new AlertDialog.Builder(ProfileActivity.this)
-                            .setMessage(error)
-                            .setPositiveButton("OK",null)
-                            .show();
+                isBusy.set(false);
+                if (e!=null) {
+                    Util.onError(e, ProfileActivity.this);
                     return;
                 }
-
-                if (currentQbUser.getFullName() != null) {
-                    name = currentQbUser.getFullName();
-                    setTitle("PawPads | " + name);
-                } else {
-                    name = currentQbUser.getLogin();
-                    setTitle("PawPads | " + name);
+                if (profile.getAge()>0){
+                    binding.age.setText(String.format(getString(R.string.age),profile.getAge()));
                 }
-
-                if (currentQbUser.getCustomData() != null) {
-                    String info = String.valueOf(currentQbUser.getCustomData());
-                    if (!info.equals("null")) {
-                        profileInfo.setText(String.valueOf(currentQbUser.getCustomData()));
-                    }
-                } else {
-                    profileInfo.setText(name + " has not set up their profile info yet.");
+                float density=getResources().getDisplayMetrics().density;
+                if (profile.getGender().equals("M")){
+                    Drawable drawable=ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon);
+                    drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+                    binding.age.setCompoundDrawables(drawable
+                            ,null,null,null);
+                }else if(profile.getGender().equals("F")){
+                    binding.age.setCompoundDrawables(
+                            ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon),null,null,null);
                 }
-
-                if (currentQbUser.getFileId() != null) {
-                    int userProfilePictureID = currentQbUser.getFileId(); // user - an instance of QBUser class
-                    float d = getResources().getDisplayMetrics().density;
-                    int size = Math.round(150 * d);
-                    AvatarLoaderHelper.loadImage(userProfilePictureID, profileAvatar, size, size);
-
-                }
-                setBlockedUI(isBlockedByMe);
+                binding.age.invalidate();
 
 
+                setBlockedUI(isBlockedByMe.get());
             }
         }.execute();
 
 
-        View.OnClickListener clickHandler = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
-                i.putExtra(ChatActivity.DIALOG, dialog);
-                i.putExtra(ChatActivity.RECIPIENT, currentQbUser);
-                i.putExtra(Util.IS_BLOCKED, isBlockedByMe);
-                startActivity(i);
-                finish();
-            }
-        };
-        chatButton.setOnClickListener(clickHandler);
     }
 
     public void displayInterAd() {
@@ -183,6 +174,35 @@ public class ProfileActivity extends BaseActivity {
         if (interAd.isLoaded() && interval == 0) {
             interAd.show();
         }
+    }
+
+    public void openChat(){
+        isBusy.set(true);
+        progressMessage.set(getString(R.string.loading));
+        QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
+        if (chatManager == null) return;
+        chatManager.createDialog(qbUser.getId(), new QBEntityCallback<QBDialog>() {
+
+            @Override
+            public void onSuccess(QBDialog dialog, Bundle params) {
+                Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
+                i.putExtra(ChatActivity.DIALOG, dialog);
+                i.putExtra(ChatActivity.RECIPIENT, currentQbUser);
+                i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
+                startActivity(i);
+                finish();
+                isBusy.set(false);
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Util.onError(e, ProfileActivity.this);
+                isBusy.set(false);
+            }
+
+        });
+
+
     }
 
     @Override
@@ -193,44 +213,52 @@ public class ProfileActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profilepage, menu);
 
         return true;
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem unblock, block;
-        block = menu.findItem(R.id.action_blockUser);
-        unblock = menu.findItem(R.id.action_unblock);
-        if (isBlockedByMe) {
-            block.setVisible(false);
-            unblock.setVisible(true);
-        } else {
-            block.setVisible(true);
-            unblock.setVisible(false);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
-            case R.id.action_blockUser:
-                addUserToBlockList();
-                return true;
-
-            case R.id.action_unblock:
-                removeUserFromBlockList();
+            case android.R.id.home:
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+
     }
 
-    private void addUserToBlockList() {
 
+
+    private void setBlockedUI(boolean isBlocked) {
+        isBlockedByMe.set(isBlocked);
+
+
+    }
+
+    private void saveBlockListToPreferences(QBPrivacyList list) {
+
+        final JSONArray ids = new JSONArray();
+        for (QBPrivacyListItem item : list.getItems()) {
+            if (item.getType() == QBPrivacyListItem.Type.USER_ID &&
+                    !item.isAllow()) {
+                Pattern p = Pattern.compile("(\\d*)");
+                Matcher m = p.matcher(item.getValueForType());
+                if (m.find()) {
+                    ids.put(m.group(1));
+                }
+            }
+        }
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(C.BLOCKED_USERS_IDS, ids.toString());
+        editor.apply();
+
+    }
+    public void blockUser(){
+        isBusy.set(true);
+        progressMessage.set(getString(R.string.blocking_user));
         new AsyncTask<Void, Void, Void>() {
             private String error;
 
@@ -256,7 +284,7 @@ public class ProfileActivity extends BaseActivity {
                     saveBlockListToPreferences(list);
 
                     QBCustomObject object = new QBCustomObject();
-                    object.putInteger("source_user", currentUser.getId());
+                    object.putInteger("source_user", qbUser.getId());
                     object.putInteger("blocked_user", currentQbUser.getId());
 
 // set the class name
@@ -265,7 +293,7 @@ public class ProfileActivity extends BaseActivity {
 
                     QBPrivateChat privatChat = QBChatService.getInstance().getPrivateChatManager().getChat(currentQbUser.getId());
                     if (privatChat==null){
-                       privatChat=QBChatService.getInstance().getPrivateChatManager().createChat(currentQbUser.getId(),null);
+                        privatChat=QBChatService.getInstance().getPrivateChatManager().createChat(currentQbUser.getId(),null);
                     }
                     QBChatMessage message=new QBChatMessage();
                     message.setProperty("blocked","1");
@@ -279,6 +307,7 @@ public class ProfileActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                isBusy.set(false);
                 if (error != null) {
                     new AlertDialog.Builder(ProfileActivity.this)
                             .setMessage(error)
@@ -295,12 +324,10 @@ public class ProfileActivity extends BaseActivity {
                 }
             }
         }.execute();
-
-
     }
-
-    private void removeUserFromBlockList() {
-
+    public void unblockUser(){
+        isBusy.set(true);
+        progressMessage.set(getString(R.string.unblocking_user));
         new AsyncTask<Void, Void, Boolean>() {
             String error;
 
@@ -308,7 +335,7 @@ public class ProfileActivity extends BaseActivity {
             protected Boolean doInBackground(Void... params) {
                 try {
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("source_user", currentUser.getId());
+                    requestBuilder.eq("source_user", qbUser.getId());
                     requestBuilder.eq("blocked_user", currentQbUser.getId());
 
                     ArrayList<QBCustomObject> blockedList = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
@@ -351,6 +378,7 @@ public class ProfileActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Boolean result) {
+                isBusy.set(false);
                 if (result) {
                     setBlockedUI(false);
                     Toast.makeText(ProfileActivity.this, R.string.user_removed_from_block_list, Toast.LENGTH_LONG).show();
@@ -360,55 +388,6 @@ public class ProfileActivity extends BaseActivity {
             }
         }.execute();
 
-
-    }
-
-    private void setBlockedUI(boolean isBlocked) {
-        isBlockedByMe = isBlocked;
-        if (isBlockedByMe) {
-            chatButton.setVisibility(View.VISIBLE);
-            isBlockedView.setVisibility(View.VISIBLE);
-
-        } else {
-            chatButton.setVisibility(View.VISIBLE);
-            isBlockedView.setVisibility(View.GONE);
-        }
-        if (isBlockedByOther || isBlockedByMe) {
-            chatButton.setText(R.string.text_chat_history);
-        }else{
-            chatButton.setText(R.string.text_chat);
-        }
-
-
-        if (isBlockedByOther) {
-            isBlockedView.setVisibility(View.VISIBLE);
-            isBlockedView.setText(R.string.text_you_blocked);
-        } else {
-            isBlockedView.setVisibility(View.GONE);
-        }
-
-
-        invalidateOptionsMenu();
-
-    }
-
-    private void saveBlockListToPreferences(QBPrivacyList list) {
-
-        final JSONArray ids = new JSONArray();
-        for (QBPrivacyListItem item : list.getItems()) {
-            if (item.getType() == QBPrivacyListItem.Type.USER_ID &&
-                    !item.isAllow()) {
-                Pattern p = Pattern.compile("(\\d*)");
-                Matcher m = p.matcher(item.getValueForType());
-                if (m.find()) {
-                    ids.put(m.group(1));
-                }
-            }
-        }
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(C.BLOCKED_USERS_IDS, ids.toString());
-        editor.apply();
 
     }
 }

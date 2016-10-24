@@ -20,9 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.location.QBLocations;
@@ -37,12 +35,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.FragmentNearByBinding;
 import saberapplications.pawpads.service.UserLocationService;
-import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.views.BaseListAdapter.Callback;
 
@@ -123,7 +121,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         lastListUpdatedLocation = UserLocationService.getLastLocation();
         adapter.setLocation(lastListUpdatedLocation);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final int currentUserId = prefs.getInt(Util.QB_USERID, 0);
+        final int currentUserId = prefs.getInt(C.QB_USERID, 0);
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
 
 
@@ -226,14 +224,19 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         final QBLocation qbLocation=item.getLocation();
         builder.eq("occupants_ids", qbLocation.getUser().getId());
 
+        Intent intent = new Intent(getContext(), ProfileActivity.class);
+        intent.putExtra(C.QB_USERID, qbLocation.getUser().getId());
+        startActivity(intent);
 
+
+/*
         QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
         if (chatManager == null) return;
         chatManager.createDialog(qbLocation.getUser().getId(), new QBEntityCallback<QBDialog>() {
 
             @Override
             public void onSuccess(QBDialog result, Bundle params) {
-                openProfile(result, qbLocation.getUser());
+                openProfile( qbLocation.getUser());
             }
 
             @Override
@@ -242,15 +245,14 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             }
 
         });
-
+*/
     }
 
 
-    private void openProfile(QBDialog dialog, QBUser user) {
+    private void openProfile(QBUser user) {
 
         Intent intent = new Intent(getContext(), ProfileActivity.class);
-        intent.putExtra(ChatActivity.DIALOG, dialog);
-        intent.putExtra(Util.QB_USERID, user.getId());
+        intent.putExtra(C.QB_USERID, user.getId());
         startActivity(intent);
     }
 

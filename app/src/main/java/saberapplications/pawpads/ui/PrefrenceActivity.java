@@ -20,12 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 
-import java.util.List;
-
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.login.LoginActivity;
@@ -208,7 +206,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(Util.QB_PASSWORD, ""))) {
-                            QBUsers.deleteUser(defaultSharedPreferences.getInt(Util.QB_USERID, -1), new QBEntityCallback() {
+                            QBUsers.deleteUser(defaultSharedPreferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
 
                                 @Override
                                 public void onSuccess(Object o, Bundle bundle) {

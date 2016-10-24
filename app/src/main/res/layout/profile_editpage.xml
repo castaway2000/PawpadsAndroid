@@ -37,7 +37,7 @@
                     style="@style/profile_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/age"
+                    android:hint="@string/age_hint"
                     android:inputType="number"
                     app:binding2way="@{activity.age}" />
 
@@ -112,14 +112,20 @@
             android:layout_height="100dp">
 
             <ImageView
-                android:id="@+id/user_background"
+                android:id="@+id/userBackground"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="97dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/app_bar_bg" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/userBackground"
+                android:background="@drawable/shadow_gradient"
+                />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

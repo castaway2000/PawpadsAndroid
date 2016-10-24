@@ -54,7 +54,7 @@
         </activity>
         <activity
             android:name=".ui.profile.ProfileActivity"
-            android:label="PawPads">
+            android:label="@string/profile">
             <intent-filter>
                 <action android:name="android.intent.action.profilepage" />
 

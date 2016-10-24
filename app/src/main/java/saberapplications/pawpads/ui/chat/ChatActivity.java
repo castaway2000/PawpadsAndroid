@@ -324,7 +324,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    currentUser = QBUsers.getUser(PreferenceManager.getDefaultSharedPreferences(ChatActivity.this).getInt(Util.QB_USERID, -1));
+                    currentUser = QBUsers.getUser(PreferenceManager.getDefaultSharedPreferences(ChatActivity.this).getInt(C.QB_USERID, -1));
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", recipient.getId());
                     requestBuilder.eq("blocked_user", currentUser.getId());

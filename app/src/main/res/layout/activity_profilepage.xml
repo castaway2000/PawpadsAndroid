@@ -1,85 +1,245 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.profile.ProfileActivity">
 
     <data>
 
         <variable
             name="activity"
             type="saberapplications.pawpads.ui.profile.ProfileActivity" />
+
+        <variable
+            name="user"
+            type="com.quickblox.users.model.QBUser" />
+
+        <variable
+            name="profile"
+            type="saberapplications.pawpads.model.UserProfile" />
     </data>
-<android.support.design.widget.CoordinatorLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <android.support.design.widget.AppBarLayout
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
+        android:layout_height="match_parent">
+
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/gridLayout"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/app_bar_bg"/>
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="bottom|center_horizontal"
-            android:src="@drawable/user_placeholder"/>
+            android:layout_height="match_parent"
+            android:layout_marginTop="210dp"
+            app:columnCount="1"
+            app:orientation="horizontal">
 
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/gridLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#97159cc6"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        app:columnCount="1"
-        tools:context=".ui.profile.ProfileActivity">
-
-
-        <ImageView
-            android:id="@+id/profilepic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/pplogo"
-            app:layout_gravity="center" />
-
-        <TextView
-            android:id="@+id/is_blocked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/blocked"
-            android:visibility="gone"
-            app:layout_gravity="center" />
-
-        <Button
-            android:id="@+id/chatBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:text="Chat"
-            android:visibility="gone"
-            app:layout_gravity="bottom|center" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_rowWeight="1">
-
-            <TextView
-                android:id="@+id/profileinfo"
-                android:layout_width="match_parent"
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:foreground="#ffffff"
-                android:text="@string/profile"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </ScrollView>
+                android:text="@{user.fullName,default=HOHN_DOW}"
+                android:textColor="@color/title"
+                android:textSize="30sp"
+                app:layout_gravity="center_horizontal"
+                app:typefaceAsset="Proxima_Nova_Semibold.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{profile.hobby,default=UI_UX_DESIGNER}"
+                android:textColor="@color/primary"
+                android:textSize="20sp"
+                app:layout_gravity="center_horizontal"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:drawablePadding="10dp"
+                android:text=""
+                android:textColor="#aaaaaa"
+                android:textSize="20sp"
+                app:layout_gravity="center_horizontal"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:gravity="top|center_horizontal"
+                android:text="@{profile.about}"
+                android:textColor="#aaaaaa"
+                android:textSize="20sp"
+                app:layout_gravity="center_horizontal|fill_vertical"
+                app:layout_rowWeight="1"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/is_blocked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_you_blocked"
+                android:visibility="@{activity.isBlockedByOther}"
+                app:layout_gravity="center"
+                android:textColor="#EA5734"
+                android:textSize="20sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/list_item_bg"
+                android:clickable="true"
+                android:drawableTop="@drawable/unblock_icon"
+                android:onClick="@{() -> activity.blockUser()}"
+                android:padding="15dp"
+                android:text="@string/block_user"
+                android:textColor="#28A7BB"
+                android:textSize="20sp"
+                android:visibility="@{activity.isBlockedByMe.not}"
+                app:layout_gravity="center_horizontal"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/list_item_bg"
+                android:clickable="true"
+                android:drawableTop="@drawable/block_icon"
+                android:onClick="@{() -> activity.unblockUser()}"
+                android:padding="15dp"
+                android:text="@string/unblock_user"
+                android:textColor="#EA5734"
+                android:textSize="20sp"
+                android:visibility="@{activity.isBlockedByMe}"
+                app:layout_gravity="center_horizontal"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
 
-    </android.support.v7.widget.GridLayout>
-</android.support.design.widget.CoordinatorLayout>
+        </android.support.v7.widget.GridLayout>
+
+
+
+        <!-- Header !-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+
+            <ImageView
+                android:id="@+id/userBackground"
+                android:layout_width="match_parent"
+                android:layout_height="147dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/app_bar_bg" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/userBackground"
+                android:background="@drawable/shadow_gradient" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <saberapplications.pawpads.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/toolbar_title"
+                    android:text="@string/profile"
+                    android:textSize="28sp"
+                    app:typefaceAsset="Proxima_Nova_Regular.otf"
+                    />
+                </android.support.v7.widget.Toolbar>
+
+        </RelativeLayout>
+
+
+
+        <android.support.v7.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:orientation="horizontal"
+            android:layout_marginTop="100dp">
+
+            <View
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                app:layout_columnWeight="1" />
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/userAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:clickable="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/user_placeholder"
+                app:borderWidth="0dp"
+                app:riv_mutate_background="true"
+                app:riv_oval="true" />
+            <FrameLayout
+                app:layout_columnWeight="1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                app:layout_gravity="center"
+                >
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/chat_button"
+                    app:layout_gravity="center"
+                    />
+                <View
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/chat_button_bg"
+                    app:layout_gravity="center"
+                    android:clickable="true"
+                    android:onClick="@{() -> activity.openChat()}"
+                    />
+            </FrameLayout>
+
+
+
+        </android.support.v7.widget.GridLayout>
+
+<!-- Loading layer !-->
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88ffffff"
+            android:visibility="@{activity.isBusy}"
+            android:clickable="true"
+            >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/textView"
+                    style="@style/list_title"
+                    android:textColor="@color/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:indeterminate="true"
+                    android:text="@{activity.progressMessage}"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
 </layout>

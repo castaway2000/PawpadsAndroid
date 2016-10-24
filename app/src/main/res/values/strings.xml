@@ -6,7 +6,7 @@
     <string name="action_profile">Edit Profile</string>
     <string name="title_activity_profilepage">Profile Page</string>
     <string name="title_activity_chat">PawPads Chat</string>
-    <string name="profile" />
+    <string name="profile" >Profile</string>
     <string name="show_dialogs">Chat History</string>
     <string name="About">About</string>
     <string name="blocked">BLOCKED</string>
@@ -55,15 +55,21 @@
     <string name="logout">Logout</string>
     <string name="save">Save</string>
     <string name="full_name">Full name</string>
-    <string name="age">Age</string>
+    <string name="age">Age: %1$d</string>
     <string name="gender">Gender</string>
     <string name="select_gender">Select gender</string>
     <string name="cancel">Cancel</string>
     <string name="hobby">Hobby</string>
     <string name="write_something_about_you">Write something about you</string>
     <string name="saving">Saving</string>
+    <string name="block_user">Block user</string>
+    <string name="unblock_user">Unblock user</string>
+    <string name="blocking_user">Blocking user</string>
+    <string name="unblocking_user">Unblocking user</string>
+    <string name="age_hint">Age</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
     </array>
+
 </resources>

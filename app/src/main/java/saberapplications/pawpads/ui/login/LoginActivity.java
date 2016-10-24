@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity  {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
         editor.putString(Util.QB_USER, user.getLogin());
         editor.putString(Util.USER_NAME, user.getLogin());
-        editor.putInt(Util.QB_USERID, user.getId());
+        editor.putInt(C.QB_USERID, user.getId());
 
         if (user.getTwitterId()!=null){
             editor.putString(C.AUTH_PROVIDER, C.TWITTER);

@@ -7,7 +7,9 @@
         <variable
             name="location"
             type="com.quickblox.location.model.QBLocation" />
-
+        <variable
+            name="username"
+            type="String"/>
         <variable
             name="lastMessage"
             type="String" />
@@ -28,11 +30,11 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="16dp"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             app:riv_border_color="#333333"
             app:riv_mutate_background="true"
             app:riv_oval="true"
-            app:riv_tile_mode="repeat"
+            android:src="@drawable/user_placeholder"
             android:layout_centerVertical="true"/>
 
         <LinearLayout
@@ -47,7 +49,7 @@
                 android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{location.user.login,default=USERNAME}"
+                android:text="@{username,default=USERNAME}"
                 style="@style/list_title"/>
 
             <saberapplications.pawpads.views.FontTextView

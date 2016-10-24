@@ -52,7 +52,7 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
                 }
             }
 
-            binding.avatar.setImageBitmap(null);
+            binding.avatar.setImageResource(R.drawable.user_placeholder);
             if(!adapter.userCache.containsKey(userId)) {
                 QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
                     @Override

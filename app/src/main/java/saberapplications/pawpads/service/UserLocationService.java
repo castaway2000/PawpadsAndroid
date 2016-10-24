@@ -31,6 +31,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.PawPadsApplication;
 import saberapplications.pawpads.Util;
 
@@ -189,7 +190,7 @@ public class UserLocationService extends Service implements
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
             editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
             editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
-            editor.putInt(Util.QB_USERID, userId);
+            editor.putInt(C.QB_USERID, userId);
             editor.apply();
 
         } catch (QBResponseException e) {

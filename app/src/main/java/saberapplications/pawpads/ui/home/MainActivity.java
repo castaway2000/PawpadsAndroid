@@ -288,7 +288,7 @@ public class MainActivity extends BaseActivity {
 
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra(ChatActivity.DIALOG, dialog);
-        intent.putExtra(Util.QB_USERID, user.getId());
+        intent.putExtra(C.QB_USERID, user.getId());
         startActivity(intent);
     }
 

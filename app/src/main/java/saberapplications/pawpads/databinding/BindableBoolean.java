@@ -20,6 +20,8 @@ public class BindableBoolean extends BaseObservable {
         return value;
     }
 
+    public boolean getValue() { return value.booleanValue();}
+
     public void set(Boolean value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = value;
@@ -78,7 +80,14 @@ public class BindableBoolean extends BaseObservable {
         }
     }
 
-
+    @BindingAdapter({"android:visibility"})
+    public static  void bindVisibilityToBooolean(View view,boolean b){
+        if (b) {
+            view.setVisibility(View.VISIBLE);
+        }else {
+            view.setVisibility(View.GONE);
+        }
+    }
 
 
 }

@@ -22,6 +22,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentChatsBinding;
@@ -51,7 +52,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         binding= DataBindingUtil.bind(view);
         adapter=new ChatsAdapter();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        currentUserId = prefs.getInt(Util.QB_USERID, 0);
+        currentUserId = prefs.getInt(C.QB_USERID, 0);
         adapter.setCurrentUserId(currentUserId);
         binding.listView.setAdapter(adapter);
         adapter.setCallback(this);

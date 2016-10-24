@@ -32,7 +32,7 @@ public class UserProfile {
     }
 
     public String getGender() {
-        return gender;
+        return gender!=null ? gender :"";
     }
 
     public void setGender(String gender) {
