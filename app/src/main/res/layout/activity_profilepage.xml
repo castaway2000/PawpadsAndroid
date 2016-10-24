@@ -77,12 +77,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_you_blocked"
-                android:visibility="@{activity.isBlockedByOther}"
-                app:layout_gravity="center"
                 android:textColor="#EA5734"
                 android:textSize="20sp"
-                app:typefaceAsset="Proxima_Nova_Regular.otf"
-                />
+                android:visibility="@{activity.isBlockedByOther}"
+                app:layout_gravity="center"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
             <saberapplications.pawpads.views.FontTextView
                 android:layout_width="wrap_content"
@@ -118,7 +117,6 @@
         </android.support.v7.widget.GridLayout>
 
 
-
         <!-- Header !-->
         <RelativeLayout
             android:layout_width="match_parent"
@@ -139,34 +137,38 @@
                 android:layout_height="3dp"
                 android:layout_below="@id/userBackground"
                 android:background="@drawable/shadow_gradient" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
+
                 <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/toolbar_title"
                     android:text="@string/profile"
                     android:textSize="28sp"
-                    app:typefaceAsset="Proxima_Nova_Regular.otf"
-                    />
-                </android.support.v7.widget.Toolbar>
+                    app:typefaceAsset="Proxima_Nova_Regular.otf" />
+            </android.support.v7.widget.Toolbar>
 
         </RelativeLayout>
 
-
+        <!-- user avatar!-->
 
         <android.support.v7.widget.GridLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
+            android:layout_marginTop="100dp"
+            app:columnCount="3"
             app:orientation="horizontal"
-            android:layout_marginTop="100dp">
-
-            <View
-                android:layout_height="wrap_content"
+            >
+            <android.support.v4.widget.Space
                 android:layout_width="0dp"
-                app:layout_columnWeight="1" />
+                android:layout_height="10dp"
+                app:layout_columnWeight="1"
+                />
+
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/userAvatar"
                 android:layout_width="100dp"
@@ -177,46 +179,45 @@
                 app:borderWidth="0dp"
                 app:riv_mutate_background="true"
                 app:riv_oval="true" />
-            <FrameLayout
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="100dp"
                 app:layout_columnWeight="1"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                app:layout_gravity="center"
-                >
+               >
+
                 <ImageView
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:src="@drawable/chat_button"
-                    app:layout_gravity="center"
-                    />
+                    android:layout_centerInParent="true" />
+
                 <View
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:background="@drawable/chat_button_bg"
-                    app:layout_gravity="center"
                     android:clickable="true"
                     android:onClick="@{() -> activity.openChat()}"
-                    />
-            </FrameLayout>
-
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
 
 
         </android.support.v7.widget.GridLayout>
 
-<!-- Loading layer !-->
+        <!-- Loading layer !-->
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#88ffffff"
-            android:visibility="@{activity.isBusy}"
             android:clickable="true"
-            >
+            android:visibility="@{activity.isBusy}">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true">
+                android:orientation="horizontal">
 
                 <ProgressBar
                     android:id="@+id/progressBar"
@@ -229,7 +230,6 @@
                 <saberapplications.pawpads.views.FontTextView
                     android:id="@+id/textView"
                     style="@style/list_title"
-                    android:textColor="@color/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -237,7 +237,7 @@
                     android:layout_marginStart="20dp"
                     android:indeterminate="true"
                     android:text="@{activity.progressMessage}"
-                    />
+                    android:textColor="@color/title" />
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>
