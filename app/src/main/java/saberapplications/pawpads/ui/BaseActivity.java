@@ -44,6 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean isExternalDialogOpened;
 
     private static Integer userId;
+    protected static QBUser currentQBUser;
 
     //    private Location lastLocation;
     private boolean isActive;

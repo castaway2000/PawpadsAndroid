@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -134,7 +135,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        binding= DataBindingUtil.setContentView(this,R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setActivity(this);
         setSupportActionBar(binding.toolbar);
 
@@ -164,8 +165,8 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setTitle(null);
         gps = new GPS(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-      //  mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
-      //  mSwipeRefreshLayout.setOnRefreshListener(this);
+        //  mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
+        //  mSwipeRefreshLayout.setOnRefreshListener(this);
         context = getApplicationContext();
         //listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
@@ -175,12 +176,27 @@ public class MainActivity extends BaseActivity {
         Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
         Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
 
-        nearByFragment=new NearByFragment();
-        chatsFragment=new ChatsFragment();
-        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
+        nearByFragment = new NearByFragment();
+        chatsFragment = new ChatsFragment();
 
+        binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1 && chatsFragment.adapter.getItemCount()==1) {
+                    chatsFragment.loadData();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
     }
 
@@ -306,26 +322,30 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onQBConnect() throws Exception {
 //        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-      //  loadAndSetNearUsers();
+        //  loadAndSetNearUsers();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final int currentUserId = prefs.getInt(C.QB_USERID, 0);
         QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser user, Bundle bundle) {
-                if (user.getFileId()!=null){
-                    float d=getResources().getDisplayMetrics().density;
-                    int size=Math.round(d*80);
-                    AvatarLoaderHelper.loadImage(user.getFileId(),binding.currentUserAvatar,size,size);
+                if (user.getFileId() != null) {
+                    float d = getResources().getDisplayMetrics().density;
+                    int size = Math.round(d * 80);
+                    AvatarLoaderHelper.loadImage(user.getFileId(), binding.currentUserAvatar, size, size);
                     binding.setUsername(Util.getUserName(user));
+                    currentQBUser=user;
                 }
 
             }
 
             @Override
             public void onError(QBResponseException e) {
-                Util.onError(e,MainActivity.this);
+                Util.onError(e, MainActivity.this);
             }
         });
+
+        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
 
         if (!isUserRegistered(context)) {
             if (checkPlayServices()) {
@@ -346,7 +366,6 @@ public class MainActivity extends BaseActivity {
 
 
     }
-
 
 
     /**
@@ -510,7 +529,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private class ViewPagerAdapter extends FragmentPagerAdapter{
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
 
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -518,9 +537,9 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position==0){
+            if (position == 0) {
                 return nearByFragment;
-            }else {
+            } else {
                 return chatsFragment;
             }
 
@@ -534,9 +553,9 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position==0){
+            if (position == 0) {
                 return getString(R.string.near_by);
-            }else {
+            } else {
                 return getString(R.string.chats);
             }
         }
@@ -544,25 +563,25 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
-    public void editProfile(){
+    public void editProfile() {
         binding.navigationDrawer.closeDrawer(Gravity.LEFT);
-        Intent intent=new Intent(this,ProfileEditActivity.class);
+        Intent intent = new Intent(this, ProfileEditActivity.class);
         startActivity(intent);
 
     }
-    public void openSettings(){
+
+    public void openSettings() {
         binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         startActivity(new Intent(this, PrefrenceActivity.class));
     }
 
-    public void openAbout(){
+    public void openAbout() {
         binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         startActivity(new Intent(this, AboutActivity.class));
 
     }
 
-    public void logout(){
+    public void logout() {
         userLocalStore = new UserLocalStore(this);
         userLocalStore.clearUserData();
         userLocalStore.setUserLoggedIn(false);

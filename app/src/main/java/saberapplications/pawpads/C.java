@@ -15,4 +15,5 @@ public class C {
     public static final String BLOCKED_USERS_IDS = "blocked_users_ids";
     public static final String MEASURE_UNIT="unit";
     public static final String QB_USERID = "qb_userid";
+    public static final String QB_USER = "qb_user";
 }

@@ -71,7 +71,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     @Override
     public void onStart() {
         super.onStart();
-        loadData();
     }
 
     public void loadData(){

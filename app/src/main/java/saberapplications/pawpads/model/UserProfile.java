@@ -14,13 +14,19 @@ public class UserProfile {
     private String about;
 
     public static UserProfile createFromJson(String json){
-        Gson gson = new Gson();
+        try {
+            Gson gson = new Gson();
 
-        UserProfile out=gson.fromJson(json, UserProfile.class);
-        if (out==null){
-            out=new UserProfile();
+            UserProfile out = gson.fromJson(json, UserProfile.class);
+            if (out == null) {
+                out = new UserProfile();
+            }
+            return out;
+        }catch (Exception e){
+            UserProfile out=new UserProfile();
+            out.setAbout(json);
+            return out;
         }
-        return out;
     }
 
     public int getAge() {

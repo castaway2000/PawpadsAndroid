@@ -39,6 +39,7 @@ import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.FragmentNearByBinding;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
@@ -51,6 +52,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
     FragmentNearByBinding binding;
     NearByAdapter adapter;
     BindableBoolean isBusy = new BindableBoolean(false);
+    BindableString progressMessage=new BindableString();
     private Location lastListUpdatedLocation;
     private ArrayMap<Integer, Long> lastMessages;
     int currentPage = 1;
@@ -111,6 +113,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             }
         });
         adapter.setCallback(this);
+        progressMessage.set(getString(R.string.obtaining_location));
         return view;
     }
 
@@ -118,12 +121,12 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
 
         if (UserLocationService.getLastLocation() == null) return;
         if (isBusy.get()) return;
+        progressMessage.set(getString(R.string.loading));
         lastListUpdatedLocation = UserLocationService.getLastLocation();
         adapter.setLocation(lastListUpdatedLocation);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         final int currentUserId = prefs.getInt(C.QB_USERID, 0);
         final ArrayList<QBLocation> nearLocations = new ArrayList<>();
-
 
         isBusy.set(true);
 
@@ -226,6 +229,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
 
         Intent intent = new Intent(getContext(), ProfileActivity.class);
         intent.putExtra(C.QB_USERID, qbLocation.getUser().getId());
+        intent.putExtra(C.QB_USER, qbLocation.getUser());
         startActivity(intent);
 
 

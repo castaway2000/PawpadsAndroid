@@ -67,6 +67,7 @@
     <string name="blocking_user">Blocking user</string>
     <string name="unblocking_user">Unblocking user</string>
     <string name="age_hint">Age</string>
+    <string name="obtaining_location">Obtaining location</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
