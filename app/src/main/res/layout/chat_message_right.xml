@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="message"
+            type="String" />
+        <variable
+            name="date"
+            type="String" />
+        <variable
+            name="isLast"
+            type="boolean"/>
+    </data>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <saberapplications.pawpads.views.FontTextView
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="16dp"
+            android:id="@+id/text"
+            android:background="@drawable/message_right_last"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="@color/accent"
+            android:textSize="21sp"
+            android:text="@{message,default=text}" />
+        <saberapplications.pawpads.views.FontTextView
+            android:layout_below="@id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="#88393939"
+            android:textSize="13sp"
+            android:text="@{date}"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="22dp"
+            android:layout_marginTop="-2dp"
+            android:visibility="@{isLast}"
+            />
+    </RelativeLayout>
+</layout>

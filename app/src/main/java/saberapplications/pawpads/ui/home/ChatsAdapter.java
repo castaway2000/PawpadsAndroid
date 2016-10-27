@@ -41,7 +41,7 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
         }
 
         @Override
-        public void showData(DataItem<QBDialog> data) {
+        public void showData(DataItem<QBDialog> data,int position) {
             QBDialog dialog=data.model.get();
             binding.setLastMessage(data.model.get().getLastMessage());
             binding.setUsername(data.model.get().getName());

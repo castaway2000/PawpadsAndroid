@@ -45,7 +45,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     }
 
 
-    ArrayList<DataItem<T>> items = new ArrayList<>();
+    protected ArrayList<DataItem<T>> items = new ArrayList<>();
 
     public final ObservableField<Boolean> selectMode = new ObservableField<>(false);
 
@@ -107,7 +107,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
             this.data = data;
         }
 
-        public abstract void showData(DataItem<T> model);
+        public abstract void showData(DataItem<T> model,int position);
     }
 
     public static class LoadMoreHolder extends RecyclerView.ViewHolder {
@@ -175,7 +175,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
             DataHolder<T> dataholder = (DataHolder<T>) holder;
             DataItem<T> item = items.get(position);
             dataholder.setData(item);
-            dataholder.showData(item);
+            dataholder.showData(item,position);
 
         }
     }

@@ -122,12 +122,12 @@ public class ProfileActivity extends BaseActivity {
                     requestBuilder.eq("source_user", currentQBUser.getId());
                     requestBuilder.eq("blocked_user", qbUser.getId());
                     ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByOther.set( blocks.size() > 0);
+                    isBlockedByMe.set( blocks.size() > 0);
                     requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", qbUser.getId());
                     requestBuilder.eq("blocked_user", currentQBUser.getId());
                     blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByMe.set(blocks.size() > 0);
+                    isBlockedByOther.set(blocks.size() > 0);
 
 
 
@@ -188,7 +188,7 @@ public class ProfileActivity extends BaseActivity {
             public void onSuccess(QBDialog dialog, Bundle params) {
                 Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
                 i.putExtra(ChatActivity.DIALOG, dialog);
-                i.putExtra(ChatActivity.RECIPIENT, currentQBUser);
+                i.putExtra(ChatActivity.RECIPIENT, qbUser);
                 i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
                 startActivity(i);
                 finish();
@@ -285,8 +285,8 @@ public class ProfileActivity extends BaseActivity {
                     saveBlockListToPreferences(list);
 
                     QBCustomObject object = new QBCustomObject();
-                    object.putInteger("source_user", qbUser.getId());
-                    object.putInteger("blocked_user", currentQBUser.getId());
+                    object.putInteger("source_user", currentQBUser.getId());
+                    object.putInteger("blocked_user", qbUser.getId());
 
 // set the class name
                     object.setClassName("BlockList");

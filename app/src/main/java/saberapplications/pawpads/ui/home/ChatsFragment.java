@@ -36,7 +36,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     FragmentChatsBinding binding;
     ChatsAdapter adapter;
-    int currentPage=1;
+    int currentPage=0;
     private int currentUserId;
 
     public ChatsFragment() {

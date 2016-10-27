@@ -78,7 +78,7 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
         }
 
         @Override
-        public void showData(DataItem<NearByAdapter.NearByItem> data) {
+        public void showData(DataItem<NearByAdapter.NearByItem> data,int position) {
 
             binding.setLocation(data.model.get().getLocation());
             binding.setLastMessage(data.model.get().getLastMessageDateFmt());

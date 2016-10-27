@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="message"
+            type="String"/>
+        <variable
+            name="date"
+            type="String" />
+        <variable
+            name="isLast"
+            type="boolean"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/message_left_last"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{message,default=text}"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="@color/title"
+            android:textSize="21sp"
+
+
+            />
+        <saberapplications.pawpads.views.FontTextView
+            android:layout_below="@id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="#88393939"
+            android:text="@{date}"
+            android:textSize="13sp"
+            android:layout_marginLeft="22dp"
+            android:layout_marginTop="-2dp"
+            android:visibility="@{isLast}"
+            />
+    </RelativeLayout>
+</layout>
