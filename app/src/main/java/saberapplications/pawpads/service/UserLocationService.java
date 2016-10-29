@@ -50,6 +50,7 @@ public class UserLocationService extends Service implements
     private static Location lastLocation;
     private QBLocation qbLocation;
     private int userId;
+    public static boolean isRunning;
 
     public UserLocationService() {
 
@@ -70,6 +71,7 @@ public class UserLocationService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+        isRunning=true;
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -100,6 +102,7 @@ public class UserLocationService extends Service implements
 
     @Override
     public void onDestroy() {
+        isRunning=false;
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }

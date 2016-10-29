@@ -13,11 +13,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.databinding.ChatMessageLeftBinding;
 import saberapplications.pawpads.databinding.ChatMessageRightBinding;
+import saberapplications.pawpads.service.FileDownloadService;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.views.BaseChatAdapter;
+import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
  * Created by Stanislav Volnjanskij on 26.10.16.
@@ -52,14 +56,37 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
         return message.getSenderId()==currentUserId;
     }
 
-    private static class HolderRight extends DataHolder<QBChatMessage> {
+    public static class MessageHolder extends DataHolder<QBChatMessage>{
+        protected ChatMessagesAdapter adapter;
+        QBAttachment attachment;
+
+        public MessageHolder(View v, BaseListAdapter<QBChatMessage> adapter) {
+            super(v, adapter);
+            this.adapter= (ChatMessagesAdapter) adapter;
+        }
+
+        @Override
+        public void showData(DataItem<QBChatMessage> model, int position) {
+
+        }
+        public void downloadAttachment(){
+            if (attachment!=null) {
+                FileDownloadService.startService(adapter.mContext, attachment);
+            }
+        }
+
+    }
+
+
+
+    public static class HolderRight extends MessageHolder {
 
         ChatMessageRightBinding binding;
-        ChatMessagesAdapter adapter;
+
         protected HolderRight(View v, ChatMessagesAdapter adapter) {
             super(v, adapter);
             binding = DataBindingUtil.bind(v);
-            this.adapter=adapter;
+            binding.setHolder(this);
         }
 
         @Override
@@ -80,22 +107,33 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 binding.text.setBackgroundResource(R.drawable.message_right_last);
                 binding.setIsLast(true);
             }
-
+            binding.setShowThumbNail(false);
             if (item.getAttachments().size()>0){
-                final QBAttachment attachment=item.getAttachments().iterator().next();
+                Iterator<QBAttachment> iterator = item.getAttachments().iterator();
+                attachment=iterator.next();
                 binding.setMessage(attachment.getName());
+                if (iterator.hasNext()) {
+                    QBAttachment thumbAttachment = iterator.next();
+                    if ( thumbAttachment.getType().equals("thumb")){
+                        binding.setMessage("");
+                        binding.setShowThumbNail(true);
+                        AvatarLoaderHelper.loadImage(Integer.parseInt(thumbAttachment.getId()),binding.thumb,300,300);
+                    }
+                }
+            }else {
+                attachment=null;
             }
         }
     }
 
-    private static class HolderLeft extends DataHolder<QBChatMessage> {
+    public static class HolderLeft extends  MessageHolder {
 
         ChatMessageLeftBinding binding;
-        ChatMessagesAdapter adapter;
+
         protected HolderLeft(View v, ChatMessagesAdapter adapter) {
             super(v, adapter);
             binding = DataBindingUtil.bind(v);
-            this.adapter=adapter;
+            binding.setHolder(this);
         }
 
         @Override
@@ -118,8 +156,25 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             }
 
             if (item.getAttachments().size()>0){
-                final QBAttachment attachment=item.getAttachments().iterator().next();
-                binding.setMessage(attachment.getName());
+                if (item.getAttachments().size()>0){
+                    Iterator<QBAttachment> iterator = item.getAttachments().iterator();
+                    attachment=iterator.next();
+                    binding.setMessage(attachment.getName());
+                    if (iterator.hasNext()) {
+                        QBAttachment thumbAttachment = iterator.next();
+                        if ( thumbAttachment.getType().equals("thumb")){
+                            binding.setMessage("");
+                            binding.setShowThumbNail(true);
+                            AvatarLoaderHelper.loadImage(Integer.parseInt(thumbAttachment.getId()),binding.thumb,300,300);
+                        }
+                    }
+                }else {
+                    attachment=null;
+                }
+
+            }else {
+                attachment=null;
+                binding.setShowThumbNail(false);
             }
 
         }

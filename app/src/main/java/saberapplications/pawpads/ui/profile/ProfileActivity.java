@@ -22,10 +22,8 @@ import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
@@ -182,26 +180,13 @@ public class ProfileActivity extends BaseActivity {
         progressMessage.set(getString(R.string.loading));
         QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
         if (chatManager == null) return;
-        chatManager.createDialog(qbUser.getId(), new QBEntityCallback<QBDialog>() {
+        Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
 
-            @Override
-            public void onSuccess(QBDialog dialog, Bundle params) {
-                Intent i = new Intent(ProfileActivity.this, ChatActivity.class);
-                i.putExtra(ChatActivity.DIALOG, dialog);
-                i.putExtra(ChatActivity.RECIPIENT, qbUser);
-                i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
-                startActivity(i);
-                finish();
-                isBusy.set(false);
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-                Util.onError(e, ProfileActivity.this);
-                isBusy.set(false);
-            }
-
-        });
+        i.putExtra(ChatActivity.RECIPIENT, qbUser);
+        i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
+        startActivity(i);
+        finish();
+        isBusy.set(false);
 
 
     }

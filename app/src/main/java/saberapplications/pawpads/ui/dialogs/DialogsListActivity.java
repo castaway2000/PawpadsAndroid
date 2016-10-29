@@ -158,7 +158,7 @@ public class DialogsListActivity extends BaseActivity implements SwipeRefreshLay
     }
 
     @Override
-    public void onQBConnect() {
+    public void onQBConnect(boolean isActivityReopened) {
         try {
         QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
 

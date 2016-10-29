@@ -14,14 +14,17 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.location.LocationListener;
 import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
+import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBMessageListener;
+import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -31,7 +34,7 @@ import java.util.Date;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
-import saberapplications.pawpads.ui.login.LoginActivity;
+import saberapplications.pawpads.ui.home.SplashActivity;
 
 
 /**
@@ -39,6 +42,7 @@ import saberapplications.pawpads.ui.login.LoginActivity;
  */
 public abstract class BaseActivity extends AppCompatActivity
         implements LocationListener {
+    private static final int RECREATE_SESSION = 2000;
     private static int openActivitiesCount = 0;
 
     protected boolean isExternalDialogOpened;
@@ -49,6 +53,28 @@ public abstract class BaseActivity extends AppCompatActivity
     //    private Location lastLocation;
     private boolean isActive;
 //    protected static QBLocation qbLocation;
+    protected boolean isReopened;
+
+    protected QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
+        @Override
+        public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
+            if (!createdLocally) {
+                qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
+                    @Override
+                    public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        onChatMessage(qbPrivateChat, qbChatMessage);
+                    }
+
+                    @Override
+                    public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
+                        Util.onError(e, BaseActivity.this);
+                    }
+
+                });
+            }
+        }
+    };
+
 
     BroadcastReceiver locationChanged = new BroadcastReceiver() {
         @Override
@@ -61,7 +87,7 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Create an instance of GoogleAPIClient.
+        isReopened=false;
 
 
     }
@@ -69,9 +95,9 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if (isLoggedIn()) {
+        if (isLoggedIn() && QBChatService.getInstance().isLoggedIn()) {
             try {
-                onQBConnect();
+                onQBConnect(isReopened);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -80,14 +106,28 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-
-        isActive = true;
         super.onStart();
+        isActive = true;
+        if (!isLoggedIn()) {
+            Intent intent = new Intent(this, SplashActivity.class);
+            intent.putExtra(C.RETURN_RESULT, true);
+            startActivityForResult(intent, RECREATE_SESSION);
+            return;
+        }
+
+        if (!QBChatService.getInstance().isLoggedIn()) {
+            loginToChat();
+            return;
+        } else {
+
+        }
+
         incrementActivityCount();
-        recreateSession();
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
+
 
     }
 
@@ -97,11 +137,12 @@ public abstract class BaseActivity extends AppCompatActivity
         isActive = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationChanged);
         decrementActivityCount();
-
+        QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+        isReopened=true;
     }
 
     public void logOutChat() {
-        if (QBChatService.isInitialized()) {
+        if (QBChatService.getInstance().isLoggedIn()) {
             try {
                 QBChatService.getInstance().logout();
 
@@ -111,95 +152,49 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
-    protected void recreateSession() {
-        if (isLoggedIn()) return;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
-                new QBEntityCallback<QBSession>() {
-                    @Override
-                    public void onSuccess(final QBSession result, Bundle params) {
-                        try {
-                            userId = result.getUserId();
-                            loginToChat();
-                            UserLocationService.startService(userId);
-                        } catch (Exception e) {
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onError(QBResponseException responseException) {
-                        startActivity(new Intent(getBaseContext(), LoginActivity.class));
-                        finish();
-                    }
-
-                });
-
-    }
 
     protected void loginToChat() {
-        if (!QBChatService.isInitialized()) {
-            QBChatService.init(getBaseContext());
-        }
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""));
         qbUser.setId(prefs.getInt(C.QB_USERID, 0));
-        if (QBChatService.getInstance().isLoggedIn()) {
-            try {
-                if (QBChatService.getInstance() != null) {
-                    QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
-                    try {
-                        QBPrivacyList list = privacyListsManager.getPrivacyList("public");
-                        if (list != null) {
-                            list.setDefaultList(true);
-                            list.setActiveList(true);
+
+        QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
+            @Override
+            public void onSuccess(Object o, Bundle bundle) {
+                QBChatService.getInstance().startAutoSendPresence(60);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
+                            try {
+                                QBPrivacyList list = privacyListsManager.getPrivacyList("public");
+                                if (list != null) {
+                                    list.setDefaultList(true);
+                                    list.setActiveList(true);
+                                }
+                                QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+                                onQBConnect(isReopened);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-
-
-                    onQBConnect();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+                });
             }
 
-        } else
-
-            QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
-                @Override
-                public void onSuccess(Object o, Bundle bundle) {
-                        QBChatService.getInstance().startAutoSendPresence(60);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    if (QBChatService.getInstance() != null) {
-                                        onQBConnect();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                }
-
-                @Override
-                public void onError(QBResponseException e) {
-                    Util.onError(e, getBaseContext());
-                }
-            } );
-        }
+            @Override
+            public void onError(QBResponseException e) {
+                Util.onError(e, getBaseContext());
+            }
+        });
+    }
 
 
-
-
-    public void onQBConnect() throws Exception {
+    public void onQBConnect(boolean isActivityReopened) throws Exception {
 
     }
 
@@ -239,15 +234,36 @@ public abstract class BaseActivity extends AppCompatActivity
         return isActive;
     }
 
-    public boolean isLoggedIn(){
+    public boolean isLoggedIn() {
         try {
-            Date expDate=QBUsers.getBaseService().getTokenExpirationDate();
-            if (expDate==null) return false;
-            return  expDate.getTime()>System.currentTimeMillis();
+            Date expDate = QBAuth.getBaseService().getTokenExpirationDate();
+            String token = QBAuth.getBaseService().getToken();
+            if (expDate == null) return false;
+            return expDate.getTime() > System.currentTimeMillis() && token != null;
         } catch (BaseServiceException e) {
             e.printStackTrace();
             return false;
         }
 
+    }
+
+    public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RECREATE_SESSION) {
+            if (resultCode == RESULT_OK) {
+                try {
+                   loginToChat();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                finish();
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.quickblox.auth.QBAuth;
@@ -27,11 +28,15 @@ import saberapplications.pawpads.ui.login.LoginActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
+    boolean returnResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
+        if (getIntent()!=null){
+            returnResult=getIntent().getBooleanExtra(C.RETURN_RESULT,false);
+        }
     }
 
     public boolean isLoggedIn() {
@@ -48,11 +53,13 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        recreateSession();
+
+        recreateSessionEmail();
     }
 
-    protected void recreateSession() {
+    protected void recreateSessionEmail() {
         if (isLoggedIn()) return;
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 
@@ -61,6 +68,8 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(final QBSession result, Bundle params) {
                         try {
+                            onSuccessLogin();
+
                             loginToChat(result.getUserId());
                         } catch (Exception e) {
 
@@ -72,10 +81,21 @@ public class SplashActivity extends AppCompatActivity {
                     public void onError(QBResponseException responseException) {
                         startActivity(new Intent(getBaseContext(), LoginActivity.class));
                         finish();
+                        LocalBroadcastManager.getInstance(SplashActivity.this).sendBroadcast(new Intent(C.CLOSE_ALL_APP_ACTIVITIES));
                     }
 
                 });
 
+    }
+
+    private void onSuccessLogin() {
+        if (returnResult){
+            setResult(RESULT_OK);
+        }else {
+            Intent intent=new Intent(this,MainActivity.class);
+            startActivity(intent);
+        }
+        finish();
     }
 
     protected void loginToChat(final int userId) {
@@ -116,12 +136,18 @@ public class SplashActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Object o, Bundle bundle) {
                             QBChatService.getInstance().startAutoSendPresence(60);
+
+
+
+
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
                                         if (QBChatService.getInstance() != null)
                                             UserLocationService.startService(userId);
+
                                         startActivity(new Intent(getBaseContext(), MainActivity.class));
                                         finish();
                                     } catch (

@@ -187,7 +187,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position == 1 && chatsFragment.adapter.getItemCount()==1) {
+                if (position == 1 && (chatsFragment.adapter==null || chatsFragment.adapter.getItemCount()==1)) {
                     chatsFragment.loadData();
                 }
             }
@@ -320,7 +320,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void onQBConnect() throws Exception {
+    public void onQBConnect(boolean isActivityReopened) throws Exception {
 //        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
         //  loadAndSetNearUsers();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

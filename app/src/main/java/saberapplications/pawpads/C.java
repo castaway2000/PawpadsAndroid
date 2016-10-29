@@ -16,4 +16,6 @@ public class C {
     public static final String MEASURE_UNIT="unit";
     public static final String QB_USERID = "qb_userid";
     public static final String QB_USER = "qb_user";
+    public static final String RETURN_RESULT = "return_result";
+    public static final String CLOSE_ALL_APP_ACTIVITIES = "close all activities";
 }

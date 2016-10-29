@@ -1,13 +1,21 @@
 package saberapplications.pawpads.ui.chat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -17,15 +25,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBMessageListener;
-import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -34,7 +43,7 @@ import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
-import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.QBProgressCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
@@ -45,6 +54,7 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -54,6 +64,8 @@ import java.util.List;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
+import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.BindableInteger;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -81,12 +93,14 @@ public class ChatActivity extends BaseActivity {
     private ArrayList<QBChatMessage> chatMessages;
     Bundle savedInstanceState;
     ActivityChatBinding binding;
+    public final BindableBoolean isSendingMessage = new BindableBoolean();
+    public final BindableInteger uploadProgress = new BindableInteger(0);
     int currentPage = 0;
     int messagesPerPage = 15;
 
-    private QBMessageListener<QBPrivateChat> messageListener = new QBMessageListener<QBPrivateChat>() {
+    private QBMessageListener messageListener=new QBMessageListener() {
         @Override
-        public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+        public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
             ChatActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -105,21 +119,11 @@ public class ChatActivity extends BaseActivity {
         }
 
         @Override
-        public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
-            Util.onError(e, ChatActivity.this);
-        }
-
-
-    };
-
-    QBPrivateChatManagerListener privateChatManagerListener = new QBPrivateChatManagerListener() {
-        @Override
-        public void chatCreated(final QBPrivateChat privateChat, final boolean createdLocally) {
-            if (!createdLocally) {
-                privateChat.addMessageListener(messageListener);
-            }
+        public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
+            Util.onError(e,ChatActivity.this);
         }
     };
+
 
     //    private QBPrivateChat chat;
     private Integer currentUserId;
@@ -156,6 +160,8 @@ public class ChatActivity extends BaseActivity {
         if (getIntent() != null) {
             if (getIntent().hasExtra(DIALOG)) {
                 dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
+            }
+            if (getIntent().hasExtra(RECIPIENT)) {
                 recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
                 isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
             }
@@ -178,7 +184,6 @@ public class ChatActivity extends BaseActivity {
         messageContainer = (LinearLayout) findViewById(R.id.message_container);
 
         sendFile = (ImageView) findViewById(R.id.imageViewSendFile);
-
 
 
     }
@@ -245,47 +250,7 @@ public class ChatActivity extends BaseActivity {
         if (resultCode == Activity.RESULT_OK) {
 
             if (requestCode == PICKFILE_REQUEST_CODE) {
-
-                Uri uri = data.getData();
-                // Get the path
-                try {
-                    final String path = getPath(this, uri);
-                    final File filePhoto = new File(path);
-                    QBContent.uploadFileTask(filePhoto, false, null, new QBEntityCallback<QBFile>() {
-                        @Override
-                        public void onSuccess(QBFile file, Bundle params) {
-
-                            // create a message
-                            QBChatMessage chatMessage = new QBChatMessage();
-                            chatMessage.setProperty("save_to_history", "1"); // Save a message to history
-
-                            // attach a photo
-                            QBAttachment attachment = new QBAttachment("photo");
-                            attachment.setId(file.getId().toString());
-                            attachment.setName(filePhoto.getName());
-                            chatMessage.addAttachment(attachment);
-                            chatMessage.setBody(filePhoto.getName());
-                            try {
-                                privateChat.sendMessage(chatMessage);
-                            } catch (SmackException.NotConnectedException e) {
-                                e.printStackTrace();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            // send a message
-                            // ...
-                        }
-
-                        @Override
-                        public void onError(QBResponseException e) {
-
-                        }
-
-
-                    });
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+                sendAttachment(data.getData());
             }
 
 
@@ -293,27 +258,23 @@ public class ChatActivity extends BaseActivity {
     }
 
     @Override
-    public void onQBConnect() {
+    public void onQBConnect(boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
         currentUserId = currentQBUser.getId();
-        if (getIntent().hasExtra(DIALOG_ID) && dialog == null) {
+        if (getIntent().hasExtra(DIALOG_ID) ) {
             loadDataById();
             return;
         }
 
-        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
-        if (dialog == null) return;
+        final QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
-        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(privateChatManagerListener);
-        QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
-
-        privateChat = privateChatManager.getChat(sendTo);
-
+        privateChat = privateChatManager.getChat(recipient.getId());
         if (privateChat == null) {
-            privateChat = privateChatManager.createChat(sendTo, messageListener);
+            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
         } else {
             privateChat.addMessageListener(messageListener);
         }
+
 
         if (chatMessages != null) return;
 
@@ -321,13 +282,14 @@ public class ChatActivity extends BaseActivity {
         new AsyncTask<Void, Void, Void>() {
 
             Exception error;
-            boolean isBlockedByMe;
-            boolean isIBlockedByOther;
+
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-
+                    if (dialog==null){
+                        dialog= privateChatManager.createDialog(recipient.getId());
+                    }
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", recipient.getId());
                     requestBuilder.eq("blocked_user", currentQBUser.getId());
@@ -369,12 +331,12 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (error!=null){
-                    Util.onError(error,ChatActivity.this);
+                if (error != null) {
+                    Util.onError(error, ChatActivity.this);
                     return;
                 }
                 chatAdapter.addItems(chatMessages);
-                if (chatMessages.size()<messagesPerPage){
+                if (chatMessages.size() < messagesPerPage) {
                     chatAdapter.disableLoadMore();
                 }
 
@@ -385,9 +347,15 @@ public class ChatActivity extends BaseActivity {
 
     private void displayChatMessage(QBChatMessage message) {
         Date dt = new Date();
-        message.setSenderId(currentQBUser.getId());
-        message.setDateSent(dt.getTime()/1000);
-        message.setAttachments(new ArrayList<QBAttachment>());
+        if (message.getSenderId()==null) {
+            message.setSenderId(currentQBUser.getId());
+        }
+        if (message.getDateSent()==0) {
+            message.setDateSent(dt.getTime() / 1000);
+        }
+        if (message.getAttachments()==null) {
+            message.setAttachments(new ArrayList<QBAttachment>());
+        }
         chatAdapter.addItem(message);
     }
 
@@ -413,12 +381,10 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    
-
 
     public static String getPath(Context context, Uri uri) throws URISyntaxException {
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = {"_data"};
+            String[] projection = {android.provider.MediaStore.Images.ImageColumns.DATA};
             Cursor cursor = null;
 
             try {
@@ -428,7 +394,7 @@ public class ChatActivity extends BaseActivity {
                     return cursor.getString(column_index);
                 }
             } catch (Exception e) {
-                // Eat it
+                e.printStackTrace();
             }
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
@@ -475,12 +441,115 @@ public class ChatActivity extends BaseActivity {
         }
     }
 
-    public void uploadFile(View view) {
+    public void sendAttachment(Uri uri) {
+        if (isSendingMessage.get()) return;
+        isSendingMessage.set(true);
+
+        // Get the path
+        try {
+            final String path = getPath(this, uri);
+            final File filePhoto = new File(path);
+            new AsyncTask<Void,Integer,QBChatMessage>(){
+                Exception exception;
+                @Override
+                protected QBChatMessage doInBackground(Void... params) {
+
+                    try {
+                        QBFile qbFile=QBContent.uploadFileTask(filePhoto,false,null, new QBProgressCallback(){
+                            @Override
+                            public void onProgressUpdate(int i) {
+                                uploadProgress.set(i);
+                            }
+                        });
+
+                        // create a message
+                        QBChatMessage chatMessage = new QBChatMessage();
+                        chatMessage.setProperty("save_to_history", "1"); // Save a message to history
+
+                        // attach a photo
+                        QBAttachment attachment = new QBAttachment("photo");
+                        attachment.setId(qbFile.getId().toString());
+                        attachment.setName(filePhoto.getName());
+                        chatMessage.addAttachment(attachment);
+                        chatMessage.setBody(filePhoto.getName());
+                        if (isImage(filePhoto)){
+                            Bitmap bitmap= BitmapFactory.decodeFile(filePhoto.getAbsolutePath());
+                            Bitmap thumb= ThumbnailUtils.extractThumbnail(bitmap,300,300);
+                            File tmp=File.createTempFile("thumb",".jpg");
+                            FileOutputStream stream=new FileOutputStream(tmp);
+                            thumb.compress(Bitmap.CompressFormat.JPEG,90,stream);
+                            stream.close();
+
+                            QBFile qbFileThumb=QBContent.uploadFileTask(tmp,false,null);
+                            QBAttachment attachmentThumb = new QBAttachment("thumb");
+                            attachmentThumb.setId(qbFileThumb.getId().toString());
+                            attachmentThumb.setName(qbFileThumb.getName());
+                            chatMessage.addAttachment(attachmentThumb);
+                        }
+
+                        privateChat.sendMessage(chatMessage);
+                        return chatMessage;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        exception=e;
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(QBChatMessage qbChatMessage) {
+                    isSendingMessage.set(false);
+                    if (exception!=null){
+                        Util.onError(exception,ChatActivity.this);
+                        return;
+                    }
+                    displayChatMessage(qbChatMessage);
+                }
+
+            } .execute();
+
+
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void selectFile() {
+        isExternalDialogOpened = true;
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    FilePickerDialog.EXTERNAL_READ_PERMISSION_GRANT);
+            return;
+        }
         isExternalDialogOpened = true;
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("file/*");
         startActivityForResult(intent, PICKFILE_REQUEST_CODE);
 
+        /*
+        DialogProperties properties=new DialogProperties();
+        properties.selection_mode= DialogConfigs.SINGLE_MODE;
+        properties.selection_type=DialogConfigs.FILE_SELECT;
+        properties.root=new File(DialogConfigs.DEFAULT_DIR);
+        properties.error_dir=new File(DialogConfigs.DEFAULT_DIR);
+        properties.extensions=null;
+        FilePickerDialog dialog = new FilePickerDialog(this,properties);
+        dialog.setTitle(getString(R.string.select_file));
+        dialog.show();
+
+        new MaterialFilePicker()
+                .withActivity(this)
+                .withRequestCode(1)
+                .withFilter(Pattern.compile(".*\\.(jpeg|jpg|png)$")) // Filtering files and directories by file name using regexp
+                .withFilterDirectories(true) // Set directories filterable (false by default)
+                .withHiddenFiles(true) // Show hidden files and folders
+                .start();
+                */
     }
 
     public void loadData() {
@@ -588,5 +657,43 @@ public class ChatActivity extends BaseActivity {
 
             }
         }.execute();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case FilePickerDialog.EXTERNAL_READ_PERMISSION_GRANT: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    selectFile();
+                }
+            }
+        }
+    }
+
+    public static boolean isImage(File file) {
+        String fileName=file.getName();
+        String ext=fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        return ext.equals("jpeg") || ext.equals("jpg") || ext.equals("png") || ext.equals("bmp");
+    }
+
+    @Override
+    public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+        if (!qbChatMessage.getDialogId().equals(dialog.getDialogId())) return;
+        ChatActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (qbChatMessage.getProperties().containsKey("blocked")) {
+                    if (qbChatMessage.getProperty("blocked").equals("1")) {
+                        onBlocked();
+                    } else if (qbChatMessage.getProperty("blocked").equals("0")) {
+                        onUnBlocked();
+                    }
+                } else {
+                    displayChatMessage(qbChatMessage);
+                }
+
+            }
+        });
     }
 }

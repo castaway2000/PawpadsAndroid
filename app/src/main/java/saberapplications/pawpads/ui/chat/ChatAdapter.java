@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.service.FileDownloadService;
 
 
 public class ChatAdapter extends ArrayAdapter<QBChatMessage> {
@@ -109,7 +108,7 @@ public class ChatAdapter extends ArrayAdapter<QBChatMessage> {
             holder.attachment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FileDownloadService.startService(context,attachment);
+
                 }
             });
         }else {

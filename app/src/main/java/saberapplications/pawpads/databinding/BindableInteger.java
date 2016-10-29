@@ -46,6 +46,14 @@ public class BindableInteger extends BaseObservable {
             return null;
         }
     }
+    @BindingConversion
+    public static int convertIntegerToInt(BindableInteger value) {
+        if (value != null && value.get()!=null)
+            return value.get().intValue();
+        else {
+            return 0;
+        }
+    }
 
     @BindingAdapter({"binding2way"})
     public static void bindEditText(EditText view,

@@ -62,9 +62,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:paddingTop="3dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             >
 
@@ -75,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 <!-- send message !-->
                 <LinearLayout
                     android:id="@+id/message_container"
@@ -94,11 +91,12 @@
                         android:id="@+id/imageViewSendFile"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:onClick="uploadFile"
+                        android:onClick="@{() -> activity.selectFile() }"
                         android:src="@drawable/paper_clip"
                         android:scaleType="fitCenter"
                         android:layout_gravity="center"
                         android:layout_marginRight="10dp"
+                        android:enabled="@{!activity.isSendingMessage.value}"
                         />
 
                     <saberapplications.pawpads.views.FontEditText
@@ -116,6 +114,7 @@
                         android:background="@drawable/chat_field_bg"
                         app:typefaceAsset="Proxima_Nova_Regular.otf"
                         style="@style/Widget.AppCompat.EditText"
+                        android:enabled="@{!activity.isSendingMessage.value}"
                         />
 
                     <saberapplications.pawpads.views.FontButton
@@ -131,6 +130,7 @@
                         android:paddingRight="8dp"
                         android:background="@drawable/chat_send_button"
                         android:onClick="@{ () -> activity.sendChatMessage()}"
+                        android:enabled="@{!activity.isSendingMessage.value}"
                         />
                 </LinearLayout>
 <!-- Blocked !-->
@@ -167,6 +167,15 @@
                         android:onClick="@{ () -> activity.unblockUser()}"
                         />
                 </FrameLayout>
+                <ProgressBar
+                    android:id="@+id/progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:max="100"
+                    android:progress="@{activity.uploadProgress}"
+                    android:visibility="@{activity.isSendingMessage}"
+                    />
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView

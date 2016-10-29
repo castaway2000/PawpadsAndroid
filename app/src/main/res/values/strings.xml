@@ -71,6 +71,7 @@
     <string name="message">Message</string>
     <string name="unblock">Unblock</string>
     <string name="unblocking">Unblocking</string>
+    <string name="select_file">Select a File</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
