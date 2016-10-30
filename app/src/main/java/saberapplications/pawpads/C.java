@@ -18,4 +18,5 @@ public class C {
     public static final String QB_USER = "qb_user";
     public static final String RETURN_RESULT = "return_result";
     public static final String CLOSE_ALL_APP_ACTIVITIES = "close all activities";
+    public static final String USER_NAME = "user_name";
 }

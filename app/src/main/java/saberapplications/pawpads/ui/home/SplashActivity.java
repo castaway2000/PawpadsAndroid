@@ -8,6 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -29,13 +30,15 @@ import saberapplications.pawpads.ui.login.LoginActivity;
 public class SplashActivity extends AppCompatActivity {
 
     boolean returnResult;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_splash);
-        if (getIntent()!=null){
-            returnResult=getIntent().getBooleanExtra(C.RETURN_RESULT,false);
+        if (getIntent() != null) {
+            returnResult = getIntent().getBooleanExtra(C.RETURN_RESULT, false);
         }
     }
 
@@ -53,50 +56,88 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        switch (prefs.getString(C.AUTH_PROVIDER,"")){
+            case C.EMAIL:
+                recreateSessionEmail();
+                break;
+            case C.FACEBOOK:
+                recreateSessionFB();
+                break;
+            case C.TWITTER:
+                recreateSessionTwitter();
+                break;
+            default:
+                onLoginFail();
 
-        recreateSessionEmail();
+        }
     }
 
     protected void recreateSessionEmail() {
         if (isLoggedIn()) return;
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        QBAuth.createSession(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""),
+        QBAuth.createSession(prefs.getString(C.QB_USER, ""), prefs.getString(C.PASSWORD, ""),
                 new QBEntityCallback<QBSession>() {
                     @Override
                     public void onSuccess(final QBSession result, Bundle params) {
-                        try {
-                            onSuccessLogin();
-
-                            loginToChat(result.getUserId());
-                        } catch (Exception e) {
-
-                        }
-
+                        onSuccessLogin();
                     }
 
                     @Override
                     public void onError(QBResponseException responseException) {
-                        startActivity(new Intent(getBaseContext(), LoginActivity.class));
-                        finish();
-                        LocalBroadcastManager.getInstance(SplashActivity.this).sendBroadcast(new Intent(C.CLOSE_ALL_APP_ACTIVITIES));
+                        onLoginFail();
                     }
 
                 });
 
     }
 
+    protected void recreateSessionFB() {
+        String fbToken = prefs.getString(C.AUTH_TOKEN, "");
+        QBUsers.signInUsingSocialProvider(QBProvider.FACEBOOK, fbToken, null, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                onSuccessLogin();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                onLoginFail();
+            }
+        });
+    }
+    private void recreateSessionTwitter(){
+        String twitterToken=prefs.getString(C.AUTH_TOKEN,"");
+        String twitterSectet=prefs.getString(C.AUTH_TOKEN_SECRET,"");
+        QBUsers.signInUsingSocialProvider(QBProvider.TWITTER, twitterToken, twitterSectet, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                onSuccessLogin();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                onLoginFail();
+            }
+        });
+    }
+
     private void onSuccessLogin() {
-        if (returnResult){
+        if (returnResult) {
             setResult(RESULT_OK);
-        }else {
-            Intent intent=new Intent(this,MainActivity.class);
+        } else {
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
         finish();
     }
+
+    private void onLoginFail() {
+        setResult(RESULT_CANCELED);
+        startActivity(new Intent(getBaseContext(), LoginActivity.class));
+        finish();
+        LocalBroadcastManager.getInstance(SplashActivity.this).sendBroadcast(new Intent(C.CLOSE_ALL_APP_ACTIVITIES));
+
+    }
+
 
     protected void loginToChat(final int userId) {
         if (!QBChatService.isInitialized()) {
@@ -122,12 +163,12 @@ public class SplashActivity extends AppCompatActivity {
                         finish();
 
                     } catch (Exception e) {
-                        Util.onError(e,this);
+                        Util.onError(e, this);
                     }
 
                 }
             } catch (Exception e) {
-                Util.onError(e,this);
+                Util.onError(e, this);
             }
 
         } else
@@ -136,9 +177,6 @@ public class SplashActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Object o, Bundle bundle) {
                             QBChatService.getInstance().startAutoSendPresence(60);
-
-
-
 
 
                             runOnUiThread(new Runnable() {
@@ -155,7 +193,7 @@ public class SplashActivity extends AppCompatActivity {
                                             )
 
                                     {
-                                        Util.onError(e,SplashActivity.this);
+                                        Util.onError(e, SplashActivity.this);
                                     }
 
                                 }

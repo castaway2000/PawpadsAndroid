@@ -29,6 +29,7 @@ import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -53,22 +54,22 @@ import saberapplications.pawpads.ui.register.RegisterActivity;
 /**
  * Created by blaze on 10/21/2015.
  */
-public class LoginActivity extends AppCompatActivity  {
+public class LoginActivity extends AppCompatActivity {
     UserLocalStore userLocalStore;
     Button bLogin;
     EditText etUsername, etPassword;
     TextView registerLink, forgotpasswordLink;
-    ImageView facebook,twitter;
+    ImageView facebook, twitter;
     private LocationManager locationManager;
     private CallbackManager callbackManager;
     private TwitterAuthClient twitterAuthClient;
-    public final ObservableBoolean isBusy=new ObservableBoolean(false);
+    public final ObservableBoolean isBusy = new ObservableBoolean(false);
     ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding= DataBindingUtil.setContentView(this,R.layout.activity_login);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.setActivity(this);
         setTitle("PawPads | Login");
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -77,7 +78,7 @@ public class LoginActivity extends AppCompatActivity  {
         bLogin = (Button) findViewById(R.id.bLogin);
         registerLink = (TextView) findViewById(R.id.tvRegisterLink);
 
-        Spanned sp = Html.fromHtml( getString(R.string.dont_have_account_register));
+        Spanned sp = Html.fromHtml(getString(R.string.dont_have_account_register));
         registerLink.setText(sp);
 
         forgotpasswordLink = (TextView) findViewById(R.id.tvForgottenPassLink);
@@ -89,13 +90,13 @@ public class LoginActivity extends AppCompatActivity  {
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
-                AsyncTask<Void,Void,Void> task=new AsyncTask<Void, Void, Void>() {
+                AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
                             QBAuth.createSession();
                             QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
-                            onSuccessLogin(user,null,loginResult.getAccessToken().getToken(),null);
+                            onSuccessLogin(user, null, loginResult.getAccessToken().getToken(), null);
                             isBusy.set(false);
                         } catch (QBResponseException e) {
                             e.printStackTrace();
@@ -119,22 +120,22 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-        if (twitterAuthClient!=null){
+        if (twitterAuthClient != null) {
             twitterAuthClient.onActivityResult(requestCode, resultCode, data);
         }
     }
-    private boolean isTwitterInstalled(){
+
+    private boolean isTwitterInstalled() {
         PackageManager pkManager = getPackageManager();
         try {
             PackageInfo pkgInfo = pkManager.getPackageInfo("com.twitter.android", 0);
             String getPkgInfo = pkgInfo.toString();
 
-            if (getPkgInfo.equals("com.twitter.android"))   {
+            if (getPkgInfo.equals("com.twitter.android")) {
                 return true;
             }
         } catch (PackageManager.NameNotFoundException e) {
@@ -144,24 +145,30 @@ public class LoginActivity extends AppCompatActivity  {
         return false;
     }
 
-    private void onSuccessLogin(QBUser user,String password,String token, String token_secret){
+    private void onSuccessLogin(QBUser user, String password, String token, String token_secret) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
-        editor.putString(Util.QB_USER, user.getLogin());
-        editor.putString(Util.USER_NAME, user.getLogin());
+        editor.putString(C.QB_USER, user.getLogin());
+        editor.putString(C.USER_NAME, user.getFullName());
         editor.putInt(C.QB_USERID, user.getId());
+        try {
 
-        if (user.getTwitterId()!=null){
-            editor.putString(C.AUTH_PROVIDER, C.TWITTER);
-            editor.putString(C.AUTH_TOKEN,token);
-            editor.putString(C.AUTH_TOKEN_SECRET,token_secret);
-        }else if (user.getFacebookId()!=null){
-            editor.putString(C.AUTH_PROVIDER, C.FACEBOOK);
-            editor.putString(C.AUTH_TOKEN,token);
-        }else{
-            editor.putString(C.AUTH_PROVIDER, C.EMAIL);
-            editor.putString(Util.QB_PASSWORD, password);
+
+            if (user.getTwitterId() != null) {
+                editor.putString(C.AUTH_PROVIDER, C.TWITTER);
+                editor.putString(C.AUTH_TOKEN, token);
+                editor.putString(C.AUTH_TOKEN_SECRET, token_secret);
+                editor.putString(C.PASSWORD, QBAuth.getBaseService().getToken());
+            } else if (user.getFacebookId() != null) {
+                editor.putString(C.AUTH_PROVIDER, C.FACEBOOK);
+                editor.putString(C.AUTH_TOKEN, token);
+                editor.putString(C.PASSWORD, QBAuth.getBaseService().getToken());
+            } else {
+                editor.putString(C.AUTH_PROVIDER, C.EMAIL);
+                editor.putString(C.PASSWORD, password);
+            }
+        } catch (BaseServiceException e) {
+            e.printStackTrace();
         }
-
         editor.apply();
         UserLocationService.startService(user.getId());
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -169,12 +176,13 @@ public class LoginActivity extends AppCompatActivity  {
         finish();
     }
 
-    public void facebookLogin(){
+    public void facebookLogin() {
         isBusy.set(true);
         LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile"));
     }
-    public void twitterLogin(){
-        if (!isTwitterInstalled()){
+
+    public void twitterLogin() {
+        if (!isTwitterInstalled()) {
             Snackbar snackbar = Snackbar
                     .make(binding.coordinatorLayout, R.string.twitter_app_required, Snackbar.LENGTH_LONG);
 
@@ -189,19 +197,20 @@ public class LoginActivity extends AppCompatActivity  {
             @Override
             public void success(final Result<TwitterSession> result) {
                 final TwitterSession sessionData = result.data;
-                AsyncTask<Void,Void,Void> task=new AsyncTask<Void, Void, Void>() {
+                AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                     Exception exception;
+
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
 
                             QBAuth.createSession();
                             QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.TWITTER, sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
-                            onSuccessLogin(user,null,sessionData.getAuthToken().token,sessionData.getAuthToken().secret);
+                            onSuccessLogin(user, null, sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
 
                         } catch (QBResponseException e) {
                             e.printStackTrace();
-                            exception=e;
+                            exception = e;
                         }
                         return null;
                     }
@@ -209,7 +218,7 @@ public class LoginActivity extends AppCompatActivity  {
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         isBusy.set(false);
-                        if (exception!=null){
+                        if (exception != null) {
                             Util.onError(exception, LoginActivity.this);
                         }
                     }
@@ -225,14 +234,14 @@ public class LoginActivity extends AppCompatActivity  {
         });
     }
 
-    public void emailLogin(){
+    public void emailLogin() {
         final String username = etUsername.getText().toString();
         final String password = etPassword.getText().toString();
-        if (username==null || username.equals("")){
+        if (username == null || username.equals("")) {
             binding.etUsername.setError(getString(R.string.login_required));
             return;
         }
-        if (password==null || password.equals("")){
+        if (password == null || password.equals("")) {
             binding.etPassword.setError(getString(R.string.password_required));
             return;
         }
@@ -249,7 +258,7 @@ public class LoginActivity extends AppCompatActivity  {
                 QBUsers.signIn(qbUser, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(final QBUser user, Bundle params) {
-                        onSuccessLogin(user,password,null,null);
+                        onSuccessLogin(user, password, null, null);
                         isBusy.set(false);
                     }
 
@@ -272,10 +281,11 @@ public class LoginActivity extends AppCompatActivity  {
         });
     }
 
-    public void register(){
+    public void register() {
         startActivity(new Intent(this, RegisterActivity.class));
     }
-    public void restorePassword(){
+
+    public void restorePassword() {
         startActivity(new Intent(this, ForgotPasswordActivity.class));
     }
 }
