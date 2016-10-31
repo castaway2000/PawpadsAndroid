@@ -80,20 +80,19 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     protected void recreateSessionEmail() {
-        if (isLoggedIn()) return;
-        QBAuth.createSession(prefs.getString(C.QB_USER, ""), prefs.getString(C.PASSWORD, ""),
-                new QBEntityCallback<QBSession>() {
-                    @Override
-                    public void onSuccess(final QBSession result, Bundle params) {
-                        onSuccessLogin();
-                    }
+        QBUser qbUser=new QBUser(prefs.getString(C.QB_USER, ""), prefs.getString(C.PASSWORD, ""));
+        QBUsers.signIn(qbUser, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                onSuccessLogin();
+            }
 
-                    @Override
-                    public void onError(QBResponseException responseException) {
-                        onLoginFail();
-                    }
+            @Override
+            public void onError(QBResponseException e) {
+                onLoginFail();
+            }
+        });
 
-                });
 
     }
 

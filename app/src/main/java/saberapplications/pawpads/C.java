@@ -19,4 +19,11 @@ public class C {
     public static final String RETURN_RESULT = "return_result";
     public static final String CLOSE_ALL_APP_ACTIVITIES = "close all activities";
     public static final String USER_NAME = "user_name";
+    public static final String ACCURACY_LOW = "low";
+    public static final String ACCURACY_MEDIUM = "medium";
+    public static final String ACCURACY_HIGH = "high";
+    public static final String ACCURACY = "accuracy";
+    public static final String RANGE = "range";
+    public static final String PUSH = "push";
+    public static final String ALERT = "alert";
 }

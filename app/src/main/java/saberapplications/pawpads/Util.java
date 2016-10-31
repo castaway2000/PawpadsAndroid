@@ -48,7 +48,7 @@ public class Util {
 
     public static int getRange() {
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
-        return defaultSharedPreferences.getInt("range_km", 60);
+        return defaultSharedPreferences.getInt(C.RANGE, 60);
     }
 
     public static void setRange(int range) {

@@ -21,8 +21,10 @@
         <item name="android:textColorPrimary">@color/accent</item>
     </style>
 
-    <style name="AppAlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+    <style name="AppAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColorPrimary">@color/title</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:windowBackground">@color/tw__transparent</item>
     </style>
     <style name="login_edit_text" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/login_bg</item>
@@ -94,5 +96,20 @@
         <item name="android:paddingBottom">10dp</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="typefaceAsset">Proxima_Nova_Regular.otf</item>
+    </style>
+
+    <style name="preferences_title">
+        <item name="typefaceAsset">Proxima_Nova_Semibold.otf</item>
+        <item name="android:textColor">#393939</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+    <style name="preferences_subtitle">
+        <item name="typefaceAsset">Proxima_Nova_Semibold.otf</item>
+        <item name="android:textColor">#393939</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="settings_edit_text" parent="profile_edit_text">
+        <item name="android:layout_marginTop">0dp</item>
     </style>
 </resources>

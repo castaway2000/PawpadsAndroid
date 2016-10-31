@@ -39,8 +39,10 @@ public class GcmIntentService extends IntentService {
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.getBoolean(C.PUSH,true);
 
-        if (Util.PUSH_NOTIFICIATIONS == true) {
+        if (preferences.getBoolean(C.PUSH,true)) {
             if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM

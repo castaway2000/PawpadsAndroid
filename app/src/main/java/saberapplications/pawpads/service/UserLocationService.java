@@ -118,7 +118,19 @@ public class UserLocationService extends Service implements
     @Override
     public void onConnected(Bundle bundle) {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(this);
+        switch (preferences.getString(C.ACCURACY,C.ACCURACY_MEDIUM)){
+            case C.ACCURACY_LOW:
+                locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+                break;
+            case C.ACCURACY_MEDIUM:
+                locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                break;
+            case C.ACCURACY_HIGH:
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                break;
+        }
+
         locationRequest.setInterval(120000);
         locationRequest.setFastestInterval(60000);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED

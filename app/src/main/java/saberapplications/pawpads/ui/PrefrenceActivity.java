@@ -6,14 +6,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.InputType;
-import android.view.View;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -26,28 +28,46 @@ import com.quickblox.users.QBUsers;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.ActivitySettingsBinding;
+import saberapplications.pawpads.databinding.BindableBoolean;
+import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
 /**
  * Created by blaze on 3/24/2016.
  */
-public class PrefrenceActivity extends BaseActivity implements View.OnClickListener {
-    private SharedPreferences defaultSharedPreferences;
+public class PrefrenceActivity extends BaseActivity{
+    private SharedPreferences preferences;
     Button removeProfile, savebtn;
     EditText dist;
     CheckBox tbMetricBox, tbImBox, tbPushBox;
     RadioGroup rbGroup;
     RadioButton rbHigh, rbMedium, rbLow, rbMI, rbKM;
-    int range, gRange, accuracy, gAccuracy;
-    public String unit, gUnit;
+
     Boolean alert, push, gAlert, gPush;
+
+    ActivitySettingsBinding binding;
+
+    public BindableString range=new BindableString();
+    public BindableString unit=new BindableString();
+    public BindableString accuracy=new BindableString();
+    public BindableBoolean pushes=new BindableBoolean();
+    public BindableBoolean popups=new BindableBoolean();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        setTitle("PawPads | Settings");
-        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
+        binding= DataBindingUtil.setContentView(this,R.layout.activity_settings);
+        binding.setActivity(this);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+        getSupportActionBar().setTitle(null);
+        TextView  textView= (TextView) findViewById(R.id.toolbar_title);
+        textView.setText(R.string.settings);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
         dist = (EditText) findViewById(R.id.etRange);
         tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
         tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
@@ -57,63 +77,80 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         rbMI = (RadioButton) findViewById(R.id.rbMI);
         rbKM = (RadioButton) findViewById(R.id.rbKM);
 
-        gAccuracy = defaultSharedPreferences.getInt("accuracy", 6);
+        accuracy.set( preferences.getString("accuracy", "medium"));
+
+        unit.set(preferences.getString(C.MEASURE_UNIT, "KM"));
+
+        range.set(String.valueOf(preferences.getInt("range", 60)));
+
+        range.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putInt(C.RANGE,Integer.parseInt(range.get()));
+                editor.apply();
+            }
+        });
+        pushes.set(preferences.getBoolean(C.PUSH, true));
+
+        pushes.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putBoolean(C.PUSH,pushes.get());
+                editor.apply();
+            }
+        });
+
+        popups.set( preferences.getBoolean(C.ALERT, true));
+
+        popups.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putBoolean(C.ALERT,popups.get());
+                editor.apply();
+            }
+        });
+
+        binding.units.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.rbKM:
+                        unit.set("KM");
+                        break;
+                    case R.id.rbMI:
+                        unit.set("MI");
+                        break;
+                }
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putString(C.MEASURE_UNIT,unit.get());
+                editor.apply();
+            }
+        });
+
+        binding.accuracy.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.rbLow:
+                        accuracy.set(C.ACCURACY_LOW);
+                        break;
+                    case R.id.rbMedium:
+                        accuracy.set(C.ACCURACY_MEDIUM);
+                        break;
+                    case R.id.rbHigh:
+                        accuracy.set(C.ACCURACY_HIGH);
+                        break;
+                }
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putString(C.ACCURACY,accuracy.get());
+                editor.apply();
+            }
+        });
 
 
-        gUnit = defaultSharedPreferences.getString("unit", "KM");
-
-
-        gRange = defaultSharedPreferences.getInt("range", 60);
-
-        dist.setText(String.valueOf(gRange));
-
-        gAlert = defaultSharedPreferences.getBoolean("alert", true);
-        gPush = defaultSharedPreferences.getBoolean("push", true);
-
-        //check box funtionality. defaults: KM, true, true;
-        if (gUnit.equals("KM")) {
-            rbMI.setChecked(false);
-            rbKM.setChecked(true);
-        } else {
-            rbKM.setChecked(false);
-            rbMI.setChecked(true);
-        }
-        if (!gPush) {
-            tbPushBox.setChecked(false);
-        } else {
-            tbPushBox.setChecked(true);
-        }
-        if (!gAlert) {
-            tbImBox.setChecked(false);
-        } else {
-            tbImBox.setChecked(true);
-        }
-        if (gAccuracy == 1) {
-            rbLow.setChecked(true);
-            rbMedium.setChecked(false);
-            rbHigh.setChecked(false);
-
-        } else if (gAccuracy == 3) {
-            rbLow.setChecked(false);
-            rbMedium.setChecked(true);
-            rbHigh.setChecked(false);
-        } else {
-            rbLow.setChecked(false);
-            rbMedium.setChecked(false);
-            rbHigh.setChecked(true);
-        }
-
-
-        savebtn = (Button) findViewById(R.id.btProfSave);
-        removeProfile = (Button) findViewById(R.id.btRmProfile);
-        savebtn.setOnClickListener(this);
-        removeProfile.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 buildRemoveAlertDialog();
-                                             }
-                                         }
-        );
         TextView appVersion = (TextView) findViewById(R.id.app_version);
         PackageInfo pInfo = null;
         try {
@@ -125,46 +162,6 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
 
     }
 
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btProfSave:
-                if (dist.getText().length() > 0) {
-                    range = Integer.valueOf(String.valueOf(dist.getText()));
-                } else {
-                    range = 60;
-                }
-
-                if (rbKM.isChecked()) {
-                    unit = "KM";
-                } else {
-                    unit = "MI";
-                }
-
-                if (tbPushBox.isChecked()) {
-                    push = true;
-                } else {
-                    push = false;
-                }
-
-                if (tbImBox.isChecked()) {
-                    alert = true;
-                } else {
-                    alert = false;
-                }
-                if (rbLow.isChecked()) {
-                    accuracy = 1;
-                } else if (rbMedium.isChecked()) {
-                    accuracy = 3;
-                } else {
-                    accuracy = 6;
-                }
-
-                saveSettings(accuracy, range, unit, alert, push);
-                break;
-        }
-    }
 
     public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
@@ -191,51 +188,51 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         Toast.makeText(getApplicationContext(), "settings saved", Toast.LENGTH_SHORT).show();
     }
 
-    private void buildRemoveAlertDialog() {
+    public void deleteUserProfile() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrefrenceActivity.this);
         alertDialog.setTitle("Remove profile");
-        alertDialog.setMessage("Enter Password");
-        final EditText input = new EditText(PrefrenceActivity.this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setPositiveButton("OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(C.PASSWORD, ""))) {
-                            QBUsers.deleteUser(defaultSharedPreferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
-
-                                @Override
-                                public void onSuccess(Object o, Bundle bundle) {
-                                    Toast.makeText(PrefrenceActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
-                                    Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
-                                    startActivity(myIntent1);
-                                    finish();
-                                }
-
-                                @Override
-                                public void onError(QBResponseException e) {
-                                    Util.onError(e, PrefrenceActivity.this);
-                                }
-
-                            });
-                        } else {
-                            Toast.makeText(PrefrenceActivity.this, "Wrong password", Toast.LENGTH_LONG).show();
-                        }
-
-
+        alertDialog.setMessage("All your data will be deleted. Are you sure?");
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                QBUsers.deleteUser(preferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
+                    @Override
+                    public void onSuccess(Object o, Bundle bundle) {
+                        Toast.makeText(PrefrenceActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
+                        Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(myIntent1);
+                        finish();
+                        LocalBroadcastManager.getInstance(PrefrenceActivity.this).sendBroadcast(new Intent(C.CLOSE_ALL_APP_ACTIVITIES));
                     }
-                });
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        Util.onError(e, PrefrenceActivity.this);
                     }
+
                 });
+
+            }
+        });
+        alertDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
         alertDialog.show();
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
+    }
 }

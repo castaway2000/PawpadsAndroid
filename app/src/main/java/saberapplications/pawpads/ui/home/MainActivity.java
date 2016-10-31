@@ -171,10 +171,10 @@ public class MainActivity extends BaseActivity {
         //listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString("unit", "MI");
+        Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString(C.MEASURE_UNIT, "MI");
         range = Util.getRange();
-        Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean("push", true);
-        Util.IM_ALERT = defaultSharedPreferences.getBoolean("alert", true);
+        Util.PUSH_NOTIFICIATIONS = defaultSharedPreferences.getBoolean(C.PUSH, true);
+        Util.IM_ALERT = defaultSharedPreferences.getBoolean(C.ALERT, true);
 
         nearByFragment = new NearByFragment();
         chatsFragment = new ChatsFragment();
@@ -197,7 +197,8 @@ public class MainActivity extends BaseActivity {
 
             }
         });
-
+        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
     }
 
     @Override
@@ -345,8 +346,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
 
         if (!isUserRegistered(context)) {
             if (checkPlayServices()) {

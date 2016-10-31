@@ -72,6 +72,20 @@
     <string name="unblock">Unblock</string>
     <string name="unblocking">Unblocking</string>
     <string name="select_file">Select a File</string>
+    <string name="distance_units">Distance Units</string>
+    <string name="settings">Settings</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="miles">Miles</string>
+    <string name="gps_accuracy">GPS Accuracy</string>
+    <string name="high">High</string>
+    <string name="medium">Medum</string>
+    <string name="low">Low</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="toggle_push_notifications">Toggle Push Notifications</string>
+    <string name="toggle_messaging_popups">Toggle Messaging Popups</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="permanently_delete_account">Permanently delete account</string>
+    <string name="delete_account">Delete account</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

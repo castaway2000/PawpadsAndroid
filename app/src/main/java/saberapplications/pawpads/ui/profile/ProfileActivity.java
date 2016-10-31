@@ -90,7 +90,7 @@ public class ProfileActivity extends BaseActivity {
 
     @Override
     public void onQBConnect(boolean isActivityReopened) throws Exception {
-
+        if (isActivityReopened) return;
         isBusy.set(true);
         new AsyncTask<Void, Void, Void>() {
             Exception e;
