@@ -27,6 +27,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivitySettingsBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
 /**
@@ -175,6 +176,10 @@ public class PrefrenceActivity extends BaseActivity{
                         startActivity(myIntent1);
                         finish();
                         LocalBroadcastManager.getInstance(PrefrenceActivity.this).sendBroadcast(new Intent(C.CLOSE_ALL_APP_ACTIVITIES));
+                        SharedPreferences.Editor editor=preferences.edit();
+                        editor.clear();
+                        editor.apply();
+                        UserLocationService.stop();
                     }
 
                     @Override

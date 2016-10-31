@@ -57,6 +57,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityMainBinding;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.PrefrenceActivity;
@@ -585,7 +586,7 @@ public class MainActivity extends BaseActivity {
         userLocalStore = new UserLocalStore(this);
         userLocalStore.clearUserData();
         userLocalStore.setUserLoggedIn(false);
-
+        UserLocationService.stop();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();

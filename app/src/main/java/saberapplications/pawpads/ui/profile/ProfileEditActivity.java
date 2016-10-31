@@ -316,7 +316,7 @@ public class ProfileEditActivity extends BaseActivity {
     }
 
     public void selectGender() {
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this,R.style.AppAlertDialogTheme)
                 .setTitle(R.string.select_gender)
                 .setItems(R.array.genders, new DialogInterface.OnClickListener() {
                     @Override

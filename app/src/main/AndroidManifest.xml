@@ -100,13 +100,18 @@
         <activity
             android:name=".ui.login.ForgotPasswordActivity"
             android:screenOrientation="portrait"
-            android:label="ForgotPass"/>
+            android:label="ForgotPass"
+            />
         <activity
             android:name=".ui.PrefrenceActivity"
-            android:label="PrefrenceActivity"/>
+            android:label="PrefrenceActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".ui.AboutActivity"
-            android:label="@string/About"/>
+            android:label="@string/About"
+            android:screenOrientation="portrait"
+            />
 
         <receiver
             android:name=".GcmBroadcastReceiver"
