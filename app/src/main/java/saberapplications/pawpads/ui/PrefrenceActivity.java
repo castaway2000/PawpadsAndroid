@@ -13,10 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,13 +34,6 @@ import saberapplications.pawpads.ui.login.LoginActivity;
  */
 public class PrefrenceActivity extends BaseActivity{
     private SharedPreferences preferences;
-    Button removeProfile, savebtn;
-    EditText dist;
-    CheckBox tbMetricBox, tbImBox, tbPushBox;
-    RadioGroup rbGroup;
-    RadioButton rbHigh, rbMedium, rbLow, rbMI, rbKM;
-
-    Boolean alert, push, gAlert, gPush;
 
     ActivitySettingsBinding binding;
 
@@ -68,14 +57,7 @@ public class PrefrenceActivity extends BaseActivity{
 
 
         preferences = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this);
-        dist = (EditText) findViewById(R.id.etRange);
-        tbPushBox = (CheckBox) findViewById(R.id.ckPushNotifications);
-        tbImBox = (CheckBox) findViewById(R.id.ckImNotification);
-        rbLow = (RadioButton) findViewById(R.id.rbLow);
-        rbMedium = (RadioButton) findViewById(R.id.rbMedium);
-        rbHigh = (RadioButton) findViewById(R.id.rbHigh);
-        rbMI = (RadioButton) findViewById(R.id.rbMI);
-        rbKM = (RadioButton) findViewById(R.id.rbKM);
+
 
         accuracy.set( preferences.getString("accuracy", "medium"));
 
@@ -87,8 +69,18 @@ public class PrefrenceActivity extends BaseActivity{
             @Override
             public void onPropertyChanged(Observable observable, int i) {
                 SharedPreferences.Editor editor=preferences.edit();
-                editor.putInt(C.RANGE,Integer.parseInt(range.get()));
+                int r=Integer.parseInt(range.get());
+                editor.putInt(C.RANGE,r);
+                if (unit.equals("MI")) {
+                    int rangeM = (int) Math.floor(r * 1.60934);
+                    editor.putInt(C.RANGE_KM, rangeM);
+                    Util.RANGE=rangeM;
+                } else {
+                    editor.putInt(C.RANGE_KM, r);
+                    Util.RANGE=r;
+                }
                 editor.apply();
+
             }
         });
         pushes.set(preferences.getBoolean(C.PUSH, true));
@@ -99,6 +91,7 @@ public class PrefrenceActivity extends BaseActivity{
                 SharedPreferences.Editor editor=preferences.edit();
                 editor.putBoolean(C.PUSH,pushes.get());
                 editor.apply();
+                Util.PUSH_NOTIFICIATIONS=pushes.get();
             }
         });
 
@@ -110,6 +103,7 @@ public class PrefrenceActivity extends BaseActivity{
                 SharedPreferences.Editor editor=preferences.edit();
                 editor.putBoolean(C.ALERT,popups.get());
                 editor.apply();
+                Util.IM_ALERT=popups.get();
             }
         });
 
@@ -127,6 +121,7 @@ public class PrefrenceActivity extends BaseActivity{
                 SharedPreferences.Editor editor=preferences.edit();
                 editor.putString(C.MEASURE_UNIT,unit.get());
                 editor.apply();
+                Util.UNIT_OF_MEASURE=unit.get();
             }
         });
 
@@ -147,6 +142,7 @@ public class PrefrenceActivity extends BaseActivity{
                 SharedPreferences.Editor editor=preferences.edit();
                 editor.putString(C.ACCURACY,accuracy.get());
                 editor.apply();
+                Util.ACCURACY=accuracy.get();
             }
         });
 
@@ -162,31 +158,6 @@ public class PrefrenceActivity extends BaseActivity{
 
     }
 
-
-    public void saveSettings(int accuracy, int range, String unit, Boolean alert, Boolean push) {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PrefrenceActivity.this).edit();
-        editor.putInt("accuracy", accuracy);
-
-        if (unit.equals("MI")) {
-            int rangeM = (int) Math.floor(range * 1.60934);
-            editor.putInt("range_km", rangeM);
-            //TODO: make this show what user input was not its modified value
-        } else {
-            editor.putInt("range_km", range);
-        }
-        editor.putInt("range", range);
-        editor.putInt("dsp_range", range);
-        editor.putString("unit", unit);
-        editor.putBoolean("alert", alert);
-        editor.putBoolean("push", push);
-        editor.apply();
-
-        Util.ACCURACY = accuracy;
-        Util.PUSH_NOTIFICIATIONS = push;
-        Util.IM_ALERT = alert;
-        Util.UNIT_OF_MEASURE = unit;
-        Toast.makeText(getApplicationContext(), "settings saved", Toast.LENGTH_SHORT).show();
-    }
 
     public void deleteUserProfile() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrefrenceActivity.this);

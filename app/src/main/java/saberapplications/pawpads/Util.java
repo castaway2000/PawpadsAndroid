@@ -39,7 +39,7 @@ public class Util {
 
     public static final String STICKERS_API_KEY = "94c58fc501b259bc84282c44cd278fdf";
 
-    public static int ACCURACY;
+    public static String ACCURACY;
     public static int RANGE;
 
     public static boolean PUSH_NOTIFICIATIONS;

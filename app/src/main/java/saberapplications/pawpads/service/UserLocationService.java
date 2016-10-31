@@ -264,11 +264,11 @@ public class UserLocationService extends Service implements
     public Double accuracySettings(Double location) {
         Double loc;
         NumberFormat formatter;
-        if (Util.ACCURACY == 3) {
+        if (Util.ACCURACY.equals(C.ACCURACY_HIGH)) {
             formatter = new DecimalFormat("#.###");
             loc = Double.valueOf(formatter.format(location));
             return loc;
-        } else if (Util.ACCURACY == 1) {
+        } else if (Util.ACCURACY.equals(C.ACCURACY_LOW)) {
             formatter = new DecimalFormat("#.#");
             loc = Double.valueOf(formatter.format(location));
             return loc;

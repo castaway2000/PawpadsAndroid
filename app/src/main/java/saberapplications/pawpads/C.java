@@ -26,4 +26,5 @@ public class C {
     public static final String RANGE = "range";
     public static final String PUSH = "push";
     public static final String ALERT = "alert";
+    public static final String RANGE_KM = "range_km";
 }
