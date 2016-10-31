@@ -27,7 +27,6 @@ import com.quickblox.location.request.QBLocationRequestBuilder;
 import com.quickblox.location.request.SortField;
 import com.quickblox.location.request.SortOrder;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -264,13 +263,15 @@ public class UserLocationService extends Service implements
     public Double accuracySettings(Double location) {
         Double loc;
         NumberFormat formatter;
+        if (Util.ACCURACY==null){
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            Util.ACCURACY=prefs.getString(C.ACCURACY,C.ACCURACY_MEDIUM);
+        }
         if (Util.ACCURACY.equals(C.ACCURACY_HIGH)) {
-            formatter = new DecimalFormat("#.###");
-            loc = Double.valueOf(formatter.format(location));
+            loc = (double)Math.round(location * 1000) / 1000;
             return loc;
         } else if (Util.ACCURACY.equals(C.ACCURACY_LOW)) {
-            formatter = new DecimalFormat("#.#");
-            loc = Double.valueOf(formatter.format(location));
+            loc = (double)Math.round(location * 10) / 10;
             return loc;
         } else {
             return location;

@@ -84,12 +84,25 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     };
 
+    BroadcastReceiver closeActivity = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isReopened=false;
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                closeActivity, new IntentFilter(C.CLOSE_ALL_APP_ACTIVITIES)
+        );
+    }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(closeActivity);
     }
 
     @Override
@@ -124,6 +137,9 @@ public abstract class BaseActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
+
+
+
 
 
         if (!QBChatService.getInstance().isLoggedIn()) {
