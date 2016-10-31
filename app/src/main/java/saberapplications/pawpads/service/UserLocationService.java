@@ -50,7 +50,7 @@ public class UserLocationService extends Service implements
     private static Location lastLocation;
     private QBLocation qbLocation;
     private int userId;
-    public static boolean isRunning;
+    private static boolean mIsRunning;
 
     public UserLocationService() {
 
@@ -71,7 +71,7 @@ public class UserLocationService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
-        isRunning=true;
+        mIsRunning = true;
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -84,10 +84,10 @@ public class UserLocationService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null && userId==0) {
+        if (intent == null && userId == 0) {
             stopSelf();
         }
-        if (intent==null) {
+        if (intent == null) {
             stopSelf();
             return START_STICKY;
         }
@@ -102,7 +102,7 @@ public class UserLocationService extends Service implements
 
     @Override
     public void onDestroy() {
-        isRunning=false;
+        mIsRunning = false;
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -145,6 +145,7 @@ public class UserLocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
+        lastLocation = location;
         updateLocationAsync(location);
     }
 
@@ -183,7 +184,7 @@ public class UserLocationService extends Service implements
             stopSelf();
             return;
         }
-        lastLocation = location;
+
         qbLocation.setLatitude(accuracySettings(location.getLatitude()));
         qbLocation.setLongitude(accuracySettings(location.getLongitude()));
 
@@ -264,5 +265,8 @@ public class UserLocationService extends Service implements
         }
     }
 
+    public static boolean isRunning() {
+        return mIsRunning;
+    }
 
 }

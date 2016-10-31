@@ -84,13 +84,20 @@ public class ProfileActivity extends BaseActivity {
         interAd = new InterstitialAd(this);
         interAd.setAdUnitId(Util.AD_UNIT_ID);
 
+
+
+    }
+
+    @Override
+    public void onQBConnect(boolean isActivityReopened) throws Exception {
+
         isBusy.set(true);
         new AsyncTask<Void, Void, Void>() {
             Exception e;
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                 //   qbUser = QBUsers.getUser(getIntent().getExtras().getInt(C.QB_USERID, -1));
+                    //   qbUser = QBUsers.getUser(getIntent().getExtras().getInt(C.QB_USERID, -1));
                     if(currentQBUser==null) {
                         currentQBUser = QBUsers.getUser(PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this).getInt(C.QB_USERID, -1));
                     }
@@ -150,7 +157,7 @@ public class ProfileActivity extends BaseActivity {
                 }
                 float density=getResources().getDisplayMetrics().density;
                 if (profile.getGender().equals("M")){
-                    Drawable drawable=ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon);
+                    Drawable drawable= ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon);
                     drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
                     binding.age.setCompoundDrawables(drawable
                             ,null,null,null);
@@ -164,8 +171,6 @@ public class ProfileActivity extends BaseActivity {
                 setBlockedUI(isBlockedByMe.get());
             }
         }.execute();
-
-
     }
 
     public void displayInterAd() {

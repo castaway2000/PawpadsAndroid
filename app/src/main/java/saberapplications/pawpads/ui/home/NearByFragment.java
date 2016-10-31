@@ -91,6 +91,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         if (lastListUpdatedLocation.distanceTo(location) > 20 && lastListUpdatedLocation.distanceTo(location) < 100) {
             adapter.setLocation(location);
         } else if (lastListUpdatedLocation.distanceTo(location) > 100) {
+            adapter.clear();
             loadData();
         }
     }
@@ -114,6 +115,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         });
         adapter.setCallback(this);
         progressMessage.set(getString(R.string.obtaining_location));
+        if (UserLocationService.getLastLocation()!=null){
+            loadData();
+        }
         return view;
     }
 

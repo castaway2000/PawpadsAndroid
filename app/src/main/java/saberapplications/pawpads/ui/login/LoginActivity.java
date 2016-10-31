@@ -47,7 +47,6 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityLoginBinding;
-import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.register.RegisterActivity;
 
@@ -170,7 +169,6 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         editor.apply();
-        UserLocationService.startService(user.getId());
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();

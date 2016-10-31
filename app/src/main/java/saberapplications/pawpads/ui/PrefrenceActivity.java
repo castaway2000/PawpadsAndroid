@@ -205,7 +205,7 @@ public class PrefrenceActivity extends BaseActivity implements View.OnClickListe
         alertDialog.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(Util.QB_PASSWORD, ""))) {
+                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(defaultSharedPreferences.getString(C.PASSWORD, ""))) {
                             QBUsers.deleteUser(defaultSharedPreferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
 
                                 @Override

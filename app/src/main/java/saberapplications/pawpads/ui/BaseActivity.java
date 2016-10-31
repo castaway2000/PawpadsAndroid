@@ -114,12 +114,9 @@ public abstract class BaseActivity extends AppCompatActivity
             startActivityForResult(intent, RECREATE_SESSION);
             return;
         }
-
-        if (!QBChatService.getInstance().isLoggedIn()) {
-            loginToChat();
-            return;
-        } else {
-
+        if (!UserLocationService.isRunning()){
+            SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(this);
+            UserLocationService.startService(preferences.getInt(C.QB_USERID,0));
         }
 
         incrementActivityCount();
@@ -127,6 +124,18 @@ public abstract class BaseActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
+
+
+        if (!QBChatService.getInstance().isLoggedIn()) {
+            loginToChat();
+            return;
+        } else {
+            QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+        }
+
+
+
+
 
 
     }
@@ -155,9 +164,13 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected void loginToChat() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final QBUser qbUser = new QBUser(prefs.getString(Util.QB_USER, ""), prefs.getString(Util.QB_PASSWORD, ""));
+        final QBUser qbUser = new QBUser();
         qbUser.setId(prefs.getInt(C.QB_USERID, 0));
-
+        try {
+            qbUser.setPassword(QBAuth.getBaseService().getToken());
+        } catch (BaseServiceException e) {
+            e.printStackTrace();
+        }
         QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
             @Override
             public void onSuccess(Object o, Bundle bundle) {
@@ -173,12 +186,11 @@ public abstract class BaseActivity extends AppCompatActivity
                                     list.setDefaultList(true);
                                     list.setActiveList(true);
                                 }
-                                QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-                                onQBConnect(isReopened);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-
+                            QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+                            onQBConnect(isReopened);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

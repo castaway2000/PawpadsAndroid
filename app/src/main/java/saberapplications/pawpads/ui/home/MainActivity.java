@@ -332,9 +332,10 @@ public class MainActivity extends BaseActivity {
                     float d = getResources().getDisplayMetrics().density;
                     int size = Math.round(d * 80);
                     AvatarLoaderHelper.loadImage(user.getFileId(), binding.currentUserAvatar, size, size);
-                    binding.setUsername(Util.getUserName(user));
-                    currentQBUser=user;
                 }
+                binding.setUsername(Util.getUserName(user));
+                currentQBUser=user;
+
 
             }
 

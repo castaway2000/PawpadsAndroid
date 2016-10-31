@@ -222,7 +222,7 @@ public class ChatActivity extends BaseActivity {
 
                 if (result) {
                     init();
-                    onQBConnect();
+                    //onQBConnect();
                 } else {
                     finish();
                 }
