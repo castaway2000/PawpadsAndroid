@@ -75,8 +75,8 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     public void loadData(){
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-        requestBuilder.setLimit(8);
-        requestBuilder.setSkip(currentPage*8);
+        requestBuilder.setLimit(10);
+        requestBuilder.setSkip(currentPage*10);
         requestBuilder.sortDesc("last_message_date_sent");
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
@@ -84,7 +84,9 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                 if(dialogs.size()>0){
                     adapter.addItems(dialogs);
                     currentPage++;
-                }else {
+                }
+
+                if ( dialogs.size()==0 || dialogs.size()<10) {
                     adapter.disableLoadMore();
                 }
                 binding.swipelayout.setRefreshing(false);
