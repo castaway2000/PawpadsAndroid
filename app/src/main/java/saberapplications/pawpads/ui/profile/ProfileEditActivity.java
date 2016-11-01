@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.View;
@@ -254,6 +255,7 @@ public class ProfileEditActivity extends BaseActivity {
                         profile.setGender("F");
                     }
 
+                    boolean userImagesChanged=false;
 
                     if (backgoundImagePath!=null) {
                         if (profile.getBackgroundId()>0){
@@ -271,6 +273,7 @@ public class ProfileEditActivity extends BaseActivity {
                         file.delete();
                         bg.recycle();
                         backgoundImagePath=null;
+                        userImagesChanged=true;
                     }
 
                     if (avatarImagePath!=null) {
@@ -288,9 +291,14 @@ public class ProfileEditActivity extends BaseActivity {
                         file.delete();
                         avatar.recycle();
                         avatarImagePath=null;
+
+                        userImagesChanged=true;
                     }
                     currentQbUser.setCustomData(gson.toJson(profile));
                     QBUsers.updateUser(currentQbUser);
+                    if (userImagesChanged){
+                        LocalBroadcastManager.getInstance(ProfileEditActivity.this).sendBroadcast(new Intent(C.USER_DATA_CHANGED));
+                    }
                     return true;
                 }catch (Exception e) {
                     this.e=e;

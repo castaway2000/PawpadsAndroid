@@ -165,7 +165,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                     getLocationsBuilder.setLastOnly();
                     // radius in kilometers
                     getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.getRange() );
-                    getLocationsBuilder.setPerPage(8);
+                    getLocationsBuilder.setPerPage(10);
                     getLocationsBuilder.setPage(currentPage);
                     getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
                     ArrayList<QBLocation> locations = QBLocations.getLocations(getLocationsBuilder, out);
@@ -205,7 +205,8 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             protected void onPostExecute(List<NearByAdapter.NearByItem> nearByItems) {
                 if (nearByItems != null && nearByItems.size()>0) {
                     adapter.addItems(nearByItems);
-                }else {
+                }
+                if (nearByItems==null || nearByItems.size()==0 || nearByItems.size()<10){
                     adapter.disableLoadMore();
                 }
 

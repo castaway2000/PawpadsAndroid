@@ -1,9 +1,11 @@
 package saberapplications.pawpads.ui.home;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -16,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -57,6 +60,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityMainBinding;
+import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
@@ -87,6 +91,16 @@ public class MainActivity extends BaseActivity {
     private Location lastListUpdatedLocation;
     public GPS gps;
 
+    BroadcastReceiver userDataChanged=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                onQBConnect(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
     private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
         @Override
         public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
@@ -200,6 +214,7 @@ public class MainActivity extends BaseActivity {
         });
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
+        LocalBroadcastManager.getInstance(this).registerReceiver(userDataChanged,new IntentFilter(C.USER_DATA_CHANGED));
     }
 
     @Override
@@ -312,13 +327,19 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
+        super.onStop();
         if (QBChatService.isInitialized()) {
             if (QBChatService.getInstance() != null && QBChatService.getInstance().getPrivateChatManager() != null && chatListener != null) {
                 QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
             }
         }
-        super.onStop();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChanged);
     }
 
     @Override
@@ -330,10 +351,15 @@ public class MainActivity extends BaseActivity {
         QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser user, Bundle bundle) {
+                float d = getResources().getDisplayMetrics().density;
                 if (user.getFileId() != null) {
-                    float d = getResources().getDisplayMetrics().density;
+
                     int size = Math.round(d * 80);
                     AvatarLoaderHelper.loadImage(user.getFileId(), binding.currentUserAvatar, size, size);
+                }
+                UserProfile profile=UserProfile.createFromJson(user.getCustomData());
+                if (profile.getBackgroundId()>0){
+                    AvatarLoaderHelper.loadImage(profile.getBackgroundId(), binding.userBg, binding.userBg.getWidth(),binding.userBg.getHeight());
                 }
                 binding.setUsername(Util.getUserName(user));
                 currentQBUser=user;

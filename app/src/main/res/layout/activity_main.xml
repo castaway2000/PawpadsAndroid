@@ -79,6 +79,7 @@
             android:clickable="true">
 
             <ImageView
+                android:id="@+id/user_bg"
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
                 android:scaleType="centerCrop"
@@ -86,26 +87,27 @@
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/current_user_avatar"
+                android:src="@drawable/user_placeholder"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:scaleType="fitCenter"
                 app:riv_border_color="#333333"
-                app:riv_mutate_background="true"
                 app:riv_oval="true"
-                app:riv_tile_mode="repeat" />
+                 />
 
             <saberapplications.pawpads.views.FontTextView
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/current_user_avatar"
+
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_alignBottom="@id/user_bg"
+                android:layout_marginBottom="10dp"
                 android:text="@{username}"
                 android:textColor="@color/accent"
-                android:textSize="30sp"
+                android:textSize="28sp"
                 app:typefaceAsset="Proxima_Nova_Semibold.otf" />
 
             <saberapplications.pawpads.views.FontTextView
