@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -56,6 +57,7 @@ public class UserLocationService extends Service implements
     }
 
     public static void startService(int userId) {
+        if (!checkPermissions()) return;
         Intent intent = new Intent(PawPadsApplication.getInstance(), UserLocationService.class);
         intent.putExtra(USERID, userId);
         PawPadsApplication.getInstance().startService(intent);
@@ -280,6 +282,18 @@ public class UserLocationService extends Service implements
 
     public static boolean isRunning() {
         return mIsRunning;
+    }
+
+    private static boolean checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(PawPadsApplication.getInstance(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(PawPadsApplication.getInstance(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+
+        }
+
+        return true;
     }
 
 }

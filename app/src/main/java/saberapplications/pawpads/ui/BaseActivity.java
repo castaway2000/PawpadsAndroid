@@ -55,6 +55,7 @@ public abstract class BaseActivity extends AppCompatActivity
 //    protected static QBLocation qbLocation;
     protected boolean isReopened;
 
+    protected SharedPreferences preferences;
     protected QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
         @Override
         public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
@@ -94,6 +95,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isReopened=false;
+        preferences=PreferenceManager.getDefaultSharedPreferences(this);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 closeActivity, new IntentFilter(C.CLOSE_ALL_APP_ACTIVITIES)
         );

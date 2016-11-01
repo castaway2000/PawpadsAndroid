@@ -1,5 +1,6 @@
 package saberapplications.pawpads.ui.home;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -74,6 +76,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 public class MainActivity extends BaseActivity {
 
+    private static final int PERMISSION_REQUEST = 100;
     String TAG = "MAIN";
     GoogleCloudMessaging gcm;
     SharedPreferences prefs;
@@ -215,6 +218,7 @@ public class MainActivity extends BaseActivity {
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChanged,new IntentFilter(C.USER_DATA_CHANGED));
+        checkPermissions();
     }
 
     @Override
@@ -518,10 +522,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case GPS.PermissionRequestId:
+            case PERMISSION_REQUEST:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // TODO continue processing
                     android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
+                    UserLocationService.startService(preferences.getInt(C.QB_USERID,0));
                 } else {
                     // TODO stop login
                     android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
@@ -621,6 +626,24 @@ public class MainActivity extends BaseActivity {
         finish();
 
     }
+
+
+    private boolean checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST);
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+
+
+
+
 
 }
 
