@@ -1,59 +1,69 @@
 package saberapplications.pawpads.ui;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
-import android.widget.TextView;
 
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.Util;
+import saberapplications.pawpads.databinding.AboutViewBinding;
 
 /**
  * Created by blaze on 2/25/2016.
  */
-public class AboutActivity extends AppCompatActivity implements View.OnClickListener {
-    TextView riverbreak, blazecollie, blazecollieTwitter, feedback, versionNum;
+public class AboutActivity extends AppCompatActivity {
+
     Intent browserIntent;
-    String versionName;
+    AboutViewBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.about_view);
-        setTitle("PawPads | About");
-        blazecollie = (TextView) findViewById(R.id.tvBlazeFA);
-        blazecollieTwitter = (TextView) findViewById(R.id.tvBlazeTwitter);
-        riverbreak = (TextView) findViewById(R.id.tvRiverbreakFA);
-        versionNum = (TextView) findViewById(R.id.tvVersionNumber);
+        binding=DataBindingUtil.setContentView(this,R.layout.about_view);
+        binding.setActivity(this);
+        PackageInfo pInfo;
 
-        feedback = (TextView) findViewById(R.id.tvFeedback);
-        feedback.setText(Html.fromHtml("<a href=\"mailto:szablya@gmail.com\">Send Feedback</a>"));
-        feedback.setMovementMethod(LinkMovementMethod.getInstance());
-        versionNum.setText(Util.APP_VERSION);
-        blazecollie.setOnClickListener(this);
-        blazecollieTwitter.setOnClickListener(this);
-        riverbreak.setOnClickListener(this);
-    }
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            binding.setVersion(getString(R.string.version) +" " + pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tvBlazeFA:
-                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blazecollie.getText().toString()));
-                startActivity(browserIntent);
-                break;
-            case R.id.tvBlazeTwitter:
-                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blazecollieTwitter.getText().toString()));
-                startActivity(browserIntent);
-                break;
-            case R.id.tvRiverbreakFA:
-                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(riverbreak.getText().toString()));
-                startActivity(browserIntent);
-                break;
         }
+
+        binding.tvBlazeFA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.furaffinity.net/user/blaze-collie"));
+                startActivity(browserIntent);
+            }
+        });
+        binding.tvBlazeTwitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/blazecollie"));
+                startActivity(browserIntent);
+
+            }
+        });
+
+        binding.iconDesign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.furaffinity.net/user/riverbreak"));
+                startActivity(browserIntent);
+            }
+        });
+
     }
+
+    public void sendFeedback(){
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto","szablya@gmail.com", null));
+        startActivity(Intent.createChooser(emailIntent, getString(R.string.send_email)));
+    }
+
 }

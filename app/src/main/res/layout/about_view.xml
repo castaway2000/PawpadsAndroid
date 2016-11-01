@@ -1,149 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#97159cc6"
-    android:orientation="vertical">
+<layout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Lead Dev and Project Manager:"
-        android:id="@+id/textView"
-        android:paddingTop="5dp"
-        android:paddingLeft="5dp" />
+    <data>
 
-    <LinearLayout
-        android:orientation="vertical"
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.AboutActivity" />
+
+        <variable
+            name="version"
+            type="String" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/primary"
+        android:orientation="vertical">
 
-        <TextView
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Blazecollie"
-            android:id="@+id/textView2"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp" />
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/app_name"
+            android:textSize="40sp"
+            app:typefaceAsset="Bellota_BoldItalic.otf" />
 
-        <TextView
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="http://www.furaffinity.net/user/blaze-collie"
-            android:id="@+id/tvBlazeFA"
-            android:paddingLeft="20dp"
-            android:clickable="true" />
+            android:layout_gravity="center"
+            android:text="@{version}"
+            android:textColor="#64ffffff"
+            android:textSize="20sp"
+            app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
-        <TextView
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/lead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="https://twitter.com/blazecollie"
-            android:id="@+id/tvBlazeTwitter"
-            android:paddingTop="10dp"
-            android:paddingLeft="20dp"
-            android:clickable="true" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Lead Project Manager:\n Blazecollie"
+            android:textColor="@color/accent"
+            android:textSize="18sp"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:layout_marginTop="40dp"
+            />
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="1">
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="207dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Icon designed by:"
-                android:id="@+id/textView3"
-                android:paddingTop="20dp"
-                android:paddingLeft="5dp" />
-
-            <TextView
+            <ImageView
+                android:id="@+id/tvBlazeFA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Riverbreak"
-                android:id="@+id/textView4"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp" />
+                android:layout_gravity="center"
+                android:layout_marginRight="40dp"
+                android:clickable="true"
+                android:src="@drawable/fa_logo" />
 
-            <TextView
+            <ImageView
+                android:id="@+id/tvBlazeTwitter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="http://www.furaffinity.net/user/riverbreak"
-                android:id="@+id/tvRiverbreakFA"
-                android:paddingLeft="20dp"
-                android:clickable="true" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Questions about ad space? Feedback? bug report?"
-                    android:id="@+id/tvFeedbackTitle"
-                    android:gravity="bottom|center"
-                    android:layout_gravity="top" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="1"
-                android:layout_weight="0.14">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/tvVersionNumber"
-                    android:text="version name"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_above="@+id/textView7"
-                    android:gravity="bottom"
-                    android:layout_gravity="center_horizontal" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="send blaze a messege"
-                    android:id="@+id/tvFeedback"
-                    android:layout_gravity="top"
-                    android:gravity="top|center" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="171dp"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="PawPads is copyright 2016 \nby Saber Applications Inc.\nsaberapplications.com"
-                    android:id="@+id/textView7"
-                    android:gravity="center"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_gravity="bottom|center_vertical" />
-            </LinearLayout>
-
+                android:clickable="true"
+                android:src="@drawable/twitter_square_logo" />
         </LinearLayout>
 
+        <saberapplications.pawpads.views.FontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Icon design: Riverbreak"
+            android:textColor="@color/accent"
+            android:textSize="18sp"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:layout_marginTop="40dp"/>
+
+        <ImageView
+            android:layout_marginTop="20dp"
+            android:id="@+id/iconDesign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/fa_logo" />
+
+
+        <saberapplications.pawpads.views.FontButton
+            android:layout_marginTop="60dp"
+            android:id="@+id/feedback"
+            style="@style/transparent_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:onClick="@{ () -> activity.sendFeedback()}"
+            android:text="@string/send_feedback" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            >
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#64ffffff"
+                android:text="© 2016 PawPads"
+                android:textSize="16sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="Privacy Policy"
+                android:textSize="16sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                />
+
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+
+</layout>

@@ -86,6 +86,8 @@
     <string name="account_settings">Account Settings</string>
     <string name="permanently_delete_account">Permanently delete account</string>
     <string name="delete_account">Delete account</string>
+    <string name="send_feedback">Send feedback</string>
+    <string name="send_email">Send email...</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
