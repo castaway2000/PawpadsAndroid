@@ -32,8 +32,8 @@ public class Util {
 //    public static final String QB_AUTH_KEY="w8YNQSmstbNJ6AJ";
 //    public static final String QB_AUTH_SECRET="ckSWjeEkjgNpdJ-";
     public static final String QB_APPID = "35252";
-    public static final String QB_AUTH_KEY = "GHHUHJMGTcGN8EY";
-    public static final String QB_AUTH_SECRET = "NNSa7QQZDUzRvpB";
+    public static final String QB_AUTH_KEY = "gb4f7kN3FLgap9A";
+    public static final String QB_AUTH_SECRET = "sszVLheuYags2ZQ";
     public static final String QB_ACCOUNT_KEY = "S6mqpsBsKxfbSqZxGY4X";
 
 

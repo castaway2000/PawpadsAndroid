@@ -2,13 +2,13 @@ package saberapplications.pawpads.ui.register;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,33 +16,26 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import java.util.List;
-
-import saberapplications.pawpads.GPS;
 import saberapplications.pawpads.GetUserCallback;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.ServerRequests;
 import saberapplications.pawpads.User;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityRegisterBinding;
-import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 
 
@@ -75,6 +68,7 @@ public class RegisterActivity extends AppCompatActivity
         binding.etRegPasswordChk.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                hideSoftKeyboard();
                 if (actionId== EditorInfo.IME_ACTION_DONE){
                     register();
                     return true;
@@ -93,6 +87,13 @@ public class RegisterActivity extends AppCompatActivity
         }
 
 
+    }
+    protected void  hideSoftKeyboard(){
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -227,10 +228,8 @@ public class RegisterActivity extends AppCompatActivity
 
     }
 
-    public void showSnack(int textId) {
-        Snackbar snackbar = Snackbar
-                .make(binding.coordinatorLayout, textId, Snackbar.LENGTH_LONG);
-        snackbar.show();
+    public void showNotification(int textId) {
+        Toast.makeText(this,textId,Toast.LENGTH_LONG).show();
     }
 
 
@@ -258,15 +257,15 @@ public class RegisterActivity extends AppCompatActivity
         if (fieldsEmpty) return;
 
         if (!Util.isEmailValid(email.get())) {
-            showSnack(R.string.wrong_email_format);
+            showNotification(R.string.wrong_email_format);
             return;
         }
         if (password.get().length() < 8) {
-            showSnack(R.string.password_to_short);
+            showNotification(R.string.password_to_short);
             return;
         }
         if (!password.equals(passwordConfirmation)) {
-            showSnack(R.string.password_not_match);
+            showNotification(R.string.password_not_match);
         }
 
         User user = new User(username.get(), password.get(), email.get(), Util.GCMREGID);

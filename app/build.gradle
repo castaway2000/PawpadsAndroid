@@ -76,7 +76,7 @@ dependencies {
     compile 'com.quickblox:quickblox-android-sdk-location:2.6.1'
     compile 'com.quickblox:quickblox-android-sdk-content:2.6.1'
     compile 'com.quickblox:quickblox-android-sdk-customobjects:2.6.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta2'
     compile 'com.android.support:design:23.4.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:gridlayout-v7:23.4.0'
