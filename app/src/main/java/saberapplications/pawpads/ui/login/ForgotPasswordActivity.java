@@ -4,15 +4,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
@@ -47,7 +50,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.password_recovery);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        binding.etEmail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                hideSoftKeyboard();
+                if (actionId== EditorInfo.IME_ACTION_DONE){
+                    recover();
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
 
@@ -85,7 +98,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }
 
         if (!Util.isEmailValid(email.get())) {
-            showSnack(R.string.wrong_email_format);
+            showNotification(R.string.wrong_email_format);
             return;
         }
         isBusy.set(true);
@@ -96,7 +109,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid, Bundle bundle) {
                         isBusy.set(false);
-                        new AlertDialog.Builder(ForgotPasswordActivity.this)
+                        new AlertDialog.Builder(ForgotPasswordActivity.this,R.style.AppAlertDialogTheme)
                                 .setMessage("if you entered your email correctly you should receive an email shortly")
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
@@ -127,10 +140,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
 
     }
-    public void showSnack(int textId) {
-        Snackbar snackbar = Snackbar
-                .make(binding.coordinatorLayout, textId, Snackbar.LENGTH_LONG);
-        snackbar.show();
+    public void showNotification(int textId) {
+        Toast.makeText(this,textId,Toast.LENGTH_LONG).show();
     }
     private void hideSoftKeyboard(){
         View view = this.getCurrentFocus();
