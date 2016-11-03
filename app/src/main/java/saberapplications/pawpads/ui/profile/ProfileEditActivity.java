@@ -242,7 +242,7 @@ public class ProfileEditActivity extends BaseActivity {
             protected Boolean doInBackground(Void... params) {
                 try{
 
-                    if (age.get() != null) {
+                    if (age.get() != null && !age.get().equals("")) {
                         profile.setAge(Integer.parseInt(age.get()));
                     }
                     profile.setAbout(about.get());
