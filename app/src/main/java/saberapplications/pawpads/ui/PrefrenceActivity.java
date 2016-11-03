@@ -171,7 +171,7 @@ public class PrefrenceActivity extends BaseActivity{
                 QBUsers.deleteUser(preferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
                     @Override
                     public void onSuccess(Object o, Bundle bundle) {
-                        Toast.makeText(PrefrenceActivity.this, "Remove profile successfully", Toast.LENGTH_LONG).show();
+                        Toast.makeText(PrefrenceActivity.this, R.string.profile_was_removed, Toast.LENGTH_LONG).show();
                         Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(myIntent1);
                         finish();

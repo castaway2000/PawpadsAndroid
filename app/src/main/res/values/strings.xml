@@ -90,6 +90,7 @@
     <string name="send_email">Send email...</string>
     <string name="full_name_too_short">Full name is too short</string>
     <string name="age_range_check">Age should be in range between 15 and 100</string>
+    <string name="profile_was_removed">Profile was removed successfully</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

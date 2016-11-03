@@ -290,7 +290,7 @@ public class ProfileEditActivity extends BaseActivity {
                         file.delete();
                         bg.recycle();
                         backgoundImagePath = null;
-                        userImagesChanged = true;
+
                     }
 
                     if (avatarImagePath != null) {
@@ -313,13 +313,13 @@ public class ProfileEditActivity extends BaseActivity {
                         avatar.recycle();
                         avatarImagePath = null;
 
-                        userImagesChanged = true;
+
                     }
                     currentQbUser.setCustomData(gson.toJson(profile));
                     QBUsers.updateUser(currentQbUser);
-                    if (userImagesChanged) {
-                        LocalBroadcastManager.getInstance(ProfileEditActivity.this).sendBroadcast(new Intent(C.USER_DATA_CHANGED));
-                    }
+
+                    LocalBroadcastManager.getInstance(ProfileEditActivity.this).sendBroadcast(new Intent(C.USER_DATA_CHANGED));
+
                     return true;
                 } catch (Exception e) {
                     this.e = e;
