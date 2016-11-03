@@ -123,4 +123,27 @@ public abstract class BaseChatAdapter<T> extends BaseListAdapter<T> {
         isBusy = false;
         notifyDataSetChanged();
     }
+
+    public void addItemsToStart(List<T> items) {
+        int pos=0;
+        for (T item : items) {
+            DataItem<T> dataItem = new DataItem<>();
+            dataItem.model.set(item);
+            this.items.add(pos,dataItem);
+            pos++;
+        }
+        isBusy = false;
+        notifyDataSetChanged();
+    }
+
+    public void alignToPageSize(int messagesPerPage,int pageCount) {
+        int sizeExpected=messagesPerPage*pageCount;
+        if (items.size()>sizeExpected){
+            for (int i=0;i<(items.size()-sizeExpected);i++){
+                items.remove(items.size()-1);
+            }
+        }
+        notifyDataSetChanged();
+
+    }
 }

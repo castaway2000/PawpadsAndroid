@@ -27,6 +27,7 @@ public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+    private SharedPreferences preferences;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -39,41 +40,40 @@ public class GcmIntentService extends IntentService {
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
-        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(this);
-        preferences.getBoolean(C.PUSH,true);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (preferences.getBoolean(C.PUSH,true)) {
-            if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+
+        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM
              * will be extended in the future with new message types, just ignore
              * any message types you're not interested in, or that you don't
              * recognize.
              */
-                if (GoogleCloudMessaging.
-                        MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                    sendNotification("Send error: " + extras.toString());
-                } else if (GoogleCloudMessaging.
-                        MESSAGE_TYPE_DELETED.equals(messageType)) {
-                    sendNotification("Deleted messages on server: " +
-                            extras.toString());
-                    // If it's a regular GCM message, do some work.
-                } else if (GoogleCloudMessaging.
-                        MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            if (GoogleCloudMessaging.
+                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+                sendNotification("Send error: " + extras.toString());
+            } else if (GoogleCloudMessaging.
+                    MESSAGE_TYPE_DELETED.equals(messageType)) {
+                sendNotification("Deleted messages on server: " +
+                        extras.toString());
+                // If it's a regular GCM message, do some work.
+            } else if (GoogleCloudMessaging.
+                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
-                    String recieved_message = intent.getStringExtra("message");
-                    Intent sendIntent = new Intent("message_recieved");
-                    sendIntent.putExtra("message", recieved_message);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
-                    if (intent.hasExtra("dialog_id") && intent.hasExtra("user_id")) {
-                        sendNotificationChat(intent);
-                    } else {
-                        sendNotification(recieved_message);
-                    }
-
+                String recieved_message = intent.getStringExtra("message");
+                Intent sendIntent = new Intent("message_recieved");
+                sendIntent.putExtra("message", recieved_message);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
+                if (intent.hasExtra("dialog_id") && intent.hasExtra("user_id")) {
+                    sendNotificationChat(intent);
+                } else {
+                    sendNotification(recieved_message);
                 }
+
             }
         }
+
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
@@ -111,7 +111,7 @@ public class GcmIntentService extends IntentService {
         String stringJSON = sharedPreferences.getString(C.BLOCKED_USERS_IDS, "");
         if (!stringJSON.isEmpty()) {
             JsonParser parser = new JsonParser();
-            JsonArray array  = parser.parse(stringJSON).getAsJsonArray();
+            JsonArray array = parser.parse(stringJSON).getAsJsonArray();
             ArrayList<String> stringsIds = new ArrayList<>();
             for (JsonElement jsonElement : array) {
                 stringsIds.add(jsonElement.getAsString());
@@ -120,28 +120,34 @@ public class GcmIntentService extends IntentService {
         }
 
         if (!isBlocked) {
-            mNotificationManager = (NotificationManager)
-                    GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
-            Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
-            chatIntent.putExtra(ChatActivity.RECIPIENT_ID, userId);
-            chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
-            PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
-                    chatIntent, 0);
+            Intent broadcastIntent = new Intent(C.UPDATE_CHAT);
+            broadcastIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(C.UPDATE_CHAT));
 
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pplogo);
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(GcmIntentService.this)
-                            .setSmallIcon(R.drawable.pplogo)
-                            .setLargeIcon(bitmap)
-                            .setAutoCancel(true)
-                            .setContentTitle("PawPads")
-                            .setStyle(new NotificationCompat.BigTextStyle()
-                                    .bigText(msg))
-                            .setContentText(msg);
+            if (preferences.getBoolean(C.PUSH, true)) {
+                mNotificationManager = (NotificationManager)
+                        GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+                Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
+                chatIntent.putExtra(ChatActivity.RECIPIENT_ID, userId);
+                chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
 
-            mBuilder.setContentIntent(contentIntent);
-            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            //10672731
+                PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
+                        chatIntent, 0);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pplogo);
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(GcmIntentService.this)
+                                .setSmallIcon(R.drawable.pplogo)
+                                .setLargeIcon(bitmap)
+                                .setAutoCancel(true)
+                                .setContentTitle("PawPads")
+                                .setStyle(new NotificationCompat.BigTextStyle()
+                                        .bigText(msg))
+                                .setContentText(msg);
+
+                mBuilder.setContentIntent(contentIntent);
+                mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                //10672731
+            }
         }
     }
 }

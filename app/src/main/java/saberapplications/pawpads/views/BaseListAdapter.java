@@ -267,4 +267,12 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     public void setShowInitialLoad(boolean showInitialLoad) {
         this.showInitialLoad = showInitialLoad;
     }
+    public List<T> getItems(){
+        ArrayList<T> out=new ArrayList<>();
+        for (DataItem<T> item:items
+        ){
+            out.add(item.model.get());
+        }
+        return out;
+    }
 }

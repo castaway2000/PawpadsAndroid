@@ -164,7 +164,9 @@ public abstract class BaseActivity extends AppCompatActivity
         isActive = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationChanged);
         decrementActivityCount();
-        QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+        if (QBChatService.getInstance().getPrivateChatManager()!=null){
+            QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+        }
         isReopened=true;
     }
 
@@ -253,7 +255,11 @@ public abstract class BaseActivity extends AppCompatActivity
                     UserLocationService.stop();
                 }
             }
-        }, 500);
+        }, getWaitBeforeLogoffTime());
+    }
+
+    protected long getWaitBeforeLogoffTime() {
+        return 500;
     }
 
     public Integer getUserId() {

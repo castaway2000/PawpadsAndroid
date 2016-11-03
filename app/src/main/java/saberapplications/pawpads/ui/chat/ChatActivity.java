@@ -2,8 +2,10 @@ package saberapplications.pawpads.ui.chat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -60,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
@@ -88,15 +92,27 @@ public class ChatActivity extends BaseActivity {
     private ChatMessagesAdapter chatAdapter;
     private FrameLayout blockedContainer;
     private LinearLayout messageContainer;
-    private ArrayList<QBChatMessage> chatMessages;
+
     Bundle savedInstanceState;
     ActivityChatBinding binding;
     public final BindableBoolean isSendingMessage = new BindableBoolean();
     public final BindableInteger uploadProgress = new BindableInteger(0);
+    public final BindableBoolean isBusy = new BindableBoolean(false);
     int currentPage = 0;
     int messagesPerPage = 15;
+    long paused;
+    boolean gotMessagesInOffline = false;
 
-    private QBMessageListener messageListener=new QBMessageListener() {
+    BroadcastReceiver updateChatReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (dialog.getDialogId().equals(intent.getStringExtra(DIALOG_ID))) {
+                gotMessagesInOffline = true;
+            }
+        }
+    };
+
+    private QBMessageListener messageListener = new QBMessageListener() {
         @Override
         public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
             ChatActivity.this.runOnUiThread(new Runnable() {
@@ -118,7 +134,7 @@ public class ChatActivity extends BaseActivity {
 
         @Override
         public void processError(QBChat qbChat, QBChatException e, QBChatMessage qbChatMessage) {
-            Util.onError(e,ChatActivity.this);
+            Util.onError(e, ChatActivity.this);
         }
     };
 
@@ -158,11 +174,16 @@ public class ChatActivity extends BaseActivity {
             dialog = (QBDialog) savedInstanceState.get(DIALOG);
             recipient = (QBUser) savedInstanceState.get(RECIPIENT);
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
+            if (savedInstanceState.containsKey("chat")) {
+                String json = savedInstanceState.getString("chat");
+                Gson gson = new Gson();
+                Type listType = new TypeToken<ArrayList<QBChatMessage>>() {
+                }.getType();
+            }
         }
 
 
-
-        if (recipient != null && dialog != null) {
+        if (recipient != null) {
             init();
         }
         this.savedInstanceState = savedInstanceState;
@@ -173,9 +194,9 @@ public class ChatActivity extends BaseActivity {
         blockedContainer = (FrameLayout) findViewById(R.id.block_container);
         messageContainer = (LinearLayout) findViewById(R.id.message_container);
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateChatReciever, new IntentFilter(C.UPDATE_CHAT));
 
     }
-
 
 
     private void init() {
@@ -210,6 +231,7 @@ public class ChatActivity extends BaseActivity {
     @Override
     public void onQBConnect(final boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
+        isBusy.set(true);
         currentUserId = currentQBUser.getId();
 
         final QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
@@ -219,19 +241,19 @@ public class ChatActivity extends BaseActivity {
         new AsyncTask<Void, Void, Void>() {
 
             Exception error;
-
+            private ArrayList<QBChatMessage> chatMessages;
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
 
-                    if (getIntent() != null) {
+                    if (getIntent() != null && !isActivityReopened) {
                         if (getIntent().hasExtra(RECIPIENT)) {
                             recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
                             isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
                         }
-                        if (recipient==null && getIntent().hasExtra(RECIPIENT_ID)) {
-                            recipient= QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID,0));
+                        if (recipient == null && getIntent().hasExtra(RECIPIENT_ID)) {
+                            recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
                         }
                         privateChat = privateChatManager.getChat(recipient.getId());
                         if (privateChat == null) {
@@ -239,12 +261,12 @@ public class ChatActivity extends BaseActivity {
                         } else {
                             privateChat.addMessageListener(messageListener);
                         }
-
+                        init();
 
                         if (getIntent().hasExtra(DIALOG)) {
                             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
                         }
-                        if (dialog==null && getIntent().hasExtra(DIALOG_ID)){
+                        if (dialog == null && getIntent().hasExtra(DIALOG_ID)) {
                             QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                             requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
                             //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
@@ -253,43 +275,40 @@ public class ChatActivity extends BaseActivity {
                             ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
                             dialog = dialogs.get(0);
                         }
-
                     }
 
-                    init();
 
-                    if (dialog==null){
-                        dialog= privateChatManager.createDialog(recipient.getId());
+                    if (dialog == null) {
+                        dialog = privateChatManager.createDialog(recipient.getId());
                     }
+
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", recipient.getId());
                     requestBuilder.eq("blocked_user", currentQBUser.getId());
-
                     ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-
                     binding.setIsBlockedByOther(blocks.size() > 0);
 
-                    requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("source_user", currentQBUser.getId());
-                    requestBuilder.eq("blocked_user", recipient.getId());
+                    if (!isActivityReopened) {
+                        requestBuilder = new QBRequestGetBuilder();
+                        requestBuilder.eq("source_user", currentQBUser.getId());
+                        requestBuilder.eq("blocked_user", recipient.getId());
 
-                    blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    binding.setIsBlockedByMe(blocks.size() > 0);
+                        blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
+                        binding.setIsBlockedByMe(blocks.size() > 0);
+                    }
 
 
-                    requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.setLimit(messagesPerPage);
-                    requestBuilder.sortDesc("date_sent");
-
-                    if (savedInstanceState != null && savedInstanceState.containsKey("chat")) {
-                        String json = savedInstanceState.getString("chat");
-                        Gson gson = new Gson();
-                        Type listType = new TypeToken<ArrayList<QBChatMessage>>() {
-                        }.getType();
-                        chatMessages = gson.fromJson(json, listType);
-                    } else if (!isActivityReopened){
+                    if (!isActivityReopened) {
+                        requestBuilder = new QBRequestGetBuilder();
+                        requestBuilder.setLimit(messagesPerPage);
+                        requestBuilder.sortDesc("date_sent");
                         chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
                         currentPage++;
+                    } else if (gotMessagesInOffline) {
+                        requestBuilder = new QBRequestGetBuilder();
+                        requestBuilder.addRule("date_sent", ">", String.valueOf(paused));
+                        requestBuilder.sortDesc("date_sent");
+                        chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
                     }
 
 
@@ -302,13 +321,20 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
                     return;
                 }
-                chatAdapter.addItems(chatMessages);
-                if (chatMessages.size() < messagesPerPage) {
-                    chatAdapter.disableLoadMore();
+                if (!isActivityReopened) {
+                    chatAdapter.addItems(chatMessages);
+                    if (chatMessages.size() < messagesPerPage) {
+                        chatAdapter.disableLoadMore();
+                    }
+                } else if (gotMessagesInOffline) {
+                    chatAdapter.addItemsToStart(chatMessages);
+                    chatAdapter.alignToPageSize(messagesPerPage, currentPage);
+                    gotMessagesInOffline = false;
                 }
 
 
@@ -319,13 +345,13 @@ public class ChatActivity extends BaseActivity {
 
     private void displayChatMessage(QBChatMessage message) {
         Date dt = new Date();
-        if (message.getSenderId()==null) {
+        if (message.getSenderId() == null) {
             message.setSenderId(currentQBUser.getId());
         }
-        if (message.getDateSent()==0) {
+        if (message.getDateSent() == 0) {
             message.setDateSent(dt.getTime() / 1000);
         }
-        if (message.getAttachments()==null) {
+        if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
         chatAdapter.addItem(message);
@@ -334,6 +360,7 @@ public class ChatActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateChatReciever);
 
     }
 
@@ -343,16 +370,14 @@ public class ChatActivity extends BaseActivity {
         outState.putSerializable(DIALOG, dialog);
         outState.putSerializable(RECIPIENT, recipient);
         outState.putInt(CURRENT_USER_ID, currentUserId);
-        Gson gson = new Gson();
-        outState.putSerializable("chat", gson.toJson(chatMessages));
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
+    protected void onStop() {
+        super.onStop();
+        paused = System.currentTimeMillis();
+        isBusy.set(true);
     }
-
 
     public static String getPath(Context context, Uri uri) throws URISyntaxException {
         if ("content".equalsIgnoreCase(uri.getScheme())) {
@@ -383,11 +408,14 @@ public class ChatActivity extends BaseActivity {
 
     private void onUnBlocked() {
         Toast.makeText(this, getString(R.string.text_you_unblocked), Toast.LENGTH_LONG).show();
-        messageContainer.setVisibility(View.VISIBLE);
-        blockedContainer.setVisibility(View.GONE);
+        binding.setIsBlockedByOther(false);
     }
 
     public void sendChatMessage() {
+        if (isBusy.get()) {
+            Toast.makeText(this,"Please wait until connection to server restored",Toast.LENGTH_LONG).show();
+            return;
+        }
         // send chat message to server
         if (!editText_chat_message.getText().toString().equals("")) {
             QBChatMessage msg = new QBChatMessage();
@@ -421,13 +449,14 @@ public class ChatActivity extends BaseActivity {
         try {
             final String path = getPath(this, uri);
             final File filePhoto = new File(path);
-            new AsyncTask<Void,Integer,QBChatMessage>(){
+            new AsyncTask<Void, Integer, QBChatMessage>() {
                 Exception exception;
+
                 @Override
                 protected QBChatMessage doInBackground(Void... params) {
 
                     try {
-                        QBFile qbFile=QBContent.uploadFileTask(filePhoto,false,null, new QBProgressCallback(){
+                        QBFile qbFile = QBContent.uploadFileTask(filePhoto, false, null, new QBProgressCallback() {
                             @Override
                             public void onProgressUpdate(int i) {
                                 uploadProgress.set(i);
@@ -444,15 +473,15 @@ public class ChatActivity extends BaseActivity {
                         attachment.setName(filePhoto.getName());
                         chatMessage.addAttachment(attachment);
                         chatMessage.setBody(filePhoto.getName());
-                        if (isImage(filePhoto)){
-                            Bitmap bitmap= BitmapFactory.decodeFile(filePhoto.getAbsolutePath());
-                            Bitmap thumb= ThumbnailUtils.extractThumbnail(bitmap,300,300);
-                            File tmp=File.createTempFile("thumb",".jpg");
-                            FileOutputStream stream=new FileOutputStream(tmp);
-                            thumb.compress(Bitmap.CompressFormat.JPEG,90,stream);
+                        if (isImage(filePhoto)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(filePhoto.getAbsolutePath());
+                            Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
+                            File tmp = File.createTempFile("thumb", ".jpg");
+                            FileOutputStream stream = new FileOutputStream(tmp);
+                            thumb.compress(Bitmap.CompressFormat.JPEG, 90, stream);
                             stream.close();
 
-                            QBFile qbFileThumb=QBContent.uploadFileTask(tmp,false,null);
+                            QBFile qbFileThumb = QBContent.uploadFileTask(tmp, false, null);
                             QBAttachment attachmentThumb = new QBAttachment("thumb");
                             attachmentThumb.setId(qbFileThumb.getId().toString());
                             attachmentThumb.setName(qbFileThumb.getName());
@@ -463,7 +492,7 @@ public class ChatActivity extends BaseActivity {
                         return chatMessage;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        exception=e;
+                        exception = e;
                     }
                     return null;
                 }
@@ -471,15 +500,14 @@ public class ChatActivity extends BaseActivity {
                 @Override
                 protected void onPostExecute(QBChatMessage qbChatMessage) {
                     isSendingMessage.set(false);
-                    if (exception!=null){
-                        Util.onError(exception,ChatActivity.this);
+                    if (exception != null) {
+                        Util.onError(exception, ChatActivity.this);
                         return;
                     }
                     displayChatMessage(qbChatMessage);
                 }
 
-            } .execute();
-
+            }.execute();
 
 
         } catch (URISyntaxException e) {
@@ -503,25 +531,7 @@ public class ChatActivity extends BaseActivity {
         intent.setType("file/*");
         startActivityForResult(intent, PICKFILE_REQUEST_CODE);
 
-        /*
-        DialogProperties properties=new DialogProperties();
-        properties.selection_mode= DialogConfigs.SINGLE_MODE;
-        properties.selection_type=DialogConfigs.FILE_SELECT;
-        properties.root=new File(DialogConfigs.DEFAULT_DIR);
-        properties.error_dir=new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions=null;
-        FilePickerDialog dialog = new FilePickerDialog(this,properties);
-        dialog.setTitle(getString(R.string.select_file));
-        dialog.show();
 
-        new MaterialFilePicker()
-                .withActivity(this)
-                .withRequestCode(1)
-                .withFilter(Pattern.compile(".*\\.(jpeg|jpg|png)$")) // Filtering files and directories by file name using regexp
-                .withFilterDirectories(true) // Set directories filterable (false by default)
-                .withHiddenFiles(true) // Show hidden files and folders
-                .start();
-                */
     }
 
     public void loadData() {
@@ -644,8 +654,8 @@ public class ChatActivity extends BaseActivity {
     }
 
     public static boolean isImage(File file) {
-        String fileName=file.getName();
-        String ext=fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        String fileName = file.getName();
+        String ext = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         return ext.equals("jpeg") || ext.equals("jpg") || ext.equals("png") || ext.equals("bmp");
     }
 
@@ -668,4 +678,6 @@ public class ChatActivity extends BaseActivity {
             }
         });
     }
+
+
 }

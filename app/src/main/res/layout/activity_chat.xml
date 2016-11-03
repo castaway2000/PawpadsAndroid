@@ -131,7 +131,7 @@
                         android:paddingRight="8dp"
                         android:background="@drawable/chat_send_button"
                         android:onClick="@{ () -> activity.sendChatMessage()}"
-                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:enabled="@{!activity.isSendingMessage.value &amp;&amp; !activity.isBusy.value}"
                         />
                 </LinearLayout>
 <!-- Blocked !-->

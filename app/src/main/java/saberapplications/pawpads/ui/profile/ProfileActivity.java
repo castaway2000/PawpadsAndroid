@@ -326,8 +326,8 @@ public class ProfileActivity extends BaseActivity {
             protected Boolean doInBackground(Void... params) {
                 try {
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("source_user", qbUser.getId());
-                    requestBuilder.eq("blocked_user", currentQBUser.getId());
+                    requestBuilder.eq("source_user", currentQBUser.getId());
+                    requestBuilder.eq("blocked_user", qbUser.getId());
 
                     ArrayList<QBCustomObject> blockedList = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
                     for (QBCustomObject item : blockedList) {
