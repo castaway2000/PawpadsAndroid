@@ -226,6 +226,13 @@ public class ProfileEditActivity extends BaseActivity {
             Toast.makeText(this, R.string.full_name_too_short,Toast.LENGTH_LONG).show();
             return;
         }
+        if (age.get()!=null && !age.get().equals("")){
+            int ageInt=Integer.parseInt(age.get());
+            if (ageInt<=14 || ageInt>100){
+                Toast.makeText(this, R.string.age_range_check,Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
 
         progressMessage.set(getString(R.string.saving));
         isBusy.set(true);
