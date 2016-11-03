@@ -266,6 +266,7 @@ public class RegisterActivity extends AppCompatActivity
         }
         if (!password.equals(passwordConfirmation)) {
             showNotification(R.string.password_not_match);
+            return;
         }
 
         User user = new User(username.get(), password.get(), email.get(), Util.GCMREGID);
