@@ -222,6 +222,11 @@ public class ProfileEditActivity extends BaseActivity {
 
     public void save() {
         if (isBusy.get()) return;
+        if (fullName.get().length()<3){
+            Toast.makeText(this, R.string.full_name_too_short,Toast.LENGTH_LONG).show();
+            return;
+        }
+
         progressMessage.set(getString(R.string.saving));
         isBusy.set(true);
 
