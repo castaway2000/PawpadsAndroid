@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -89,7 +88,6 @@ public class ChatActivity extends BaseActivity {
     private ChatMessagesAdapter chatAdapter;
     private FrameLayout blockedContainer;
     private LinearLayout messageContainer;
-    private ImageView sendFile;
     private ArrayList<QBChatMessage> chatMessages;
     Bundle savedInstanceState;
     ActivityChatBinding binding;
@@ -127,7 +125,6 @@ public class ChatActivity extends BaseActivity {
 
     //    private QBPrivateChat chat;
     private Integer currentUserId;
-    private int sendTo;
 
     private QBPrivateChat privateChat;
 
@@ -157,20 +154,13 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
-        if (getIntent() != null) {
-            if (getIntent().hasExtra(DIALOG)) {
-                dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
-            }
-            if (getIntent().hasExtra(RECIPIENT)) {
-                recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
-                isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
-            }
-        } else if (savedInstanceState != null) {
+        if (savedInstanceState != null) {
             dialog = (QBDialog) savedInstanceState.get(DIALOG);
             recipient = (QBUser) savedInstanceState.get(RECIPIENT);
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
         }
-        binding.setUsername(Util.getUserName(recipient));
+
+
 
         if (recipient != null && dialog != null) {
             init();
@@ -183,64 +173,24 @@ public class ChatActivity extends BaseActivity {
         blockedContainer = (FrameLayout) findViewById(R.id.block_container);
         messageContainer = (LinearLayout) findViewById(R.id.message_container);
 
-        sendFile = (ImageView) findViewById(R.id.imageViewSendFile);
-
 
     }
 
-    private void loadDataById() {
-        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                try {
-                    QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
-                    //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
 
-                    Bundle bundle = new Bundle();
-                    ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
-                    dialog = dialogs.get(0);
-                    Integer recipientId = 0;
-                    for (Integer uid : dialog.getOccupants()) {
-                        if (uid != currentUserId) {
-                            recipientId = uid;
-                        }
-
-                    }
-
-                    recipient = QBUsers.getUser(recipientId);
-
-                } catch (QBResponseException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-
-                if (result) {
-                    init();
-                    //onQBConnect();
-                } else {
-                    finish();
-                }
-
-            }
-        };
-        task.execute();
-
-    }
 
     private void init() {
-        sendTo = recipient.getId();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (recipient.getFileId() != null) {
+                    float d = getResources().getDisplayMetrics().density;
+                    int size = Math.round(80 * d);
+                    AvatarLoaderHelper.loadImage(recipient.getFileId(), binding.recipientAvatar, size, size);
+                }
+                binding.setUsername(Util.getUserName(recipient));
+            }
+        });
 
-        if (recipient.getFileId() != null) {
-            float d = getResources().getDisplayMetrics().density;
-            int size = Math.round(80 * d);
-            AvatarLoaderHelper.loadImage(recipient.getFileId(), binding.recipientAvatar, size, size);
-        }
     }
 
     @Override
@@ -258,25 +208,12 @@ public class ChatActivity extends BaseActivity {
     }
 
     @Override
-    public void onQBConnect(boolean isActivityReopened) {
+    public void onQBConnect(final boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
         currentUserId = currentQBUser.getId();
-        if (getIntent().hasExtra(DIALOG_ID) ) {
-            loadDataById();
-            return;
-        }
 
         final QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
-        privateChat = privateChatManager.getChat(recipient.getId());
-        if (privateChat == null) {
-            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
-        } else {
-            privateChat.addMessageListener(messageListener);
-        }
-
-
-        if (chatMessages != null) return;
 
         // Detect blocked state
         new AsyncTask<Void, Void, Void>() {
@@ -287,6 +224,40 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+
+                    if (getIntent() != null) {
+                        if (getIntent().hasExtra(RECIPIENT)) {
+                            recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
+                            isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
+                        }
+                        if (recipient==null && getIntent().hasExtra(RECIPIENT_ID)) {
+                            recipient= QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID,0));
+                        }
+                        privateChat = privateChatManager.getChat(recipient.getId());
+                        if (privateChat == null) {
+                            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
+                        } else {
+                            privateChat.addMessageListener(messageListener);
+                        }
+
+
+                        if (getIntent().hasExtra(DIALOG)) {
+                            dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
+                        }
+                        if (dialog==null && getIntent().hasExtra(DIALOG_ID)){
+                            QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+                            requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
+                            //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
+
+                            Bundle bundle = new Bundle();
+                            ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
+                            dialog = dialogs.get(0);
+                        }
+
+                    }
+
+                    init();
+
                     if (dialog==null){
                         dialog= privateChatManager.createDialog(recipient.getId());
                     }
@@ -316,7 +287,7 @@ public class ChatActivity extends BaseActivity {
                         Type listType = new TypeToken<ArrayList<QBChatMessage>>() {
                         }.getType();
                         chatMessages = gson.fromJson(json, listType);
-                    } else {
+                    } else if (!isActivityReopened){
                         chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
                         currentPage++;
                     }
@@ -339,6 +310,7 @@ public class ChatActivity extends BaseActivity {
                 if (chatMessages.size() < messagesPerPage) {
                     chatAdapter.disableLoadMore();
                 }
+
 
             }
         }.execute();
@@ -424,7 +396,7 @@ public class ChatActivity extends BaseActivity {
             //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
 
             msg.setProperty("save_to_history", "1");
-            msg.setRecipientId(sendTo);
+            msg.setRecipientId(recipient.getId());
             msg.setDialogId(dialog.getDialogId());
             msg.setProperty("send_to_chat", "1");
 

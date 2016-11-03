@@ -53,7 +53,8 @@
                         app:riv_oval="true"
                         android:layout_marginRight="16dp"
                         android:layout_alignParentRight="true"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/user_placeholder"/>
                 </RelativeLayout>
             </android.support.v7.widget.Toolbar>
 
