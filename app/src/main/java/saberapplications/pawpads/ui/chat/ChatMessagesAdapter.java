@@ -116,6 +116,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                     QBAttachment thumbAttachment = iterator.next();
                     if ( thumbAttachment.getType().equals("thumb")){
                         binding.setMessage("");
+                        binding.thumb.setImageBitmap(null);
                         binding.setShowThumbNail(true);
                         AvatarLoaderHelper.loadImage(Integer.parseInt(thumbAttachment.getId()),binding.thumb,300,300);
                     }

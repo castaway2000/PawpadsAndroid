@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,7 +57,6 @@ import org.jivesoftware.smack.SmackException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,6 +69,7 @@ import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 
@@ -379,26 +378,7 @@ public class ChatActivity extends BaseActivity {
         isBusy.set(true);
     }
 
-    public static String getPath(Context context, Uri uri) throws URISyntaxException {
-        if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = {android.provider.MediaStore.Images.ImageColumns.DATA};
-            Cursor cursor = null;
 
-            try {
-                cursor = context.getContentResolver().query(uri, projection, null, null, null);
-                int column_index = cursor.getColumnIndexOrThrow("_data");
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-
-        return null;
-    }
 
     private void onBlocked() {
         Toast.makeText(this, getString(R.string.text_you_blocked), Toast.LENGTH_LONG).show();
@@ -446,8 +426,8 @@ public class ChatActivity extends BaseActivity {
         isSendingMessage.set(true);
 
         // Get the path
-        try {
-            final String path = getPath(this, uri);
+
+            final String path = FileUtil.getPath(this, uri);
             final File filePhoto = new File(path);
             new AsyncTask<Void, Integer, QBChatMessage>() {
                 Exception exception;
@@ -486,6 +466,7 @@ public class ChatActivity extends BaseActivity {
                             attachmentThumb.setId(qbFileThumb.getId().toString());
                             attachmentThumb.setName(qbFileThumb.getName());
                             chatMessage.addAttachment(attachmentThumb);
+                            bitmap.recycle();
                         }
 
                         privateChat.sendMessage(chatMessage);
@@ -510,9 +491,7 @@ public class ChatActivity extends BaseActivity {
             }.execute();
 
 
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+
 
     }
 
@@ -528,7 +507,7 @@ public class ChatActivity extends BaseActivity {
         }
         isExternalDialogOpened = true;
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("file/*");
+        intent.setType("*/*");
         startActivityForResult(intent, PICKFILE_REQUEST_CODE);
 
 
