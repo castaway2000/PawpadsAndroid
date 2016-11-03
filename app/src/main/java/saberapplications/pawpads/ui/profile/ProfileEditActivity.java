@@ -62,7 +62,7 @@ public class ProfileEditActivity extends BaseActivity {
 
     private Runnable timeOutRunnable;
     public final BindableBoolean isBusy = new BindableBoolean();
-    public final BindableString progressMessage=new BindableString();
+    public final BindableString progressMessage = new BindableString();
 
     private ProfileEditpageBinding binding;
     public final BindableString fullName = new BindableString();
@@ -82,7 +82,6 @@ public class ProfileEditActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
-
 
 
         genders = getResources().getStringArray(R.array.genders);
@@ -139,7 +138,7 @@ public class ProfileEditActivity extends BaseActivity {
                 } else {
                     isBusy.set(false);
                 }
-                if (profile.getBackgroundId()>0){
+                if (profile.getBackgroundId() > 0) {
                     AvatarLoaderHelper.loadImage(profile.getBackgroundId(), binding.userBackground,
                             binding.userBackground.getWidth(), binding.userBackground.getHeight()
                             , new AvatarLoaderHelper.Callback() {
@@ -171,7 +170,7 @@ public class ProfileEditActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_IMAGE) {
                 Uri selectedImageUri = data.getData();
@@ -212,6 +211,7 @@ public class ProfileEditActivity extends BaseActivity {
         intent.setType("image/*");
         startActivityForResult(intent, SELECT_IMAGE);
     }
+
     public void changeProfileBackgound() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -238,9 +238,10 @@ public class ProfileEditActivity extends BaseActivity {
 
         AsyncTask<Void, View, Boolean> saveTask = new AsyncTask<Void, View, Boolean>() {
             Exception e;
+
             @Override
             protected Boolean doInBackground(Void... params) {
-                try{
+                try {
 
                     if (age.get() != null && !age.get().equals("")) {
                         profile.setAge(Integer.parseInt(age.get()));
@@ -255,76 +256,84 @@ public class ProfileEditActivity extends BaseActivity {
                         profile.setGender("F");
                     }
 
-                    boolean userImagesChanged=false;
+                    boolean userImagesChanged = false;
 
-                    if (backgoundImagePath!=null) {
-                        if (profile.getBackgroundId()>0){
-                            QBContent.deleteFile(profile.getBackgroundId());
+                    if (backgoundImagePath != null) {
+                        if (profile.getBackgroundId() > 0) {
+                            try {
+                                QBContent.deleteFile(profile.getBackgroundId());
+                            } catch (Exception e) {
+
+                            }
                         }
-                        Bitmap bg =  MediaStore.Images.Media.getBitmap(getContentResolver(),backgoundImagePath);
+                        Bitmap bg = MediaStore.Images.Media.getBitmap(getContentResolver(), backgoundImagePath);
                         bg = ThumbnailUtils.extractThumbnail(bg, 1080, 540);
                         final File file = File.createTempFile("avatar_bg", ".jpg", getCacheDir());
                         FileOutputStream out = new FileOutputStream(file);
                         bg.compress(Bitmap.CompressFormat.JPEG, 90, out);
                         out.close();
-                        QBFile qbFile=QBContent.uploadFileTask(file, false, file.getAbsolutePath());
+                        QBFile qbFile = QBContent.uploadFileTask(file, false, file.getAbsolutePath());
 
                         profile.setBackgroundId(qbFile.getId());
                         file.delete();
                         bg.recycle();
-                        backgoundImagePath=null;
-                        userImagesChanged=true;
+                        backgoundImagePath = null;
+                        userImagesChanged = true;
                     }
 
-                    if (avatarImagePath!=null) {
-                        if (currentQbUser.getFileId()>0){
-                            QBContent.deleteFile(currentQbUser.getFileId());
+                    if (avatarImagePath != null) {
+                        if (currentQbUser.getFileId()!=null && currentQbUser.getFileId() > 0) {
+                            try {
+                                QBContent.deleteFile(currentQbUser.getFileId());
+                            } catch (Exception e) {
+
+                            }
                         }
-                        Bitmap avatar =  MediaStore.Images.Media.getBitmap(getContentResolver(),avatarImagePath);
+                        Bitmap avatar = MediaStore.Images.Media.getBitmap(getContentResolver(), avatarImagePath);
                         avatar = ThumbnailUtils.extractThumbnail(avatar, 500, 500);
                         final File file = File.createTempFile("avatar", ".jpg", getCacheDir());
                         FileOutputStream out = new FileOutputStream(file);
                         avatar.compress(Bitmap.CompressFormat.JPEG, 90, out);
                         out.close();
-                        QBFile qbFile=QBContent.uploadFileTask(file, false, file.getAbsolutePath());
+                        QBFile qbFile = QBContent.uploadFileTask(file, false, file.getAbsolutePath());
                         currentQbUser.setFileId(qbFile.getId());
                         file.delete();
                         avatar.recycle();
-                        avatarImagePath=null;
+                        avatarImagePath = null;
 
-                        userImagesChanged=true;
+                        userImagesChanged = true;
                     }
                     currentQbUser.setCustomData(gson.toJson(profile));
                     QBUsers.updateUser(currentQbUser);
-                    if (userImagesChanged){
+                    if (userImagesChanged) {
                         LocalBroadcastManager.getInstance(ProfileEditActivity.this).sendBroadcast(new Intent(C.USER_DATA_CHANGED));
                     }
                     return true;
-                }catch (Exception e) {
-                    this.e=e;
+                } catch (Exception e) {
+                    this.e = e;
                     return false;
                 }
 
             }
+
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 isBusy.set(false);
                 handler.removeCallbacks(timeOutRunnable);
-                if(aBoolean){
+                if (aBoolean) {
                     onProfileSaved("profile saved");
-                }else {
-                    Util.onError(e,ProfileEditActivity.this);
+                } else {
+                    Util.onError(e, ProfileEditActivity.this);
                 }
             }
         };
         saveTask.execute();
 
 
-
     }
 
     public void selectGender() {
-        new AlertDialog.Builder(this,R.style.AppAlertDialogTheme)
+        new AlertDialog.Builder(this, R.style.AppAlertDialogTheme)
                 .setTitle(R.string.select_gender)
                 .setItems(R.array.genders, new DialogInterface.OnClickListener() {
                     @Override

@@ -110,17 +110,8 @@ public class ProfileActivity extends BaseActivity {
                     profile = UserProfile.createFromJson(qbUser.getCustomData());
                     float density=getResources().getDisplayMetrics().density;
 
-                    if (qbUser.getFileId()!=null){
-                        AvatarLoaderHelper.loadImageSync(qbUser.getFileId(), binding.userAvatar,
-                                Math.round(density*100), Math.round(density*100));
-                    }
 
-                    int width=getResources().getDisplayMetrics().widthPixels;
-                    if (profile.getBackgroundId()>0){
-                        int height=Math.round(density*147);
-                        AvatarLoaderHelper.loadImageSync(profile.getBackgroundId(), binding.userBackground,
-                                width,height);
-                    }
+
                     binding.setProfile(profile);
 
                     QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
@@ -157,14 +148,30 @@ public class ProfileActivity extends BaseActivity {
                 }
                 float density=getResources().getDisplayMetrics().density;
                 if (profile.getGender().equals("M")){
-                    Drawable drawable= ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon);
+                    Drawable drawable= ContextCompat.getDrawable(ProfileActivity.this,R.drawable.male_icon);
                     drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
                     binding.age.setCompoundDrawables(drawable
                             ,null,null,null);
                 }else if(profile.getGender().equals("F")){
-                    binding.age.setCompoundDrawables(
-                            ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon),null,null,null);
+                    Drawable drawable= ContextCompat.getDrawable(ProfileActivity.this,R.drawable.female_icon);
+                    drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+                    binding.age.setCompoundDrawables(drawable
+                            ,null,null,null);
                 }
+
+                if (qbUser.getFileId()!=null){
+                    AvatarLoaderHelper.loadImage(qbUser.getFileId(), binding.userAvatar,
+                            Math.round(density*100), Math.round(density*100));
+                }
+
+
+                if (profile.getBackgroundId()>0){
+                    int height=Math.round(density*147);
+                    int width=getResources().getDisplayMetrics().widthPixels;
+                    AvatarLoaderHelper.loadImage(profile.getBackgroundId(), binding.userBackground,
+                            width,height);
+                }
+
                 binding.age.invalidate();
 
 
