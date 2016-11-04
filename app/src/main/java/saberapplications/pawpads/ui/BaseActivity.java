@@ -1,7 +1,9 @@
 package saberapplications.pawpads.ui;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -32,8 +34,10 @@ import org.jivesoftware.smack.SmackException;
 import java.util.Date;
 
 import saberapplications.pawpads.C;
+import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
+import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.home.SplashActivity;
 
 
@@ -284,7 +288,22 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
-
+        if (Util.IM_ALERT == true) {
+            new AlertDialog.Builder(BaseActivity.this)
+                    .setTitle(R.string.new_chat_message)
+                    .setMessage(qbChatMessage.getBody())
+                    .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(BaseActivity.this, ChatActivity.class);
+                            intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
+                            intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId().toString());
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
     }
 
     @Override

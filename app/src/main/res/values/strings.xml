@@ -66,7 +66,7 @@
     <string name="unblock_user">Unblock user</string>
     <string name="blocking_user">Blocking user</string>
     <string name="unblocking_user">Unblocking user</string>
-    <string name="age_hint">Age</string>
+    <string name="age_hint">Birth year</string>
     <string name="obtaining_location">Obtaining location</string>
     <string name="message">Message</string>
     <string name="unblock">Unblock</string>
@@ -91,6 +91,10 @@
     <string name="full_name_too_short">Full name is too short</string>
     <string name="age_range_check">Age should be in range between 15 and 100</string>
     <string name="profile_was_removed">Profile was removed successfully</string>
+    <string name="new_chat_message">New Chat Message</string>
+    <string name="near_by_empty">There seems to be no one around. Try visiting this screen later or change your Distance Settings.</string>
+    <string name="empty_chats">You has no active chats.Start a new chat with our users.</string>
+    <string name="full_name_max_len">Full name can not be more than 50 characters</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

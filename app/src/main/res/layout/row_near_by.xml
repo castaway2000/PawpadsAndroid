@@ -7,16 +7,22 @@
         <variable
             name="location"
             type="com.quickblox.location.model.QBLocation" />
+
         <variable
             name="username"
-            type="String"/>
+            type="String" />
+
         <variable
             name="lastMessage"
             type="String" />
+
         <variable
             name="distance"
             type="String" />
-        <import type="android.view.View" alias="View"/>
+
+        <import
+            alias="View"
+            type="android.view.View" />
     </data>
 
     <RelativeLayout
@@ -29,53 +35,55 @@
             android:id="@+id/avatar"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_centerVertical="true"
             android:layout_margin="16dp"
             android:scaleType="centerCrop"
+            android:src="@drawable/user_placeholder"
             app:riv_border_color="#333333"
             app:riv_mutate_background="true"
-            app:riv_oval="true"
-            android:src="@drawable/user_placeholder"
-            android:layout_centerVertical="true"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/avatar"
-            android:layout_toEndOf="@id/avatar"
-            android:orientation="vertical">
-
-            <saberapplications.pawpads.views.FontTextView
-                android:id="@+id/username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{username,default=USERNAME}"
-                style="@style/list_title"/>
-
-            <saberapplications.pawpads.views.FontTextView
-                android:id="@+id/last_message_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text='@{lastMessage,default="28 AUG" }'
-                style="@style/list_details"
-                android:visibility='@{lastMessage.equals("")?View.GONE:View.VISIBLE}'
-                android:drawableLeft="@drawable/message_icon"
-                android:drawablePadding="5dp"
-
-                />
-
-        </LinearLayout>
+            app:riv_oval="true" />
 
         <saberapplications.pawpads.views.FontTextView
             android:id="@+id/distance"
+            style="@style/list_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
-            android:text='@{distance,default="150 feet" }'
-            style="@style/list_details" />
+            android:text='@{distance,default="150 feet" }' />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/distance"
+            android:layout_toRightOf="@id/avatar"
+            android:orientation="vertical">
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
+                style="@style/list_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{username,default=USERNAME}"
+                android:textSize="@{username.length &gt;  30 ? 16:19 }" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/last_message_date"
+                style="@style/list_details"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/message_icon"
+                android:drawablePadding="5dp"
+                android:text='@{lastMessage,default="28 AUG" }'
+                android:visibility='@{lastMessage.equals("")?View.GONE:View.VISIBLE}'
+
+                />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
 </layout>

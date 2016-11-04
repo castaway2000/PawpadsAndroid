@@ -80,6 +80,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
+                if (adapter==null) return;
                 if (dialogs.size() > 0) {
                     adapter.addItems(dialogs);
                     currentPage++;

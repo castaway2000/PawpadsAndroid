@@ -158,10 +158,14 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
                 return new InitialLoadHolder(v);
             case EMPTY_STATE_ITEM:
                 v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.empty_state, parent, false);
+                        .inflate(getEmptyStateResId(), parent, false);
                 return new EmptyStateHolder(v);
         }
         return null;
+    }
+
+    protected int getEmptyStateResId() {
+        return R.layout.empty_state;
     }
 
     @Override

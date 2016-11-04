@@ -113,4 +113,9 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
         View v=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_near_by,parent,false);
         return new LocationHolder(v,this);
     }
+
+    @Override
+    protected int getEmptyStateResId() {
+        return R.layout.empty_state_nearby;
+    }
 }

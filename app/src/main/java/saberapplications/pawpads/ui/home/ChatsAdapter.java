@@ -84,5 +84,8 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
         this.currentUserId = currentUserId;
     }
 
-
+    @Override
+    protected int getEmptyStateResId() {
+        return R.layout.empty_state_chats;
+    }
 }

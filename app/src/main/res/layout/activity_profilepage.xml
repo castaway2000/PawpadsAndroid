@@ -16,6 +16,7 @@
         <variable
             name="profile"
             type="saberapplications.pawpads.model.UserProfile" />
+
     </data>
 
     <RelativeLayout

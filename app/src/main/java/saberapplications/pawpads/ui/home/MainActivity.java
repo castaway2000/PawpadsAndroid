@@ -15,6 +15,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -35,12 +36,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
-import com.quickblox.chat.exception.QBChatException;
-import com.quickblox.chat.listeners.QBMessageListener;
-import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -104,48 +100,7 @@ public class MainActivity extends BaseActivity {
             }
         }
     };
-    private QBPrivateChatManagerListener chatListener = new QBPrivateChatManagerListener() {
-        @Override
-        public void chatCreated(QBPrivateChat qbPrivateChat, final boolean createdLocally) {
-            if (!createdLocally) {
-                qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
-                    @Override
-                    public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
-                        if (qbChatMessage.getProperties().containsKey("blocked")) {
-                            return;
-                        }
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (Util.IM_ALERT == true) {
-                                    new AlertDialog.Builder(MainActivity.this)
-                                            .setTitle("New Chat Message")
-                                            .setMessage(qbChatMessage.getBody())
-                                            .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                                                    intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
-                                                    intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId().toString());
-                                                    startActivity(intent);
-                                                }
-                                            })
-                                            .setNegativeButton("Cancel", null)
-                                            .show();
-                                }
-                            }
-                        });
-                    }
 
-                    @Override
-                    public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
-                        Util.onError(e, MainActivity.this);
-                    }
-
-                });
-            }
-        }
-    };
     private ActionBarDrawerToggle mDrawerToggle;
 
 
@@ -206,7 +161,14 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == 1 && (chatsFragment.adapter==null || chatsFragment.adapter.getItemCount()==1)) {
-                    chatsFragment.loadData();
+                    Handler handler=new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            chatsFragment.loadData();
+                        }
+                    },50);
+
                 }
             }
 
@@ -365,6 +327,7 @@ public class MainActivity extends BaseActivity {
                 if (profile.getBackgroundId()>0){
                     AvatarLoaderHelper.loadImage(profile.getBackgroundId(), binding.userBg, binding.userBg.getWidth(),binding.userBg.getHeight());
                 }
+
                 binding.setUsername(Util.getUserName(user));
                 currentQBUser=user;
 

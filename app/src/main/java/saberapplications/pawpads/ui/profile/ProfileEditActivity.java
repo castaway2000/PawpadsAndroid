@@ -32,6 +32,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
@@ -226,8 +228,13 @@ public class ProfileEditActivity extends BaseActivity {
             Toast.makeText(this, R.string.full_name_too_short,Toast.LENGTH_LONG).show();
             return;
         }
+        if (fullName.get().length()>50){
+            Toast.makeText(this, R.string.full_name_max_len,Toast.LENGTH_LONG).show();
+            return;
+        }
         if (age.get()!=null && !age.get().equals("")){
-            int ageInt=Integer.parseInt(age.get());
+            Calendar calendar= GregorianCalendar.getInstance();
+            int ageInt=calendar.get(Calendar.YEAR)-Integer.parseInt(age.get());
             if (ageInt<=14 || ageInt>100){
                 Toast.makeText(this, R.string.age_range_check,Toast.LENGTH_LONG).show();
                 return;

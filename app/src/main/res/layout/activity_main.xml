@@ -107,7 +107,7 @@
                 android:layout_marginBottom="10dp"
                 android:text="@{username}"
                 android:textColor="@color/accent"
-                android:textSize="28sp"
+                app:textSize="@{ username.length &lt; 25 ? 28 : 20}"
                 app:typefaceAsset="Proxima_Nova_Semibold.otf" />
 
             <saberapplications.pawpads.views.FontTextView

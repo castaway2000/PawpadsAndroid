@@ -34,6 +34,8 @@ import com.quickblox.users.model.QBUser;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,7 +146,8 @@ public class ProfileActivity extends BaseActivity {
                     return;
                 }
                 if (profile.getAge()>0){
-                    binding.age.setText(String.format(getString(R.string.age),profile.getAge()));
+                    Calendar calendar= GregorianCalendar.getInstance();
+                    binding.age.setText(String.format(getString(R.string.age),calendar.get(Calendar.YEAR)-profile.getAge()));
                 }
                 float density=getResources().getDisplayMetrics().density;
                 if (profile.getGender().equals("M")){

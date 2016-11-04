@@ -49,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{username,default=USERNAME}"
+                android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
                 style="@style/list_title"/>
 
             <saberapplications.pawpads.views.FontTextView
