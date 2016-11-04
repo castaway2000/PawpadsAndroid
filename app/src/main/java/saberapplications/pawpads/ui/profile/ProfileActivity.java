@@ -142,7 +142,9 @@ public class ProfileActivity extends BaseActivity {
             protected void onPostExecute(Void aVoid) {
                 isBusy.set(false);
                 if (e!=null) {
+
                     Util.onError(e, ProfileActivity.this);
+
                     return;
                 }
                 if (profile.getAge()>0){

@@ -145,6 +145,7 @@ public class ChatActivity extends BaseActivity {
     private QBPrivateChat privateChat;
 
     private boolean isBlocked;
+    private boolean userDeleted;
 
 
     @Override
@@ -203,6 +204,7 @@ public class ChatActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (recipient==null || userDeleted) return;
                 if (recipient.getFileId() != null) {
                     float d = getResources().getDisplayMetrics().density;
                     int size = Math.round(80 * d);
@@ -253,16 +255,29 @@ public class ChatActivity extends BaseActivity {
                             isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
                         }
                         if (recipient == null && getIntent().hasExtra(RECIPIENT_ID)) {
-                            recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
-                        }
-                        privateChat = privateChatManager.getChat(recipient.getId());
-                        if (privateChat == null) {
-                            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
-                        } else {
-                            privateChat.addMessageListener(messageListener);
-                        }
-                        init();
+                            try {
+                                recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
+                            }catch (QBResponseException e){
+                                if (e.getHttpStatusCode()==404){
+                                    binding.setIsDeleted(true);
+                                    userDeleted=true;
+                                    hideSoftKeyboard();
+                                }else {
+                                    throw e;
+                                }
+                            }
 
+                        }
+                        if (!userDeleted) {
+                            privateChat = privateChatManager.getChat(recipient.getId());
+                            if (privateChat == null) {
+                                privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
+                            } else {
+                                privateChat.addMessageListener(messageListener);
+                            }
+
+                            init();
+                        }
                         if (getIntent().hasExtra(DIALOG)) {
                             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
                         }
@@ -281,20 +296,22 @@ public class ChatActivity extends BaseActivity {
                     if (dialog == null) {
                         dialog = privateChatManager.createDialog(recipient.getId());
                     }
-
-                    QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                    requestBuilder.eq("source_user", recipient.getId());
-                    requestBuilder.eq("blocked_user", currentQBUser.getId());
-                    ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    binding.setIsBlockedByOther(blocks.size() > 0);
-
-                    if (!isActivityReopened) {
+                    QBRequestGetBuilder requestBuilder;
+                    if (!userDeleted) {
                         requestBuilder = new QBRequestGetBuilder();
-                        requestBuilder.eq("source_user", currentQBUser.getId());
-                        requestBuilder.eq("blocked_user", recipient.getId());
+                        requestBuilder.eq("source_user", recipient.getId());
+                        requestBuilder.eq("blocked_user", currentQBUser.getId());
+                        ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
+                        binding.setIsBlockedByOther(blocks.size() > 0);
 
-                        blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                        binding.setIsBlockedByMe(blocks.size() > 0);
+                        if (!isActivityReopened) {
+                            requestBuilder = new QBRequestGetBuilder();
+                            requestBuilder.eq("source_user", currentQBUser.getId());
+                            requestBuilder.eq("blocked_user", recipient.getId());
+
+                            blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
+                            binding.setIsBlockedByMe(blocks.size() > 0);
+                        }
                     }
 
 
@@ -482,6 +499,7 @@ public class ChatActivity extends BaseActivity {
                 @Override
                 protected void onPostExecute(QBChatMessage qbChatMessage) {
                     isSendingMessage.set(false);
+                    isBusy.set(false);
                     if (exception != null) {
                         Util.onError(exception, ChatActivity.this);
                         return;

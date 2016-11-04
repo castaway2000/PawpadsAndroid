@@ -25,9 +25,9 @@ android {
         minSdkVersion 15
 
         targetSdkVersion 23
-        versionCode 11
+        versionCode 12
 
-        versionName "1.1"
+        versionName "2.0.0"
         // Enabling multidex support.
         multiDexEnabled true
 
@@ -56,10 +56,7 @@ android {
 }
 
 dependencies {
-    compile files('libs/volley.jar')
-    compile files('libs/universal-image-loader-1.9.4.jar')
-
-
+    
 
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
@@ -89,5 +86,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:9.6.1'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.makeramen:roundedimageview:2.2.1'
-    
+
 }
