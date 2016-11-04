@@ -1,4 +1,5 @@
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -18,10 +19,10 @@
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.dell.myapplication.ChatActivity">
+        >
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -36,16 +37,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                    >
-
-                    <saberapplications.pawpads.views.FontTextView
-                        android:id="@+id/toolbar_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:typefaceAsset="Proxima_Nova_Regular.otf"
-                        android:textSize="25sp"
-                        android:text="@{username}"
-                        android:layout_centerVertical="true"/>
-
                     <com.makeramen.roundedimageview.RoundedImageView
                         android:id="@+id/recipient_avatar"
                         android:layout_width="35dp"
@@ -55,6 +46,18 @@
                         android:layout_alignParentRight="true"
                         android:scaleType="centerCrop"
                         android:src="@drawable/user_placeholder"/>
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf"
+                        android:textSize="@{username.length >30 ? 20 : 25 }"
+                        android:text="@{username}"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/recipient_avatar"/>
+
+
                 </RelativeLayout>
             </android.support.v7.widget.Toolbar>
 
