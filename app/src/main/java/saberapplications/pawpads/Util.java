@@ -63,26 +63,24 @@ public class Util {
         for (String error : errors) {
             msg = msg + error + "\n";
         }
-        new AlertDialog.Builder(context)
-                .setMessage(msg)
-                .setTitle("Error")
-                .setPositiveButton("OK", null)
-                .show();
+        showAlert(context,msg);
     }
 
     public static void onError(Exception e, Context context) {
-
-        new AlertDialog.Builder(context)
-                .setMessage(e.getLocalizedMessage())
-                .setTitle("Error")
-                .setPositiveButton("OK", null)
-                .show();
+        showAlert(context,e.getLocalizedMessage());
     }
 
     public static void onError(QBResponseException e, Context context) {
+        showAlert(context,e.getLocalizedMessage());
 
-        new AlertDialog.Builder(context)
-                .setMessage(e.getLocalizedMessage())
+    }
+    public static void onError(String error, Context context) {
+        showAlert(context,error);
+    }
+
+    private static void showAlert(Context context,String message){
+        new AlertDialog.Builder(context,R.style.AppAlertDialogTheme)
+                .setMessage(message)
                 .setTitle("Error")
                 .setPositiveButton("OK", null)
                 .show();

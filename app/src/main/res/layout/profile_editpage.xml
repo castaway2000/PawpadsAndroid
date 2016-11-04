@@ -39,7 +39,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/age_hint"
                     android:inputType="number"
-                    app:binding2way="@{activity.age}" />
+                    app:binding2way="@{activity.age}"
+                    android:maxLength="4"/>
 
                 <saberapplications.pawpads.views.FontTextView
                     android:id="@+id/gender"

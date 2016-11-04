@@ -125,7 +125,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onError(QBResponseException e) {
                         isBusy.set(false);
-                        Util.onError(e,ForgotPasswordActivity.this);
+                        if (e.getHttpStatusCode()==404){
+                            Util.onError(getString(R.string.email_not_exists),ForgotPasswordActivity.this);
+                        }else {
+                            Util.onError(e,ForgotPasswordActivity.this);
+                        }
+
                     }
                 });
             }

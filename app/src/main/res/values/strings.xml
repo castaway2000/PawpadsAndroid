@@ -95,6 +95,7 @@
     <string name="near_by_empty">There seems to be no one around. Try visiting this screen later or change your Distance Settings.</string>
     <string name="empty_chats">You has no active chats.Start a new chat with our users.</string>
     <string name="full_name_max_len">Full name can not be more than 50 characters</string>
+    <string name="email_not_exists">Email does not exist</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

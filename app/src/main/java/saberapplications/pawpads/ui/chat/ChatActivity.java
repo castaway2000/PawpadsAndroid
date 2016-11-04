@@ -26,7 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.github.angads25.filepicker.view.FilePickerDialog;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.quickblox.chat.QBChat;
@@ -80,6 +80,7 @@ public class ChatActivity extends BaseActivity {
     public static final String RECIPIENT_ID = "user_id";
     public static final String CURRENT_USER_ID = "current user id";
     private static final int PICKFILE_REQUEST_CODE = 2;
+    private static final int PERMISSION_REQUEST = 200;
     //EditText editText_mail_id;
     EditText editText_chat_message;
 
@@ -502,7 +503,7 @@ public class ChatActivity extends BaseActivity {
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    FilePickerDialog.EXTERNAL_READ_PERMISSION_GRANT);
+                    PERMISSION_REQUEST);
             return;
         }
         isExternalDialogOpened = true;
@@ -624,7 +625,7 @@ public class ChatActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case FilePickerDialog.EXTERNAL_READ_PERMISSION_GRANT: {
+            case PERMISSION_REQUEST: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     selectFile();
                 }
