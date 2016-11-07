@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,7 +71,13 @@ public class PrefrenceActivity extends BaseActivity{
             @Override
             public void onPropertyChanged(Observable observable, int i) {
                 SharedPreferences.Editor editor=preferences.edit();
-                int r=Integer.parseInt(range.get());
+                int r;
+                if(range.get().equals("")){
+                    r=0;
+                }else {
+                    r=Integer.parseInt(range.get());
+                }
+
                 editor.putInt(C.RANGE,r);
                 if (unit.equals("MI")) {
                     int rangeM = (int) Math.floor(r * 1.60934);
@@ -82,6 +89,14 @@ public class PrefrenceActivity extends BaseActivity{
                 }
                 editor.apply();
 
+            }
+        });
+        binding.etRange.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus && range.get().equals("")){
+                    range.set("0");
+                }
             }
         });
         pushes.set(preferences.getBoolean(C.PUSH, true));
