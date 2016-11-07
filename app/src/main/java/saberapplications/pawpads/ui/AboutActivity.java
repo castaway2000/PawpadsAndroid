@@ -62,7 +62,7 @@ public class AboutActivity extends AppCompatActivity {
 
     public void sendFeedback(){
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto","szablya@gmail.com", null));
+                "mailto","feedback@pawpadsapp.com", null));
         startActivity(Intent.createChooser(emailIntent, getString(R.string.send_email)));
     }
 
