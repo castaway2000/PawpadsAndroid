@@ -10,7 +10,7 @@ public class C {
     public static final String  FACEBOOK ="facebook" ;
     public static final String  EMAIL ="email" ;
     public static final String  AUTH_TOKEN ="auth_token" ;
-    public static final String  AUTH_TOKEN_SECRET ="auth_token" ;
+    public static final String  AUTH_TOKEN_SECRET ="auth_token_secret" ;
     public static final String  PASSWORD ="password" ;
     public static final String BLOCKED_USERS_IDS = "blocked_users_ids";
     public static final String MEASURE_UNIT="unit";

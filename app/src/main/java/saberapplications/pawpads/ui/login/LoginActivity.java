@@ -132,9 +132,8 @@ public class LoginActivity extends AppCompatActivity {
         PackageManager pkManager = getPackageManager();
         try {
             PackageInfo pkgInfo = pkManager.getPackageInfo("com.twitter.android", 0);
-            String getPkgInfo = pkgInfo.toString();
 
-            if (getPkgInfo.equals("com.twitter.android")) {
+            if (pkgInfo.packageName.equals("com.twitter.android")) {
                 return true;
             }
         } catch (PackageManager.NameNotFoundException e) {
