@@ -128,7 +128,7 @@ public class GcmIntentService extends IntentService {
                 mNotificationManager = (NotificationManager)
                         GcmIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
                 Intent chatIntent = new Intent(GcmIntentService.this, ChatActivity.class);
-                chatIntent.putExtra(ChatActivity.RECIPIENT_ID, userId);
+                chatIntent.putExtra(ChatActivity.RECIPIENT_ID, Integer.parseInt(userId));
                 chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
 
                 PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,

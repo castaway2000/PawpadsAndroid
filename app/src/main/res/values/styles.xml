@@ -19,6 +19,7 @@
         <item name="android:windowBackground">@color/accent</item>
         <item name="android:alertDialogTheme">@style/AppAlertDialogTheme</item>
         <item name="android:textColorPrimary">@color/accent</item>
+        <item name="android:textColorHighlight">#cccccc</item>
     </style>
 
     <style name="AppAlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">

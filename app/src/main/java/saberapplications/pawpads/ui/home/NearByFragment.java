@@ -56,6 +56,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
     private Location lastListUpdatedLocation;
     private ArrayMap<Integer, Long> lastMessages;
     int currentPage = 1;
+    int itemsPerPage=12;
     BroadcastReceiver locationChanged = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -165,7 +166,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                     getLocationsBuilder.setLastOnly();
                     // radius in kilometers
                     getLocationsBuilder.setRadius(lastListUpdatedLocation.getLatitude(), lastListUpdatedLocation.getLongitude(), Util.getRange() );
-                    getLocationsBuilder.setPerPage(10);
+                    getLocationsBuilder.setPerPage(itemsPerPage);
                     getLocationsBuilder.setPage(currentPage);
                     getLocationsBuilder.setSort(SortField.DISTANCE, SortOrder.ASCENDING);
                     ArrayList<QBLocation> locations = QBLocations.getLocations(getLocationsBuilder, out);
@@ -206,7 +207,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                 if (nearByItems != null && nearByItems.size()>0) {
                     adapter.addItems(nearByItems);
                 }
-                if (nearByItems==null || nearByItems.size()==0 || nearByItems.size()<10){
+                if (nearByItems==null || nearByItems.size()==0 || nearByItems.size()<(itemsPerPage-1)){
                     adapter.disableLoadMore();
                 }
 

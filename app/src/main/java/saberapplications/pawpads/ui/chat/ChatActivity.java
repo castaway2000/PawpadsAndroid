@@ -234,7 +234,7 @@ public class ChatActivity extends BaseActivity {
     public void onQBConnect(final boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
         isBusy.set(true);
-        currentUserId = currentQBUser.getId();
+
 
         final QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
@@ -248,7 +248,10 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-
+                    if (currentQBUser==null){
+                        currentQBUser=QBUsers.getUser(preferences.getInt(C.QB_USERID,0));
+                    }
+                    currentUserId = currentQBUser.getId();
                     if (getIntent() != null && !isActivityReopened) {
                         if (getIntent().hasExtra(RECIPIENT)) {
                             recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
@@ -256,7 +259,7 @@ public class ChatActivity extends BaseActivity {
                         }
                         if (recipient == null && getIntent().hasExtra(RECIPIENT_ID)) {
                             try {
-                                recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
+                                recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID,0));
                             }catch (QBResponseException e){
                                 if (e.getHttpStatusCode()==404){
                                     binding.setIsDeleted(true);
@@ -266,7 +269,6 @@ public class ChatActivity extends BaseActivity {
                                     throw e;
                                 }
                             }
-
                         }
                         if (!userDeleted) {
                             privateChat = privateChatManager.getChat(recipient.getId());
