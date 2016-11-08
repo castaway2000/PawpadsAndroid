@@ -68,6 +68,7 @@ import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.LocationServiceHelper;
 
 
 public class MainActivity extends BaseActivity {
@@ -180,7 +181,9 @@ public class MainActivity extends BaseActivity {
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChanged,new IntentFilter(C.USER_DATA_CHANGED));
-        checkPermissions();
+        if (checkPermissions()){
+            LocationServiceHelper.checkService(this);
+        }
     }
 
     @Override
@@ -489,6 +492,7 @@ public class MainActivity extends BaseActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // TODO continue processing
                     android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
+                    LocationServiceHelper.checkService(this);
                     UserLocationService.startService(preferences.getInt(C.QB_USERID,0));
                 } else {
                     // TODO stop login

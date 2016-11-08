@@ -97,6 +97,8 @@
     <string name="full_name_max_len">Full name can not be more than 50 characters</string>
     <string name="email_not_exists">Email does not exist</string>
     <string name="user_account_was_deleted">User account was deleted</string>
+    <string name="location_sercice_is_disabled">Location service is not enabled</string>
+    <string name="open_location_settings">Open location settings</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
