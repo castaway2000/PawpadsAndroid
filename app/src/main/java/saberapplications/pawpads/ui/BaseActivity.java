@@ -201,21 +201,21 @@ public abstract class BaseActivity extends AppCompatActivity
             @Override
             public void onSuccess(Object o, Bundle bundle) {
                 QBChatService.getInstance().startAutoSendPresence(60);
+                QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
+                try {
+                    QBPrivacyList list = privacyListsManager.getPrivacyList("public");
+                    if (list != null) {
+                        list.setDefaultList(true);
+                        list.setActiveList(true);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
-                            try {
-                                QBPrivacyList list = privacyListsManager.getPrivacyList("public");
-                                if (list != null) {
-                                    list.setDefaultList(true);
-                                    list.setActiveList(true);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
                             onQBConnect(isReopened);
                         } catch (Exception e) {
                             e.printStackTrace();

@@ -1,8 +1,10 @@
 package saberapplications.pawpads.ui.profile;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.graphics.Bitmap;
@@ -13,12 +15,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -32,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -44,6 +50,7 @@ import saberapplications.pawpads.databinding.ProfileEditpageBinding;
 import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.FileUtil;
 
 
 /**
@@ -52,6 +59,9 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 public class ProfileEditActivity extends BaseActivity {
     private final static int SELECT_IMAGE = 1;
     private final static int SELECT_BACKGOUND = 2;
+    private static final int PERMISSION_REQUEST = 200;
+    private static final int CHANGE_PROFILE_PICTURE = 1;
+    private static final int CHANGE_PROFILE_BACKGROUND = 2;
     String selectedImagePath;
 
     EditText proDescr;
@@ -73,6 +83,7 @@ public class ProfileEditActivity extends BaseActivity {
     public final BindableString about = new BindableString();
     public final BindableString gender = new BindableString();
     String[] genders;
+    private int imageAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,30 +187,52 @@ public class ProfileEditActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_IMAGE) {
                 Uri selectedImageUri = data.getData();
-                selectedImagePath = getPath(selectedImageUri);
+                selectedImagePath = FileUtil.getPath(this, selectedImageUri);
                 System.out.println("Image Path : " + selectedImagePath);
                 avatarImagePath = selectedImageUri;
-                //  try {
-                //    bitmap = decodeUri(getApplicationContext(), selectedImageUri, img.getWidth());
-                Picasso.with(this).load(selectedImageUri)
-                        .resize(binding.userAvatar.getWidth(), binding.userAvatar.getHeight())
-                        .centerCrop()
-                        .into(binding.userAvatar);
+
+                displayBitmap(avatarImagePath, binding.userAvatar);
             }
             if (requestCode == SELECT_BACKGOUND) {
                 Uri selectedImageUri = data.getData();
-                selectedImagePath = getPath(selectedImageUri);
+                selectedImagePath = FileUtil.getPath(this, selectedImageUri);
                 System.out.println("Image Path : " + selectedImagePath);
                 backgoundImagePath = selectedImageUri;
                 //  try {
                 //    bitmap = decodeUri(getApplicationContext(), selectedImageUri, img.getWidth());
-                Picasso.with(this).load(selectedImageUri)
-                        .resize(binding.userBackground.getWidth(), binding.userBackground.getHeight())
-                        .centerCrop()
-                        .into(binding.userBackground);
+                displayBitmap(backgoundImagePath, binding.userBackground);
             }
 
         }
+    }
+
+    private void displayBitmap(final Uri uri, final ImageView view) {
+
+        final int width = view.getWidth();
+        final int height = view.getHeight();
+        new AsyncTask<Void, Void, Bitmap>() {
+
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, width, height);
+                    bitmap.recycle();
+                    return thumb;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                if (bitmap != null)
+                    view.setImageBitmap(bitmap);
+            }
+        }.execute();
     }
 
     public String getPath(Uri uri) {
@@ -208,6 +241,8 @@ public class ProfileEditActivity extends BaseActivity {
 
 
     public void changeProfilePicture() {
+        imageAction = CHANGE_PROFILE_PICTURE;
+        if (!permissionCheck()) return;
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
@@ -215,6 +250,8 @@ public class ProfileEditActivity extends BaseActivity {
     }
 
     public void changeProfileBackgound() {
+        imageAction = CHANGE_PROFILE_BACKGROUND;
+        if (!permissionCheck()) return;
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
@@ -224,19 +261,19 @@ public class ProfileEditActivity extends BaseActivity {
 
     public void save() {
         if (isBusy.get()) return;
-        if (fullName.get().length()<3){
-            Toast.makeText(this, R.string.full_name_too_short,Toast.LENGTH_LONG).show();
+        if (fullName.get().length() < 3) {
+            Toast.makeText(this, R.string.full_name_too_short, Toast.LENGTH_LONG).show();
             return;
         }
-        if (fullName.get().length()>50){
-            Toast.makeText(this, R.string.full_name_max_len,Toast.LENGTH_LONG).show();
+        if (fullName.get().length() > 50) {
+            Toast.makeText(this, R.string.full_name_max_len, Toast.LENGTH_LONG).show();
             return;
         }
-        if (age.get()!=null && !age.get().equals("")){
-            Calendar calendar= GregorianCalendar.getInstance();
-            int ageInt=calendar.get(Calendar.YEAR)-Integer.parseInt(age.get());
-            if (ageInt<=14 || ageInt>100){
-                Toast.makeText(this, R.string.age_range_check,Toast.LENGTH_LONG).show();
+        if (age.get() != null && !age.get().equals("")) {
+            Calendar calendar = GregorianCalendar.getInstance();
+            int ageInt = calendar.get(Calendar.YEAR) - Integer.parseInt(age.get());
+            if (ageInt <= 14 || ageInt > 100) {
+                Toast.makeText(this, R.string.age_range_check, Toast.LENGTH_LONG).show();
                 return;
             }
         }
@@ -301,7 +338,7 @@ public class ProfileEditActivity extends BaseActivity {
                     }
 
                     if (avatarImagePath != null) {
-                        if (currentQbUser.getFileId()!=null && currentQbUser.getFileId() > 0) {
+                        if (currentQbUser.getFileId() != null && currentQbUser.getFileId() > 0) {
                             try {
                                 QBContent.deleteFile(currentQbUser.getFileId());
                             } catch (Exception e) {
@@ -383,5 +420,36 @@ public class ProfileEditActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public boolean permissionCheck() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    switch (imageAction) {
+                        case CHANGE_PROFILE_PICTURE:
+                            changeProfilePicture();
+                            break;
+                        case CHANGE_PROFILE_BACKGROUND:
+                            changeProfileBackgound();
+                            break;
+                    }
+                }
+            }
+        }
     }
 }
