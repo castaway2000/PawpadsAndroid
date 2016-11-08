@@ -88,7 +88,8 @@
                     android:layout_marginTop="16dp"
                     android:hint="Range:"
                     android:inputType="number"
-                    app:binding2way="@{activity.range}"/>
+                    app:binding2way="@{activity.range}"
+                    android:maxLength="5"/>
 
 
                 <RadioGroup
