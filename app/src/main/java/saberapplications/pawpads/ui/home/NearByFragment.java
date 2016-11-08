@@ -93,7 +93,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             adapter.setLocation(location);
         } else if (lastListUpdatedLocation.distanceTo(location) > 100) {
             adapter.clear();
+            currentPage=1;
             loadData();
+
         }
     }
 
