@@ -30,7 +30,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="210dp"
             app:columnCount="1"
-            app:orientation="horizontal">
+            app:orientation="horizontal"
+            android:layout_above="@+id/profileAdView">
 
             <saberapplications.pawpads.views.FontTextView
                 android:layout_width="wrap_content"
@@ -161,6 +162,7 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginTop="100dp"
+            android:layout_above="@id/mainBannerAdView"
             app:columnCount="3"
             app:orientation="horizontal"
             >
@@ -241,6 +243,17 @@
                     android:textColor="@color/title" />
             </LinearLayout>
         </RelativeLayout>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/profileAdView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:adUnitId="@string/profile_activity_ad_unit_id"
+            app:adSize="BANNER"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            />
+
     </RelativeLayout>
 
 </layout>

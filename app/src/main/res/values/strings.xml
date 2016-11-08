@@ -99,6 +99,7 @@
     <string name="user_account_was_deleted">User account was deleted</string>
     <string name="location_sercice_is_disabled">Location service is not enabled</string>
     <string name="open_location_settings">Open location settings</string>
+    <string name="copyright">© 2016 Saber Applications Inc.</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -85,6 +87,21 @@ public class ProfileActivity extends BaseActivity {
         qbUser= (QBUser) getIntent().getSerializableExtra(C.QB_USER);
         interAd = new InterstitialAd(this);
         interAd.setAdUnitId(Util.AD_UNIT_ID);
+
+
+        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        binding.profileAdView.loadAd(adRequest);
+
+        interAd.loadAd(adRequest);
+        interAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                displayInterAd();
+            }
+        });
 
 
 

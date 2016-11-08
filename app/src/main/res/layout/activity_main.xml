@@ -65,8 +65,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/mainBannerAdView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adUnitId="@string/main_activity_ad_unit_id"
+                app:adSize="BANNER"
+                android:layout_alignBottom="@+id/swipelayout"
+                android:layout_centerHorizontal="true"
+                app:layout_anchorGravity="center_horizontal|bottom"
+                app:layout_anchor="@id/viewPager"/>
         </android.support.design.widget.CoordinatorLayout>
 
         <RelativeLayout

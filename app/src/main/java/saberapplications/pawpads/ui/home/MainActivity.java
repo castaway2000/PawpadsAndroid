@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -180,6 +182,11 @@ public class MainActivity extends BaseActivity {
         });
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
+        MobileAds.initialize(getApplicationContext(),getString(R.string.admob_app_id));
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
+                .build();
+        binding.mainBannerAdView.loadAd(adRequest);
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChanged,new IntentFilter(C.USER_DATA_CHANGED));
         if (checkPermissions()){
             LocationServiceHelper.checkService(this);

@@ -120,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#64ffffff"
-                android:text="© 2016 PawPads"
+                android:text="@string/copyright"
                 android:textSize="16sp"
                 app:typefaceAsset="Proxima_Nova_Regular.otf"
                 />

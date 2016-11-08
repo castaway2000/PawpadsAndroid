@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admob_app_id">ca-app-pub-5883625079032168/1470784739</string>
+    <string name="main_activity_ad_unit_id">ca-app-pub-5883625079032168/1470784739</string>
+    <string name="profile_activity_ad_unit_id">ca-app-pub-5883625079032168/1470784739</string>
+</resources>
