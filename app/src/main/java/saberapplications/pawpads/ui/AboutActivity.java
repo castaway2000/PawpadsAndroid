@@ -57,6 +57,13 @@ public class AboutActivity extends AppCompatActivity {
                 startActivity(browserIntent);
             }
         });
+        binding.privacyPolicy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.pawpadsapp.com/p/t-and-privacy-policy.html"));
+                startActivity(browserIntent);
+            }
+        });
 
     }
 

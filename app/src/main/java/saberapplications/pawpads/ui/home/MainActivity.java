@@ -55,7 +55,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import saberapplications.pawpads.C;
-import saberapplications.pawpads.GPS;
+
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
@@ -91,7 +91,7 @@ public class MainActivity extends BaseActivity {
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
-    public GPS gps;
+
 
     BroadcastReceiver userDataChanged=new BroadcastReceiver() {
         @Override
@@ -139,7 +139,7 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(null);
-        gps = new GPS(this);
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //  mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         //  mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -499,12 +499,14 @@ public class MainActivity extends BaseActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // TODO continue processing
                     android.util.Log.i(this.toString(), "ACCESS_FINE_LOCATION was granted");
-                    LocationServiceHelper.checkService(this);
+                    LocationServiceHelper.checkService(MainActivity.this);
                     UserLocationService.startService(preferences.getInt(C.QB_USERID,0));
                 } else {
                     // TODO stop login
                     android.util.Log.w(this.toString(), "ACCESS_FINE_LOCATION was denied");
-                    showGPSDisabledAlertToUser();
+                    new AlertDialog.Builder(this,R.style.AppAlertDialogTheme)
+                            .setMessage("You have to allow location access to get nearby users")
+                            .setPositiveButton("OK",null);
                 }
                 break;
             default:
@@ -512,27 +514,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void showGPSDisabledAlertToUser() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Goto Settings Page To Enable GPS",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent callGPSSettingIntent = new Intent(
-                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivity(callGPSSettingIntent);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
-    }
 
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
