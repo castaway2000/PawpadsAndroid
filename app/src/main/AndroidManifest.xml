@@ -103,7 +103,7 @@
             android:label="ForgotPass"
             />
         <activity
-            android:name=".ui.PrefrenceActivity"
+            android:name=".ui.settings.PrefrenceActivity"
             android:label="PrefrenceActivity"
             android:screenOrientation="portrait"
             />

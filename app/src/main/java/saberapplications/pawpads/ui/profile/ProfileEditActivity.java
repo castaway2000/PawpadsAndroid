@@ -33,7 +33,6 @@ import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -126,6 +125,7 @@ public class ProfileEditActivity extends BaseActivity {
                 fullName.set(qbUser.getFullName());
                 if (profile.getAge() > 0)
                     age.set(String.valueOf(profile.getAge()));
+
 
                 if (profile.getGender() != null) {
                     if (profile.getGender().equals("M")) {
@@ -301,6 +301,8 @@ public class ProfileEditActivity extends BaseActivity {
 
                     if (age.get() != null && !age.get().equals("")) {
                         profile.setAge(Integer.parseInt(age.get()));
+                    }else{
+                        profile.setAge(0);
                     }
                     profile.setAbout(about.get());
                     profile.setHobby(hobby.get());
@@ -310,6 +312,8 @@ public class ProfileEditActivity extends BaseActivity {
                         profile.setGender("M");
                     } else if (gender.get().equals(genders[1])) {
                         profile.setGender("F");
+                    }else{
+                        profile.setGender("");
                     }
 
                     boolean userImagesChanged = false;
@@ -395,9 +399,12 @@ public class ProfileEditActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
-
-                        gender.set(genders[which]);
+                        if (which<2) {
+                            gender.set(genders[which]);
+                        }else {
+                            gender.set(getString(R.string.gender));
+                            binding.gender.setTextColor(ContextCompat.getColor(ProfileEditActivity.this,R.color.hint));
+                        }
 
                     }
                 })

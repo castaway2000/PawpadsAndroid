@@ -1,7 +1,6 @@
-package saberapplications.pawpads.ui;
+package saberapplications.pawpads.ui.settings;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -29,12 +28,13 @@ import saberapplications.pawpads.databinding.ActivitySettingsBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.service.UserLocationService;
+import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 
 /**
  * Created by blaze on 3/24/2016.
  */
-public class PrefrenceActivity extends BaseActivity{
+public class PrefrenceActivity extends BaseActivity {
     private SharedPreferences preferences;
 
     ActivitySettingsBinding binding;
@@ -176,16 +176,19 @@ public class PrefrenceActivity extends BaseActivity{
 
 
     public void deleteUserProfile() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrefrenceActivity.this);
-        alertDialog.setTitle("Remove profile");
-        alertDialog.setMessage("All your data will be deleted. Are you sure?");
-        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        DeleteAccountConfirmationDialog dialog = new DeleteAccountConfirmationDialog();
+        dialog.show(getSupportFragmentManager(),"dialog");
+        dialog.setCallback(new DeleteAccountConfirmationDialog.Callback() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onDelete() {
+                final ProgressDialog progressDialog=new ProgressDialog(PrefrenceActivity.this,R.style.AppAlertDialogTheme);
+                progressDialog.setMessage(getString(R.string.deleting_profile));
+                progressDialog.show();
+                progressDialog.setCancelable(false);
                 QBUsers.deleteUser(preferences.getInt(C.QB_USERID, -1), new QBEntityCallback() {
                     @Override
                     public void onSuccess(Object o, Bundle bundle) {
+                        progressDialog.dismiss();
                         Toast.makeText(PrefrenceActivity.this, R.string.profile_was_removed, Toast.LENGTH_LONG).show();
                         Intent myIntent1 = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(myIntent1);
@@ -199,21 +202,13 @@ public class PrefrenceActivity extends BaseActivity{
 
                     @Override
                     public void onError(QBResponseException e) {
+                        progressDialog.dismiss();
                         Util.onError(e, PrefrenceActivity.this);
                     }
 
                 });
+        }});
 
-            }
-        });
-        alertDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

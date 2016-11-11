@@ -5,7 +5,7 @@
 
         <variable
             name="activity"
-            type="saberapplications.pawpads.ui.PrefrenceActivity" />
+            type="saberapplications.pawpads.ui.settings.PrefrenceActivity" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
