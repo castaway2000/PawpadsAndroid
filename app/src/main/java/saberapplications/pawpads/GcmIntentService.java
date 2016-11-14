@@ -133,10 +133,10 @@ public class GcmIntentService extends IntentService {
 
                 PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
                         chatIntent, 0);
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pplogo);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(GcmIntentService.this)
-                                .setSmallIcon(R.drawable.pplogo)
+                                .setSmallIcon(R.drawable.app_icon)
                                 .setLargeIcon(bitmap)
                                 .setAutoCancel(true)
                                 .setContentTitle("PawPads")
