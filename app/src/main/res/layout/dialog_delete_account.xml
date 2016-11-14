@@ -67,13 +67,18 @@
                 android:onClick="@{ () -> dialog.delete()}"
                 />
         </LinearLayout>
-        <Button
+        <saberapplications.pawpads.views.FontButton
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textSize="18sp"
             android:background="@drawable/chat_unblock_button"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:gravity="center"
             android:onClick="@{ () -> dialog.cancel()}"
+            android:padding="10dp"
             />
 
     </LinearLayout>
