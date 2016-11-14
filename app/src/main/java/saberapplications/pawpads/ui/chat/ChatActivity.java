@@ -18,14 +18,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -139,9 +138,6 @@ public class ChatActivity extends BaseActivity {
     };
 
 
-    //    private QBPrivateChat chat;
-    private Integer currentUserId;
-
     private QBPrivateChat privateChat;
 
     private boolean isBlocked;
@@ -157,7 +153,9 @@ public class ChatActivity extends BaseActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        chatAdapter = new ChatMessagesAdapter(ChatActivity.this, currentQBUser.getId());
+
+        chatAdapter = new ChatMessagesAdapter(ChatActivity.this, currentUserId);
+
         binding.listViewChatMessages.setAdapter(chatAdapter);
         chatAdapter.setCallback(new BaseListAdapter.Callback<QBChatMessage>() {
             @Override
@@ -204,7 +202,7 @@ public class ChatActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (recipient==null || userDeleted) return;
+                if (recipient == null || userDeleted) return;
                 if (recipient.getFileId() != null) {
                     float d = getResources().getDisplayMetrics().density;
                     int size = Math.round(80 * d);
@@ -248,38 +246,40 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    if (currentQBUser==null){
-                        currentQBUser=QBUsers.getUser(preferences.getInt(C.QB_USERID,0));
+                    if (currentQBUser == null) {
+                        currentQBUser = QBUsers.getUser(preferences.getInt(C.QB_USERID, 0));
                     }
                     currentUserId = currentQBUser.getId();
-                    if (getIntent() != null && !isActivityReopened) {
+                    if (recipient == null) {
                         if (getIntent().hasExtra(RECIPIENT)) {
                             recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
                             isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
                         }
-                        if (recipient == null && getIntent().hasExtra(RECIPIENT_ID)) {
+                        if (getIntent().hasExtra(RECIPIENT_ID)) {
                             try {
-                                recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID,0));
-                            }catch (QBResponseException e){
-                                if (e.getHttpStatusCode()==404){
+                                recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
+                            } catch (QBResponseException e) {
+                                if (e.getHttpStatusCode() == 404) {
                                     binding.setIsDeleted(true);
-                                    userDeleted=true;
+                                    userDeleted = true;
                                     hideSoftKeyboard();
-                                }else {
+                                } else {
                                     throw e;
                                 }
                             }
                         }
-                        if (!userDeleted) {
-                            privateChat = privateChatManager.getChat(recipient.getId());
-                            if (privateChat == null) {
-                                privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
-                            } else {
-                                privateChat.addMessageListener(messageListener);
-                            }
-
-                            init();
+                    }
+                    if (!userDeleted) {
+                        privateChat = privateChatManager.getChat(recipient.getId());
+                        if (privateChat == null) {
+                            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
+                        } else {
+                            privateChat.addMessageListener(messageListener);
                         }
+
+                        init();
+                    }
+                    if (dialog == null) {
                         if (getIntent().hasExtra(DIALOG)) {
                             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
                         }
@@ -316,14 +316,16 @@ public class ChatActivity extends BaseActivity {
                         }
                     }
 
-
+                    Log.d("CHAT","bload");
                     if (!isActivityReopened) {
+                        Log.d("CHAT","loADMESSages");
                         requestBuilder = new QBRequestGetBuilder();
                         requestBuilder.setLimit(messagesPerPage);
                         requestBuilder.sortDesc("date_sent");
                         chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
                         currentPage++;
                     } else if (gotMessagesInOffline) {
+                        Log.d("CHAT","offline");
                         requestBuilder = new QBRequestGetBuilder();
                         requestBuilder.addRule("date_sent", ">", String.valueOf(paused));
                         requestBuilder.sortDesc("date_sent");
@@ -340,6 +342,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                Log.d("CHAT","finished");
                 isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
@@ -399,7 +402,6 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-
     private void onBlocked() {
         Toast.makeText(this, getString(R.string.text_you_blocked), Toast.LENGTH_LONG).show();
         messageContainer.setVisibility(View.GONE);
@@ -413,7 +415,7 @@ public class ChatActivity extends BaseActivity {
 
     public void sendChatMessage() {
         if (isBusy.get()) {
-            Toast.makeText(this,"Please wait until connection to server restored",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please wait until connection to server restored", Toast.LENGTH_LONG).show();
             return;
         }
         // send chat message to server
@@ -447,71 +449,69 @@ public class ChatActivity extends BaseActivity {
 
         // Get the path
 
-            final String path = FileUtil.getPath(this, uri);
-            final File filePhoto = new File(path);
-            new AsyncTask<Void, Integer, QBChatMessage>() {
-                Exception exception;
+        final String path = FileUtil.getPath(this, uri);
+        final File filePhoto = new File(path);
+        new AsyncTask<Void, Integer, QBChatMessage>() {
+            Exception exception;
 
-                @Override
-                protected QBChatMessage doInBackground(Void... params) {
+            @Override
+            protected QBChatMessage doInBackground(Void... params) {
 
-                    try {
-                        QBFile qbFile = QBContent.uploadFileTask(filePhoto, false, null, new QBProgressCallback() {
-                            @Override
-                            public void onProgressUpdate(int i) {
-                                uploadProgress.set(i);
-                            }
-                        });
-
-                        // create a message
-                        QBChatMessage chatMessage = new QBChatMessage();
-                        chatMessage.setProperty("save_to_history", "1"); // Save a message to history
-
-                        // attach a photo
-                        QBAttachment attachment = new QBAttachment("photo");
-                        attachment.setId(qbFile.getId().toString());
-                        attachment.setName(filePhoto.getName());
-                        chatMessage.addAttachment(attachment);
-                        chatMessage.setBody(filePhoto.getName());
-                        if (isImage(filePhoto)) {
-                            Bitmap bitmap = BitmapFactory.decodeFile(filePhoto.getAbsolutePath());
-                            Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
-                            File tmp = File.createTempFile("thumb", ".jpg");
-                            FileOutputStream stream = new FileOutputStream(tmp);
-                            thumb.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                            stream.close();
-
-                            QBFile qbFileThumb = QBContent.uploadFileTask(tmp, false, null);
-                            QBAttachment attachmentThumb = new QBAttachment("thumb");
-                            attachmentThumb.setId(qbFileThumb.getId().toString());
-                            attachmentThumb.setName(qbFileThumb.getName());
-                            chatMessage.addAttachment(attachmentThumb);
-                            bitmap.recycle();
+                try {
+                    QBFile qbFile = QBContent.uploadFileTask(filePhoto, false, null, new QBProgressCallback() {
+                        @Override
+                        public void onProgressUpdate(int i) {
+                            uploadProgress.set(i);
                         }
+                    });
 
-                        privateChat.sendMessage(chatMessage);
-                        return chatMessage;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        exception = e;
+                    // create a message
+                    QBChatMessage chatMessage = new QBChatMessage();
+                    chatMessage.setProperty("save_to_history", "1"); // Save a message to history
+
+                    // attach a photo
+                    QBAttachment attachment = new QBAttachment("photo");
+                    attachment.setId(qbFile.getId().toString());
+                    attachment.setName(filePhoto.getName());
+                    chatMessage.addAttachment(attachment);
+                    chatMessage.setBody(filePhoto.getName());
+                    if (isImage(filePhoto)) {
+                        Bitmap bitmap = BitmapFactory.decodeFile(filePhoto.getAbsolutePath());
+                        Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
+                        File tmp = File.createTempFile("thumb", ".jpg");
+                        FileOutputStream stream = new FileOutputStream(tmp);
+                        thumb.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                        stream.close();
+
+                        QBFile qbFileThumb = QBContent.uploadFileTask(tmp, false, null);
+                        QBAttachment attachmentThumb = new QBAttachment("thumb");
+                        attachmentThumb.setId(qbFileThumb.getId().toString());
+                        attachmentThumb.setName(qbFileThumb.getName());
+                        chatMessage.addAttachment(attachmentThumb);
+                        bitmap.recycle();
                     }
-                    return null;
+
+                    privateChat.sendMessage(chatMessage);
+                    return chatMessage;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    exception = e;
                 }
+                return null;
+            }
 
-                @Override
-                protected void onPostExecute(QBChatMessage qbChatMessage) {
-                    isSendingMessage.set(false);
-                    isBusy.set(false);
-                    if (exception != null) {
-                        Util.onError(exception, ChatActivity.this);
-                        return;
-                    }
-                    displayChatMessage(qbChatMessage);
+            @Override
+            protected void onPostExecute(QBChatMessage qbChatMessage) {
+                isSendingMessage.set(false);
+                isBusy.set(false);
+                if (exception != null) {
+                    Util.onError(exception, ChatActivity.this);
+                    return;
                 }
+                displayChatMessage(qbChatMessage);
+            }
 
-            }.execute();
-
-
+        }.execute();
 
 
     }
@@ -575,17 +575,6 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
 
     public void unblockUser() {
         binding.unblock.setEnabled(false);
@@ -661,6 +650,7 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+        if (dialog == null) return;
         if (!qbChatMessage.getDialogId().equals(dialog.getDialogId())) return;
         ChatActivity.this.runOnUiThread(new Runnable() {
             @Override

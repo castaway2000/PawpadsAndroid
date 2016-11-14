@@ -53,7 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected boolean isExternalDialogOpened;
 
-    private static Integer userId;
+    protected static Integer currentUserId;
     protected static QBUser currentQBUser;
 
     //    private Location lastLocation;
@@ -102,6 +102,7 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         isReopened=false;
         preferences=PreferenceManager.getDefaultSharedPreferences(this);
+        currentUserId=preferences.getInt(C.QB_USERID,0);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 closeActivity, new IntentFilter(C.CLOSE_ALL_APP_ACTIVITIES)
         );
@@ -269,7 +270,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public Integer getUserId() {
-        return userId;
+        return  currentUserId;
     }
 
     protected boolean isActive() {
@@ -314,6 +315,7 @@ public abstract class BaseActivity extends AppCompatActivity
         if (requestCode == RECREATE_SESSION) {
             if (resultCode == RESULT_OK) {
                 try {
+                    isReopened=false;
                    loginToChat();
                 } catch (Exception e) {
                     e.printStackTrace();

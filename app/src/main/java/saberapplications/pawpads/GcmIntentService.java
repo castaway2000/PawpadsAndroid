@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -131,8 +132,10 @@ public class GcmIntentService extends IntentService {
                 chatIntent.putExtra(ChatActivity.RECIPIENT_ID, Integer.parseInt(userId));
                 chatIntent.putExtra(ChatActivity.DIALOG_ID, extras.getString("dialog_id"));
 
-                PendingIntent contentIntent = PendingIntent.getActivity(GcmIntentService.this, 0,
-                        chatIntent, 0);
+                PendingIntent contentIntent =TaskStackBuilder.create(this)
+                        .addNextIntentWithParentStack(chatIntent)
+                        .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(GcmIntentService.this)

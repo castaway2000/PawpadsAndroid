@@ -1,4 +1,4 @@
-<resources>
+   <resources>
 
     <declare-styleable name="FontText">
         <attr name="typefaceAsset" format="string" />

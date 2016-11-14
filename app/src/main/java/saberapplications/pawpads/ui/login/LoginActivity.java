@@ -126,6 +126,9 @@ public class LoginActivity extends AppCompatActivity {
         if (twitterAuthClient != null) {
             twitterAuthClient.onActivityResult(requestCode, resultCode, data);
         }
+        if (resultCode==RESULT_CANCELED){
+            isBusy.set(false);
+        }
     }
 
     private boolean isTwitterInstalled() {
@@ -284,5 +287,11 @@ public class LoginActivity extends AppCompatActivity {
 
     public void restorePassword() {
         startActivity(new Intent(this, ForgotPasswordActivity.class));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
     }
 }

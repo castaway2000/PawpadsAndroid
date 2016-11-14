@@ -90,7 +90,11 @@ public class Util {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-
+    /**
+     *
+     * @param distanceTo in meters
+     * @return formatted distance
+     */
     public static  String formatDistance(float distanceTo) {
 
         if (Util.UNIT_OF_MEASURE.equals("MI")) {

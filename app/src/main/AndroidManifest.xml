@@ -28,7 +28,10 @@
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-feature android:name="android.hardware.location.gps" android:required="true"/>
+
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
     <application
         android:name=".PawPadsApplication"
         android:allowBackup="true"
@@ -36,7 +39,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
@@ -49,14 +54,14 @@
         <activity
             android:name=".ui.home.MainActivity"
             android:screenOrientation="portrait"
-            >
+            android:launchMode="singleInstance">
 
         </activity>
         <activity
             android:name=".ui.profile.ProfileActivity"
-            android:windowSoftInputMode="stateHidden"
+            android:label="@string/profile"
             android:screenOrientation="portrait"
-            android:label="@string/profile">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.profilepage" />
 
@@ -65,9 +70,8 @@
         </activity>
         <activity
             android:name=".ui.login.LoginActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait"
-            >
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.Login" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -76,7 +80,12 @@
         <activity
             android:name=".ui.chat.ChatActivity"
             android:label="Chat"
-            android:screenOrientation="portrait"></activity>
+            android:parentActivityName=".ui.home.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.home.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.dialogs.DialogsListActivity"
             android:label="DialogsList"></activity>
@@ -84,7 +93,7 @@
             android:name=".ui.profile.ProfileEditActivity"
             android:label="PawPads"
             android:screenOrientation="portrait"
-           android:windowSoftInputMode="adjustPan"  >
+            android:windowSoftInputMode="adjustPan">
             >
             <intent-filter>
                 <action android:name="android.intent.action.profileEditPage" />
@@ -95,23 +104,19 @@
         <activity
             android:name=".ui.register.RegisterActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.login.ForgotPasswordActivity"
-            android:screenOrientation="portrait"
             android:label="ForgotPass"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.settings.PrefrenceActivity"
             android:label="PrefrenceActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.AboutActivity"
             android:label="@string/About"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <receiver
             android:name=".GcmBroadcastReceiver"
@@ -152,10 +157,10 @@
             android:name=".service.FileDownloadService"
             android:exported="false"></service>
 
-        <activity android:name=".ui.home.SplashActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+        <activity
+            android:name=".ui.home.SplashActivity"
             android:screenOrientation="portrait"
-            >
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -189,7 +189,14 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                         if (lastMessages.containsKey(qbLocation.getUserId())) {
                             item.setLastMessageDate(lastMessages.get(qbLocation.getUserId()));
                         }
-                        result.add(item);
+                        Location userLocation = new Location("");
+                        userLocation.setLatitude(item.getLocation().getLatitude());
+                        userLocation.setLongitude(item.getLocation().getLongitude());
+
+                        if (lastListUpdatedLocation.distanceTo(userLocation)<=Util.getRange()*1000){
+                            result.add(item);
+                        }
+
                     }
                     return result;
 
