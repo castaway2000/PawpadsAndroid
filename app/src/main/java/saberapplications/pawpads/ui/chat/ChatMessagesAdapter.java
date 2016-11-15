@@ -111,7 +111,13 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             if (item.getAttachments().size()>0){
                 Iterator<QBAttachment> iterator = item.getAttachments().iterator();
                 attachment=iterator.next();
-                binding.setMessage(attachment.getName());
+                if (attachment.getName()!=null){
+                    binding.setMessage(attachment.getName());
+                }else{
+                    binding.setMessage(item.getBody());
+                }
+
+
                 if (iterator.hasNext()) {
                     QBAttachment thumbAttachment = iterator.next();
                     if ( thumbAttachment.getType().equals("thumb")){

@@ -58,6 +58,7 @@ import java.io.FileOutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import saberapplications.pawpads.C;
@@ -316,16 +317,13 @@ public class ChatActivity extends BaseActivity {
                         }
                     }
 
-                    Log.d("CHAT","bload");
                     if (!isActivityReopened) {
-                        Log.d("CHAT","loADMESSages");
                         requestBuilder = new QBRequestGetBuilder();
                         requestBuilder.setLimit(messagesPerPage);
                         requestBuilder.sortDesc("date_sent");
                         chatMessages = QBChatService.getDialogMessages(dialog, requestBuilder, new Bundle());
                         currentPage++;
                     } else if (gotMessagesInOffline) {
-                        Log.d("CHAT","offline");
                         requestBuilder = new QBRequestGetBuilder();
                         requestBuilder.addRule("date_sent", ">", String.valueOf(paused));
                         requestBuilder.sortDesc("date_sent");
@@ -342,7 +340,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                Log.d("CHAT","finished");
+                Log.d("CHAT", "finished");
                 isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
@@ -376,6 +374,7 @@ public class ChatActivity extends BaseActivity {
         if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
+
         chatAdapter.addItem(message);
     }
 
@@ -450,8 +449,8 @@ public class ChatActivity extends BaseActivity {
         // Get the path
 
         final String path = FileUtil.getPath(this, uri);
-        if (path==null){
-            Util.onError(getString(R.string.unable_to_get_file),this);
+        if (path == null) {
+            Util.onError(getString(R.string.unable_to_get_file), this);
             return;
         }
         final File filePhoto = new File(path);
@@ -463,12 +462,14 @@ public class ChatActivity extends BaseActivity {
             protected QBChatMessage doInBackground(Void... params) {
 
                 try {
-                    QBFile qbFile = QBContent.uploadFileTask(filePhoto, false, null, new QBProgressCallback() {
+                    UploadFileTask task = new UploadFileTask(filePhoto, false, null, new QBProgressCallback() {
                         @Override
                         public void onProgressUpdate(int i) {
                             uploadProgress.set(i);
                         }
                     });
+
+                    QBFile qbFile = task.execute();
 
                     // create a message
                     QBChatMessage chatMessage = new QBChatMessage();
@@ -498,7 +499,7 @@ public class ChatActivity extends BaseActivity {
 
                     privateChat.sendMessage(chatMessage);
 
-                    if (filePhoto.getAbsolutePath().contains("cache")){
+                    if (filePhoto.getAbsolutePath().contains("cache")) {
                         filePhoto.delete();
                     }
                     return chatMessage;
@@ -526,7 +527,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void selectFile() {
-        isExternalDialogOpened = true;
+
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {

@@ -250,16 +250,19 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public synchronized void decrementActivityCount() {
-        if (isExternalDialogOpened) return;
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 openActivitiesCount--;
                 if (openActivitiesCount == 0) {
-                    logOutChat();
+                    if (!isExternalDialogOpened) {
+                        logOutChat();
+                        UserLocationService.stop();
+                    }
                     //stoplocation updates
-                    UserLocationService.stop();
+
                 }
             }
         }, getWaitBeforeLogoffTime());
