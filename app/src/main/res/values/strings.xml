@@ -104,6 +104,7 @@
     <string name="delete_account_warning">If you delete your account you will permanently loose your profile, photos and messages.</string>
     <string name="delete_account_question">Are you sure you want to delete your account?</string>
     <string name="delete">Delete</string>
+    <string name="unable_to_get_file">Unable to get specified file</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

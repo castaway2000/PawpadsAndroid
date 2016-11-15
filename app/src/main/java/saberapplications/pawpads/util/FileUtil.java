@@ -8,6 +8,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by Stanislav Volnjanskij on 11/3/16.
@@ -53,6 +60,32 @@ public class FileUtil {
                 final String selection = "_id=?";
                 final String[] selectionArgs = new String[] {split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+            try {
+
+                Cursor returnCursor =
+                        context.getContentResolver().query(uri, null, null, null, null);
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                returnCursor.moveToFirst();
+                String filename=returnCursor.getString(nameIndex);
+
+
+                InputStream inputStream = context.getContentResolver().openInputStream(uri);
+
+                File file=new File(context.getCacheDir(),filename);
+                FileOutputStream outStream = new FileOutputStream(file);
+                while (inputStream.available()>0){
+                    byte[] buffer=new byte[1024];
+                    inputStream.read(buffer);
+                    outStream.write(buffer);
+                }
+                outStream.close();
+                inputStream.close();
+                return file.getAbsolutePath();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         }
         // MediaStore (and general)
@@ -111,6 +144,7 @@ public class FileUtil {
      * @return Whether the Uri authority is Google Photos.
      */
     public static boolean isGooglePhotosUri(Uri uri) {
-        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+        return "com.google.android.apps.photos.content".equals(uri.getAuthority())
+        || "com.google.android.apps.docs.storage".equals(uri.getAuthority());
     }
 }

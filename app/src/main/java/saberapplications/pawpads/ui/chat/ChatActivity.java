@@ -450,7 +450,12 @@ public class ChatActivity extends BaseActivity {
         // Get the path
 
         final String path = FileUtil.getPath(this, uri);
+        if (path==null){
+            Util.onError(getString(R.string.unable_to_get_file),this);
+            return;
+        }
         final File filePhoto = new File(path);
+
         new AsyncTask<Void, Integer, QBChatMessage>() {
             Exception exception;
 
@@ -492,6 +497,10 @@ public class ChatActivity extends BaseActivity {
                     }
 
                     privateChat.sendMessage(chatMessage);
+
+                    if (filePhoto.getAbsolutePath().contains("cache")){
+                        filePhoto.delete();
+                    }
                     return chatMessage;
                 } catch (Exception e) {
                     e.printStackTrace();
