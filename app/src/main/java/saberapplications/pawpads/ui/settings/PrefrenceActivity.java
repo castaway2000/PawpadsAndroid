@@ -91,6 +91,12 @@ public class PrefrenceActivity extends BaseActivity {
 
             }
         });
+        unit.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                range.notifyChange();
+            }
+        });
         binding.etRange.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
