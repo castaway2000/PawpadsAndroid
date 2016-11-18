@@ -12,10 +12,12 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
+
 repositories {
     maven { url 'http://maven.stickerpipe.com/artifactory/stickerfactory' }
     maven { url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/" }
     maven { url 'https://maven.fabric.io/public' }
+
 }
 android {
     compileSdkVersion 23
@@ -25,9 +27,9 @@ android {
         minSdkVersion 15
 
         targetSdkVersion 23
-        versionCode 16
+        versionCode 18
 
-        versionName "2.0.16"
+        versionName "2.0.18"
         // Enabling multidex support.
         multiDexEnabled true
 
@@ -58,10 +60,6 @@ android {
 dependencies {
     
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
-        transitive = true;
-    }
-
     compile('com.twitter.sdk.android:twitter-core:2.0.0@aar') {
         transitive = true;
     }
@@ -86,5 +84,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:9.6.1'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.makeramen:roundedimageview:2.2.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+        transitive = true;
+    }
 
 }

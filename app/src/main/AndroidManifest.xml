@@ -149,9 +149,6 @@
             android:name=".service.UserLocationService"
             android:enabled="true"></service>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="f9519ed3f0c8d678804a9e33709edaa47cf8a37e" />
 
         <service
             android:name=".service.FileDownloadService"
@@ -169,6 +166,9 @@
 
         </activity>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="71b41297088b136c5894241c6ffdecec047779a6" />
     </application>
 
 </manifest>
