@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="admob_app_id">ca-app-pub-5883625079032168/1470784739</string>
+    <string name="admob_app_id">ca-app-pub-5883625079032168~8994051532</string>
+    <string name="chat_ad_id">ca-app-pub-5883625079032168/7696927136</string>
+    <string name="full_profile_page_ad">ca-app-pub-5883625079032168/5482181931</string>
     <string name="main_activity_ad_unit_id">ca-app-pub-5883625079032168/1470784739</string>
-    <string name="profile_activity_ad_unit_id">ca-app-pub-5883625079032168/1470784739</string>
+    <string name="profile_activity_ad_unit_id">ca-app-pub-5883625079032168/6220193937</string>
 </resources>

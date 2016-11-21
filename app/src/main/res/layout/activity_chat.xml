@@ -72,7 +72,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.google.android.gms.ads.AdView
+                    android:id="@+id/chatBannerAdview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:adUnitId="@string/chat_ad_id"
+                    app:adSize="BANNER"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    />
+            </RelativeLayout>
 
             <!-- Footer !-->
             <LinearLayout
@@ -203,14 +215,14 @@
                 android:id="@+id/listView_chat_messages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@+id/footer_container"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:scrollbars="none"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll"
                 app:layoutManager="LinearLayoutManager"
-                app:reverseLayout="true" />
+                app:reverseLayout="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>

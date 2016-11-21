@@ -22,17 +22,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -54,7 +52,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import saberapplications.pawpads.C;
-
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
@@ -63,11 +60,11 @@ import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
-import saberapplications.pawpads.ui.settings.PrefrenceActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
+import saberapplications.pawpads.ui.settings.PrefrenceActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.LocationServiceHelper;
 
@@ -85,8 +82,6 @@ public class MainActivity extends BaseActivity {
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
     ChatsFragment chatsFragment;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ListView listView;
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
@@ -140,10 +135,7 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setTitle(null);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //  mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
-        //  mSwipeRefreshLayout.setOnRefreshListener(this);
         context = getApplicationContext();
-        //listView = (ListView) findViewById(R.id.listView);
         userLocalStore = new UserLocalStore(this);
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         Util.UNIT_OF_MEASURE = defaultSharedPreferences.getString(C.MEASURE_UNIT, "MI");
@@ -181,11 +173,12 @@ public class MainActivity extends BaseActivity {
         });
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         binding.tabLayout.setupWithViewPager(binding.viewPager);
-        MobileAds.initialize(getApplicationContext(),getString(R.string.admob_app_id));
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("3064B67C1862D04332D90B97D7E7F360") //Remove this when going live.
-                .build();
-        binding.mainBannerAdView.loadAd(adRequest);
+
+        //banner ad
+        AdView adView = (AdView)findViewById(R.id.mainBannerAdView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChanged,new IntentFilter(C.USER_DATA_CHANGED));
         if (checkPermissions()){
             LocationServiceHelper.checkService(this);

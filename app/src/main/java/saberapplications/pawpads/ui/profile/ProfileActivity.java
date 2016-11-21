@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -55,10 +56,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 
 public class ProfileActivity extends BaseActivity {
 
-
-
     private InterstitialAd interAd;
-
     private TextView isBlockedView;
 
     private QBUser qbUser;
@@ -83,23 +81,25 @@ public class ProfileActivity extends BaseActivity {
 
         progressMessage.set(getString(R.string.loading));
         isBlockedView = (TextView) findViewById(R.id.is_blocked);
-
         qbUser= (QBUser) getIntent().getSerializableExtra(C.QB_USER);
+
+        //banner ad
+        AdView adView = (AdView)findViewById(R.id.profileAdView);
+        adView.loadAd(requestNewAd());
+
+        //full page ad
         interAd = new InterstitialAd(this);
         interAd.setAdUnitId(Util.AD_UNIT_ID);
-
-
-        //String DEVICE_ID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("3064B67C1862D04332D90B97D7E7F360")//)AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        binding.profileAdView.loadAd(adRequest);
-
-        interAd.loadAd(adRequest);
+        interAd.loadAd(requestNewAd());
         interAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 displayInterAd();
+            }
+
+            @Override
+            public void onAdClosed() {
+                requestNewAd();
             }
         });
 
@@ -127,9 +127,7 @@ public class ProfileActivity extends BaseActivity {
 
 
                     profile = UserProfile.createFromJson(qbUser.getCustomData());
-                    float density=getResources().getDisplayMetrics().density;
-
-
+                    float density = getResources().getDisplayMetrics().density;
 
                     binding.setProfile(profile);
 
@@ -203,10 +201,18 @@ public class ProfileActivity extends BaseActivity {
     }
 
     public void displayInterAd() {
-        int interval = (int) Math.floor(Math.random() * 101) % 3;
-        if (interAd.isLoaded() && interval == 0) {
+        //int interval = (int) Math.floor(Math.random() * 101) % 3;
+        if (interAd.isLoaded())// && interval == 0)
+        {
             interAd.show();
+            requestNewAd();
         }
+    }
+
+    public AdRequest requestNewAd(){
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        return adRequest;
     }
 
     public void openChat(){

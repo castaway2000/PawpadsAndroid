@@ -162,7 +162,6 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginTop="100dp"
-            android:layout_above="@id/mainBannerAdView"
             app:columnCount="3"
             app:orientation="horizontal"
             >

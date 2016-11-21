@@ -19,17 +19,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <android.support.design.widget.CoordinatorLayout
             android:id="@+id/coordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffffff">
 
-            <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
+            </android.support.v4.view.ViewPager>
+
+
+
+            <android.support.design.widget.AppBarLayout
 
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -48,6 +58,8 @@
 
                 </android.support.v7.widget.Toolbar>
 
+
+
                 <saberapplications.pawpads.views.FontTabLayout
                     android:id="@+id/tabLayout"
                     android:layout_width="match_parent"
@@ -57,25 +69,25 @@
 
 
                 </saberapplications.pawpads.views.FontTabLayout>
+
             </android.support.design.widget.AppBarLayout>
 
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/viewPager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </android.support.design.widget.CoordinatorLayout>
+
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content">
             <com.google.android.gms.ads.AdView
                 android:id="@+id/mainBannerAdView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:adUnitId="@string/main_activity_ad_unit_id"
                 app:adSize="BANNER"
-                android:layout_alignBottom="@+id/swipelayout"
+                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                app:layout_anchorGravity="center_horizontal|bottom"
-                app:layout_anchor="@id/viewPager"/>
-        </android.support.design.widget.CoordinatorLayout>
+                />
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/left_drawer"
@@ -139,6 +151,7 @@
                 android:paddingTop="6dp"
                 app:columnCount="2">
 
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -152,6 +165,7 @@
                         style="@style/navigation_item"
                         android:onClick="@{ () -> activity.openSettings()}"
                         />
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -178,9 +192,11 @@
                     android:text="@string/logout"
                     style="@style/navigation_item"
                     android:onClick="@{ () -> activity.logout()}"
-
                     />
+
             </android.support.v7.widget.GridLayout>
         </RelativeLayout>
+
     </android.support.v4.widget.DrawerLayout>
+
 </layout>

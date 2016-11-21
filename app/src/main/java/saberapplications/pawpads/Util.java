@@ -22,15 +22,12 @@ public class Util {
     public static final String IS_BLOCKED = "is_blocked";
     public static final String USER_LOCATION_LAT = "user_location_lat";
     public static final String USER_LOCATION_LONG = "user_location_long";
-    public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/4982654336";
+    public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/5482181931";
 
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "325095426674";
     public static String GCMREGID = "nothing yet";
-    //notes: chat implemented with quickblox. these are my own not the contractors
-//    public static final String QB_APPID="33547";
-//    public static final String QB_AUTH_KEY="w8YNQSmstbNJ6AJ";
-//    public static final String QB_AUTH_SECRET="ckSWjeEkjgNpdJ-";
+
     public static final String QB_APPID = "35252";
     public static final String QB_AUTH_KEY = "gb4f7kN3FLgap9A";
     public static final String QB_AUTH_SECRET = "sszVLheuYags2ZQ";
