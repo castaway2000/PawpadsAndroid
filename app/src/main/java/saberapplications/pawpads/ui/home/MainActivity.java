@@ -323,10 +323,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onQBConnect(boolean isActivityReopened) throws Exception {
-//        QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
-        //  loadAndSetNearUsers();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final int currentUserId = prefs.getInt(C.QB_USERID, 0);
+
         QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser user, Bundle bundle) {
@@ -343,13 +340,17 @@ public class MainActivity extends BaseActivity {
 
                 binding.setUsername(Util.getUserName(user));
                 currentQBUser=user;
-
-
             }
 
             @Override
-            public void onError(QBResponseException e) {
-                Util.onError(e, MainActivity.this);
+            public void onError(final QBResponseException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.onError(e, MainActivity.this);
+                    }
+                });
+
             }
         });
 
