@@ -68,18 +68,20 @@
 
         </android.support.design.widget.AppBarLayout>
 
+
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
                 <com.google.android.gms.ads.AdView
-                    android:id="@+id/chatBannerAdview"
+                    android:id="@+id/chatAdView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:adUnitId="@string/chat_ad_id"
                     app:adSize="BANNER"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
@@ -182,7 +184,7 @@
                         android:textSize="22sp"
                         android:visibility="@{isBlockedByMe}" />
                 </FrameLayout>
-<!-- Deleted !-->
+                <!-- Deleted !-->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

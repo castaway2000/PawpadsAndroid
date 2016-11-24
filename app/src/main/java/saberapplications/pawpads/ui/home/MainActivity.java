@@ -50,6 +50,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
@@ -176,6 +177,7 @@ public class MainActivity extends BaseActivity {
 
         //banner ad
         AdView adView = (AdView)findViewById(R.id.mainBannerAdView);
+        adView.setAdUnitId(getNewAdID());
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
@@ -283,6 +285,15 @@ public class MainActivity extends BaseActivity {
         });
 
 
+    }
+    public String getNewAdID(){
+        String ID;
+        Random rand = new Random();
+        int n = rand.nextInt(3)+1;
+        if(n == 1){ ID = String.valueOf(R.string.main_activity_ad_unit_id); }
+        else if(n == 2){ ID = String.valueOf(R.string.main_activity_ad_unit_id2); }
+        else{ ID = String.valueOf(R.string.main_activity_ad_unit_id3); }
+        return ID;
     }
 
     private void openProfile(QBDialog dialog, QBUser user) {

@@ -247,7 +247,6 @@
             android:id="@+id/profileAdView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:adUnitId="@string/profile_activity_ad_unit_id"
             app:adSize="BANNER"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
