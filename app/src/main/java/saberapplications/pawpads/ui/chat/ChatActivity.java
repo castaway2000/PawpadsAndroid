@@ -18,7 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,9 +26,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.quickblox.chat.QBChat;
@@ -62,7 +59,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
@@ -142,9 +138,6 @@ public class ChatActivity extends BaseActivity {
     };
 
 
-    //    private QBPrivateChat chat;
-    private Integer currentUserId;
-
     private QBPrivateChat privateChat;
 
     private boolean isBlocked;
@@ -160,7 +153,9 @@ public class ChatActivity extends BaseActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        chatAdapter = new ChatMessagesAdapter(ChatActivity.this, currentQBUser.getId());
+
+        chatAdapter = new ChatMessagesAdapter(ChatActivity.this, currentUserId);
+
         binding.listViewChatMessages.setAdapter(chatAdapter);
         chatAdapter.setCallback(new BaseListAdapter.Callback<QBChatMessage>() {
             @Override
@@ -200,11 +195,6 @@ public class ChatActivity extends BaseActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateChatReciever, new IntentFilter(C.UPDATE_CHAT));
 
-        //banner ad
-        AdView adView = (AdView)findViewById(R.id.chatAdView);
-        adView.setAdUnitId(getNewAdID());
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
     }
 
 
@@ -212,7 +202,7 @@ public class ChatActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (recipient==null || userDeleted) return;
+                if (recipient == null || userDeleted) return;
                 if (recipient.getFileId() != null) {
                     float d = getResources().getDisplayMetrics().density;
                     int size = Math.round(80 * d);
@@ -242,7 +232,7 @@ public class ChatActivity extends BaseActivity {
     public void onQBConnect(final boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
         isBusy.set(true);
-        currentUserId = currentQBUser.getId();
+
 
         final QBPrivateChatManager privateChatManager = QBChatService.getInstance().getPrivateChatManager();
 
@@ -256,36 +246,40 @@ public class ChatActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-
-                    if (getIntent() != null && !isActivityReopened) {
+                    if (currentQBUser == null) {
+                        currentQBUser = QBUsers.getUser(preferences.getInt(C.QB_USERID, 0));
+                    }
+                    currentUserId = currentQBUser.getId();
+                    if (recipient == null) {
                         if (getIntent().hasExtra(RECIPIENT)) {
                             recipient = (QBUser) getIntent().getSerializableExtra(RECIPIENT);
                             isBlocked = getIntent().getBooleanExtra(Util.IS_BLOCKED, false);
                         }
-                        if (recipient == null && getIntent().hasExtra(RECIPIENT_ID)) {
+                        if (getIntent().hasExtra(RECIPIENT_ID)) {
                             try {
                                 recipient = QBUsers.getUser(getIntent().getIntExtra(RECIPIENT_ID, 0));
-                            }catch (QBResponseException e){
-                                if (e.getHttpStatusCode()==404){
+                            } catch (QBResponseException e) {
+                                if (e.getHttpStatusCode() == 404) {
                                     binding.setIsDeleted(true);
-                                    userDeleted=true;
+                                    userDeleted = true;
                                     hideSoftKeyboard();
-                                }else {
+                                } else {
                                     throw e;
                                 }
                             }
-
                         }
-                        if (!userDeleted) {
-                            privateChat = privateChatManager.getChat(recipient.getId());
-                            if (privateChat == null) {
-                                privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
-                            } else {
-                                privateChat.addMessageListener(messageListener);
-                            }
-
-                            init();
+                    }
+                    if (!userDeleted) {
+                        privateChat = privateChatManager.getChat(recipient.getId());
+                        if (privateChat == null) {
+                            privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
+                        } else {
+                            privateChat.addMessageListener(messageListener);
                         }
+
+                        init();
+                    }
+                    if (dialog == null) {
                         if (getIntent().hasExtra(DIALOG)) {
                             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
                         }
@@ -322,7 +316,6 @@ public class ChatActivity extends BaseActivity {
                         }
                     }
 
-
                     if (!isActivityReopened) {
                         requestBuilder = new QBRequestGetBuilder();
                         requestBuilder.setLimit(messagesPerPage);
@@ -346,6 +339,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                Log.d("CHAT", "finished");
                 isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
@@ -379,6 +373,7 @@ public class ChatActivity extends BaseActivity {
         if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
+
         chatAdapter.addItem(message);
     }
 
@@ -405,7 +400,6 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-
     private void onBlocked() {
         Toast.makeText(this, getString(R.string.text_you_blocked), Toast.LENGTH_LONG).show();
         messageContainer.setVisibility(View.GONE);
@@ -417,19 +411,9 @@ public class ChatActivity extends BaseActivity {
         binding.setIsBlockedByOther(false);
     }
 
-    public String getNewAdID(){
-        String ID;
-        Random rand = new Random();
-        int n = rand.nextInt(3)+1;
-        if(n == 1){ ID = String.valueOf(R.string.chat_ad_id); }
-        else if(n == 2){ ID = String.valueOf(R.string.chat_ad_id2); }
-        else{ ID = String.valueOf(R.string.chat_ad_id3); }
-        return ID;
-    }
-
     public void sendChatMessage() {
         if (isBusy.get()) {
-            Toast.makeText(this,"Please wait until connection to server restored",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please wait until connection to server restored", Toast.LENGTH_LONG).show();
             return;
         }
         // send chat message to server
@@ -464,7 +448,12 @@ public class ChatActivity extends BaseActivity {
         // Get the path
 
         final String path = FileUtil.getPath(this, uri);
+        if (path == null) {
+            Util.onError(getString(R.string.unable_to_get_file), this);
+            return;
+        }
         final File filePhoto = new File(path);
+
         new AsyncTask<Void, Integer, QBChatMessage>() {
             Exception exception;
 
@@ -472,12 +461,14 @@ public class ChatActivity extends BaseActivity {
             protected QBChatMessage doInBackground(Void... params) {
 
                 try {
-                    QBFile qbFile = QBContent.uploadFileTask(filePhoto, false, null, new QBProgressCallback() {
+                    UploadFileTask task = new UploadFileTask(filePhoto, false, null, new QBProgressCallback() {
                         @Override
                         public void onProgressUpdate(int i) {
                             uploadProgress.set(i);
                         }
                     });
+
+                    QBFile qbFile = task.execute();
 
                     // create a message
                     QBChatMessage chatMessage = new QBChatMessage();
@@ -506,6 +497,10 @@ public class ChatActivity extends BaseActivity {
                     }
 
                     privateChat.sendMessage(chatMessage);
+
+                    if (filePhoto.getAbsolutePath().contains("cache")) {
+                        filePhoto.delete();
+                    }
                     return chatMessage;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -528,12 +523,10 @@ public class ChatActivity extends BaseActivity {
         }.execute();
 
 
-
-
     }
 
     public void selectFile() {
-        isExternalDialogOpened = true;
+
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -591,17 +584,6 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
 
     public void unblockUser() {
         binding.unblock.setEnabled(false);
@@ -677,6 +659,7 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+        if (dialog == null) return;
         if (!qbChatMessage.getDialogId().equals(dialog.getDialogId())) return;
         ChatActivity.this.runOnUiThread(new Runnable() {
             @Override
@@ -694,6 +677,4 @@ public class ChatActivity extends BaseActivity {
             }
         });
     }
-
-
 }

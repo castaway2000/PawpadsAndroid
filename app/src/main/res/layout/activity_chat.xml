@@ -24,9 +24,9 @@
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -68,25 +68,11 @@
 
         </android.support.design.widget.AppBarLayout>
 
-
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <RelativeLayout
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
-                <com.google.android.gms.ads.AdView
-                    android:id="@+id/chatAdView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:adSize="BANNER"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    />
-            </RelativeLayout>
 
             <!-- Footer !-->
             <LinearLayout
@@ -217,14 +203,14 @@
                 android:id="@+id/listView_chat_messages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@+id/footer_container"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:scrollbars="none"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll"
                 app:layoutManager="LinearLayoutManager"
-                app:reverseLayout="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                app:reverseLayout="true" />
 
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>

@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,8 +83,6 @@ public class ProfileActivity extends BaseActivity {
         binding.setUser(qbUser);
         //banner ad
         AdView adView = (AdView)findViewById(R.id.profileAdView);
-        //app:adUnitId="@string/profile_activity_ad_unit_id"
-        adView.setAdUnitId(getNewAdID());
         adView.loadAd(requestNewAd());
 
     }
@@ -189,15 +186,15 @@ public class ProfileActivity extends BaseActivity {
         return adRequest;
     }
 
-    public String getNewAdID(){
-        String ID;
-        Random rand = new Random();
-        int n = rand.nextInt(3)+1;
-        if(n == 1){ ID = String.valueOf(R.string.profile_activity_ad_unit_id); }
-        else if(n == 2){ ID = String.valueOf(R.string.profile_activity_ad_unit_id2); }
-        else{ ID = String.valueOf(R.string.profile_activity_ad_unit_id3); }
-        return ID;
-    }
+//    public String getNewAdID(){
+//        String ID;
+//        Random rand = new Random();
+//        int n = rand.nextInt(3)+1;
+//        if(n == 1){ ID = String.valueOf(R.string.profile_activity_ad_unit_id); }
+//        else if(n == 2){ ID = String.valueOf(R.string.profile_activity_ad_unit_id2); }
+//        else{ ID = String.valueOf(R.string.profile_activity_ad_unit_id3); }
+//        return ID;
+//    }
 
 
     public void openChat(){
