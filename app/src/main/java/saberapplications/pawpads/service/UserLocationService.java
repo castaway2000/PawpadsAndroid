@@ -51,6 +51,7 @@ public class UserLocationService extends Service implements
     private QBLocation qbLocation;
     private int userId;
     private static boolean mIsRunning;
+    private long mLocationLastSent;
 
     public UserLocationService() {
 
@@ -132,8 +133,7 @@ public class UserLocationService extends Service implements
                 break;
         }
 
-        locationRequest.setInterval(120000);
-        locationRequest.setFastestInterval(60000);
+        locationRequest.setInterval(C.LOCATION_PUSH_INTERVAL);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -197,17 +197,19 @@ public class UserLocationService extends Service implements
             stopSelf();
             return;
         }
+        if (mLocationLastSent >0 && (System.currentTimeMillis()- mLocationLastSent)<C.LOCATION_PUSH_INTERVAL)
+            return;
 
         qbLocation.setLatitude(accuracySettings(location.getLatitude()));
         qbLocation.setLongitude(accuracySettings(location.getLongitude()));
-
         try {
             QBLocations.deleteObsoleteLocations(1);
             qbLocation = QBLocations.updateLocation(qbLocation);
+            mLocationLastSent =System.currentTimeMillis();
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
             editor.putString(Util.USER_LOCATION_LAT, String.valueOf(qbLocation.getLatitude()));
             editor.putString(Util.USER_LOCATION_LONG, String.valueOf(qbLocation.getLongitude()));
-            editor.putInt(C.QB_USERID, userId);
+
             editor.apply();
 
         } catch (QBResponseException e) {

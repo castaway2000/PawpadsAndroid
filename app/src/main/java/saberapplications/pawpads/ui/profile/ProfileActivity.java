@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,7 +81,7 @@ public class ProfileActivity extends BaseActivity {
         progressMessage.set(getString(R.string.loading));
         isBlockedView = (TextView) findViewById(R.id.is_blocked);
         qbUser= (QBUser) getIntent().getSerializableExtra(C.QB_USER);
-
+        binding.setUser(qbUser);
         //banner ad
         AdView adView = (AdView)findViewById(R.id.profileAdView);
         adView.loadAd(requestNewAd());
@@ -231,17 +230,6 @@ public class ProfileActivity extends BaseActivity {
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -335,7 +323,7 @@ public class ProfileActivity extends BaseActivity {
             protected void onPostExecute(Void aVoid) {
                 isBusy.set(false);
                 if (error != null) {
-                    new AlertDialog.Builder(ProfileActivity.this)
+                    new AlertDialog.Builder(ProfileActivity.this,R.style.AppAlertDialogTheme)
                             .setMessage(error)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override

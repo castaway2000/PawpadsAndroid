@@ -32,6 +32,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.Date;
 
@@ -58,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     //    private Location lastLocation;
     private boolean isActive;
-//    protected static QBLocation qbLocation;
+    //    protected static QBLocation qbLocation;
     protected boolean isReopened;
 
     protected SharedPreferences preferences;
@@ -97,12 +98,13 @@ public abstract class BaseActivity extends AppCompatActivity
             finish();
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isReopened=false;
-        preferences=PreferenceManager.getDefaultSharedPreferences(this);
-        currentUserId=preferences.getInt(C.QB_USERID,0);
+        isReopened = false;
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        currentUserId = preferences.getInt(C.QB_USERID, 0);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 closeActivity, new IntentFilter(C.CLOSE_ALL_APP_ACTIVITIES)
         );
@@ -136,9 +138,9 @@ public abstract class BaseActivity extends AppCompatActivity
             startActivityForResult(intent, RECREATE_SESSION);
             return;
         }
-        if (!UserLocationService.isRunning()){
-            SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(this);
-            UserLocationService.startService(preferences.getInt(C.QB_USERID,0));
+        if (!UserLocationService.isRunning()) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            UserLocationService.startService(preferences.getInt(C.QB_USERID, 0));
         }
 
         incrementActivityCount();
@@ -147,20 +149,12 @@ public abstract class BaseActivity extends AppCompatActivity
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
 
-
-
-
-
         if (!QBChatService.getInstance().isLoggedIn()) {
             loginToChat();
             return;
         } else {
             QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
         }
-
-
-
-
 
 
     }
@@ -171,10 +165,10 @@ public abstract class BaseActivity extends AppCompatActivity
         isActive = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationChanged);
         decrementActivityCount();
-        if (QBChatService.getInstance().getPrivateChatManager()!=null){
+        if (QBChatService.getInstance().getPrivateChatManager() != null) {
             QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
         }
-        isReopened=true;
+        isReopened = true;
     }
 
     public void logOutChat() {
@@ -204,14 +198,21 @@ public abstract class BaseActivity extends AppCompatActivity
                 QBChatService.getInstance().startAutoSendPresence(60);
                 QBPrivacyListsManager privacyListsManager = QBChatService.getInstance().getPrivacyListsManager();
                 try {
-                    QBPrivacyList list = privacyListsManager.getPrivacyList("public");
-                    if (list != null) {
-                        list.setDefaultList(true);
-                        list.setActiveList(true);
+                    if (privacyListsManager.getPrivacyLists().size() > 0) {
+                        QBPrivacyList list = privacyListsManager.getPrivacyList("public");
+                        if (list != null) {
+                            list.setDefaultList(true);
+                            list.setActiveList(true);
+                        }
                     }
-                } catch (Exception e) {
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NoResponseException e) {
                     e.printStackTrace();
                 }
+
                 QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -226,8 +227,13 @@ public abstract class BaseActivity extends AppCompatActivity
             }
 
             @Override
-            public void onError(QBResponseException e) {
-                Util.onError(e, getBaseContext());
+            public void onError(final QBResponseException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.onError(e, BaseActivity.this);
+                    }
+                });
             }
         });
     }
@@ -273,7 +279,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public Integer getUserId() {
-        return  currentUserId;
+        return currentUserId;
     }
 
     protected boolean isActive() {
@@ -318,8 +324,8 @@ public abstract class BaseActivity extends AppCompatActivity
         if (requestCode == RECREATE_SESSION) {
             if (resultCode == RESULT_OK) {
                 try {
-                    isReopened=false;
-                   loginToChat();
+                    isReopened = false;
+                    loginToChat();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -328,10 +334,11 @@ public abstract class BaseActivity extends AppCompatActivity
             }
         }
     }
-    public  void hideSoftKeyboard(){
+
+    public void hideSoftKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
