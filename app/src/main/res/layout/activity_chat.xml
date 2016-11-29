@@ -215,6 +215,7 @@
                 android:id="@+id/listView_chat_messages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@id/footer_container"
                 android:scrollbars="none"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll"

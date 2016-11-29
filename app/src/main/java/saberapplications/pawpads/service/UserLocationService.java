@@ -180,6 +180,8 @@ public class UserLocationService extends Service implements
 
     private void updateUserLocation(Location location) {
         if (!mGoogleApiClient.isConnected()) return;
+        if (mLocationLastSent >0 && (System.currentTimeMillis()- mLocationLastSent)<C.LOCATION_PUSH_INTERVAL)
+            return;
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -197,8 +199,6 @@ public class UserLocationService extends Service implements
             stopSelf();
             return;
         }
-        if (mLocationLastSent >0 && (System.currentTimeMillis()- mLocationLastSent)<C.LOCATION_PUSH_INTERVAL)
-            return;
 
         qbLocation.setLatitude(accuracySettings(location.getLatitude()));
         qbLocation.setLongitude(accuracySettings(location.getLongitude()));
