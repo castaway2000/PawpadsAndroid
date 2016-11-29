@@ -203,9 +203,13 @@
                 android:id="@+id/listView_chat_messages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+<<<<<<< HEAD
+                android:layout_above="@id/footer_container"
+=======
                 android:layout_above="@+id/footer_container"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+>>>>>>> 433d3931936e69382d1e37c94766353e1d4b1149
                 android:scrollbars="none"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll"

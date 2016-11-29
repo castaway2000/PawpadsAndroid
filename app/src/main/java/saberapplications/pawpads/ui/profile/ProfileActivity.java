@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -85,24 +84,6 @@ public class ProfileActivity extends BaseActivity {
         //banner ad
         AdView adView = (AdView)findViewById(R.id.profileAdView);
         adView.loadAd(requestNewAd());
-
-        //full page ad
-        interAd = new InterstitialAd(this);
-        interAd.setAdUnitId(Util.AD_UNIT_ID);
-        interAd.loadAd(requestNewAd());
-        interAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                displayInterAd();
-            }
-
-            @Override
-            public void onAdClosed() {
-                requestNewAd();
-            }
-        });
-
-
 
     }
 
@@ -199,20 +180,22 @@ public class ProfileActivity extends BaseActivity {
         }.execute();
     }
 
-    public void displayInterAd() {
-        //int interval = (int) Math.floor(Math.random() * 101) % 3;
-        if (interAd.isLoaded())// && interval == 0)
-        {
-            interAd.show();
-            requestNewAd();
-        }
-    }
-
     public AdRequest requestNewAd(){
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         return adRequest;
     }
+
+//    public String getNewAdID(){
+//        String ID;
+//        Random rand = new Random();
+//        int n = rand.nextInt(3)+1;
+//        if(n == 1){ ID = String.valueOf(R.string.profile_activity_ad_unit_id); }
+//        else if(n == 2){ ID = String.valueOf(R.string.profile_activity_ad_unit_id2); }
+//        else{ ID = String.valueOf(R.string.profile_activity_ad_unit_id3); }
+//        return ID;
+//    }
+
 
     public void openChat(){
         isBusy.set(true);
