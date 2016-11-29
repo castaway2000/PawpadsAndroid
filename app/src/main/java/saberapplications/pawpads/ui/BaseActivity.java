@@ -149,15 +149,40 @@ public abstract class BaseActivity extends AppCompatActivity
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
 
-        if (!QBChatService.getInstance().isLoggedIn()) {
+        if (!QBChatService.getInstance().isLoggedIn()
+                ) {
             loginToChat();
             return;
-        } else {
+        } else if (QBChatService.getInstance().getPrivateChatManager() == null) {
+            reconnectToChat();
+        }else{
             QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
         }
 
 
     }
+    public void reconnectToChat(){
+        if (QBChatService.getInstance().isLoggedIn()) {
+            QBChatService.getInstance().logout(new QBEntityCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid, Bundle bundle) {
+                    loginToChat();
+                }
+                @Override
+                public void onError(final QBResponseException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Util.onError(e,BaseActivity.this);
+                        }
+                    });
+                }
+            });
+        }else {
+            loginToChat();
+        }
+    }
+
 
     @Override
     protected void onStop() {
@@ -173,12 +198,19 @@ public abstract class BaseActivity extends AppCompatActivity
 
     public void logOutChat() {
         if (QBChatService.getInstance().isLoggedIn()) {
-            try {
-                QBChatService.getInstance().logout();
+                QBChatService.getInstance().logout(new QBEntityCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid, Bundle bundle) {
 
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-            }
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+
+                    }
+                });
+
+
         }
     }
 
@@ -192,6 +224,7 @@ public abstract class BaseActivity extends AppCompatActivity
         } catch (BaseServiceException e) {
             e.printStackTrace();
         }
+        if (QBChatService.getInstance().isLoggedIn()) return;
         QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
             @Override
             public void onSuccess(Object o, Bundle bundle) {
@@ -228,6 +261,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
             @Override
             public void onError(final QBResponseException e) {
+                if (e.getMessage().equals("You have already logged in chat")) return;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

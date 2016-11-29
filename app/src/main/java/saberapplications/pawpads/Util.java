@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
@@ -64,10 +65,12 @@ public class Util {
     }
 
     public static void onError(Exception e, Context context) {
+        Crashlytics.getInstance().logException(e);
         showAlert(context,e.getLocalizedMessage());
     }
 
     public static void onError(QBResponseException e, Context context) {
+        Crashlytics.getInstance().logException(e);
         showAlert(context,e.getLocalizedMessage());
 
     }

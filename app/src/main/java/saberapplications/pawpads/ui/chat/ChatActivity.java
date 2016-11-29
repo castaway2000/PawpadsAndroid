@@ -26,8 +26,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -55,7 +53,6 @@ import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +93,7 @@ public class ChatActivity extends BaseActivity {
     ActivityChatBinding binding;
     public final BindableBoolean isSendingMessage = new BindableBoolean();
     public final BindableInteger uploadProgress = new BindableInteger(0);
-    public final BindableBoolean isBusy = new BindableBoolean(false);
+    public final BindableBoolean isBusy = new BindableBoolean(true);
     int currentPage = 0;
     int messagesPerPage = 15;
     long paused;
@@ -173,12 +170,6 @@ public class ChatActivity extends BaseActivity {
             dialog = (QBDialog) savedInstanceState.get(DIALOG);
             recipient = (QBUser) savedInstanceState.get(RECIPIENT);
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
-            if (savedInstanceState.containsKey("chat")) {
-                String json = savedInstanceState.getString("chat");
-                Gson gson = new Gson();
-                Type listType = new TypeToken<ArrayList<QBChatMessage>>() {
-                }.getType();
-            }
         }
 
 
