@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -16,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.location.LocationListener;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.chat.QBChatService;
@@ -105,6 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity
         isReopened = false;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         currentUserId = preferences.getInt(C.QB_USERID, 0);
+        Crashlytics.setUserIdentifier(currentUserId.toString());
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 closeActivity, new IntentFilter(C.CLOSE_ALL_APP_ACTIVITIES)
         );
@@ -375,6 +379,16 @@ public abstract class BaseActivity extends AppCompatActivity
             InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+
+        return false;
     }
 
 }

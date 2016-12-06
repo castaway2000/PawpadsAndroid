@@ -95,6 +95,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
             @Override
             public void onError(QBResponseException e) {
+                if (getContext()==null) return;
                 Util.onError(e, getContext());
 
             }

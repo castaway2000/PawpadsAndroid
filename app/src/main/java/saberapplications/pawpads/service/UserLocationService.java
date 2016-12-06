@@ -213,8 +213,12 @@ public class UserLocationService extends Service implements
             editor.apply();
 
         } catch (QBResponseException e) {
-            e.printStackTrace();
-            Crashlytics.logException(e);
+            if (e.getMessage().contains("Entity you are looking for was not found")){
+                initUserLocation(location);
+            }else {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
         }
 
     }

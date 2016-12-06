@@ -105,6 +105,8 @@
     <string name="delete_account_question">Are you sure you want to delete your account?</string>
     <string name="delete">Delete</string>
     <string name="unable_to_get_file">Unable to get specified file</string>
+    <string name="verify_internet_connection">Please verify your internet connection</string>
+    <string name="reconnect_message">Server connection is lost. Trying to reconnect</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

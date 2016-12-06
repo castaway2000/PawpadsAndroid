@@ -424,7 +424,14 @@ public class ChatActivity extends BaseActivity {
                 privateChat.sendMessage(msg);
                 displayChatMessage(msg);
             } catch (SmackException.NotConnectedException e) {
-                Util.onError(e, ChatActivity.this);
+                if (!isNetworkAvailable()){
+                    Util.onError(getString(R.string.verify_internet_connection),this);
+                }else {
+                    isReopened=true;
+                    isBusy.set(true);
+                    loginToChat();
+                    Toast.makeText(this, R.string.reconnect_message,Toast.LENGTH_LONG).show();
+                }
             } catch (Exception e) {
                 Util.onError(e, ChatActivity.this);
             }
