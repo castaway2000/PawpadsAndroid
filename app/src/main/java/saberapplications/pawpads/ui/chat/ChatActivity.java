@@ -14,12 +14,14 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -64,6 +66,7 @@ import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -674,5 +677,28 @@ public class ChatActivity extends BaseActivity {
 
             }
         });
+    }
+
+    public void openProfile() {
+        hideSoftKeyboard();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(recipient != null) {
+                    Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
+                    intent.putExtra(C.QB_USERID, recipient.getId());
+                    intent.putExtra(C.QB_USER, recipient);
+                    startActivity(intent);
+                }
+            }
+        }, 50);
+    }
+
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 }
