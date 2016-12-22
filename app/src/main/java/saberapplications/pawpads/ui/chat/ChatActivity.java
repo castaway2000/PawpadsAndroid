@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -13,12 +14,16 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -55,9 +60,11 @@ import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
@@ -71,6 +78,8 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
 
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+
 
 public class ChatActivity extends BaseActivity {
     public static final String DIALOG = "dialog";
@@ -79,29 +88,23 @@ public class ChatActivity extends BaseActivity {
     public static final String RECIPIENT_ID = "user_id";
     public static final String CURRENT_USER_ID = "current user id";
     private static final int PICKFILE_REQUEST_CODE = 2;
+    private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
     private static final int PERMISSION_REQUEST = 200;
-    //EditText editText_mail_id;
-    EditText editText_chat_message;
-
-    Button button_send_chat;
-
-    //    BroadcastReceiver recieve_chat;
-    private QBDialog dialog;
-    private QBUser recipient;
-    private ChatMessagesAdapter chatAdapter;
-    private FrameLayout blockedContainer;
-    private LinearLayout messageContainer;
-
-    Bundle savedInstanceState;
-    ActivityChatBinding binding;
     public final BindableBoolean isSendingMessage = new BindableBoolean();
     public final BindableInteger uploadProgress = new BindableInteger(0);
     public final BindableBoolean isBusy = new BindableBoolean(true);
+    //EditText editText_mail_id;
+    EditText editText_chat_message;
+    Button button_send_chat;
+    Bundle savedInstanceState;
+    ActivityChatBinding binding;
     int currentPage = 0;
     int messagesPerPage = 15;
     long paused;
     boolean gotMessagesInOffline = false;
-
+    private Uri mPhotoUri;
+    //    BroadcastReceiver recieve_chat;
+    private QBDialog dialog;
     BroadcastReceiver updateChatReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -110,7 +113,10 @@ public class ChatActivity extends BaseActivity {
             }
         }
     };
-
+    private QBUser recipient;
+    private ChatMessagesAdapter chatAdapter;
+    private FrameLayout blockedContainer;
+    private LinearLayout messageContainer;
     private QBMessageListener messageListener = new QBMessageListener() {
         @Override
         public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
@@ -143,6 +149,11 @@ public class ChatActivity extends BaseActivity {
     private boolean isBlocked;
     private boolean userDeleted;
 
+    public static boolean isImage(File file) {
+        String fileName = file.getName();
+        String ext = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        return ext.equals("jpeg") || ext.equals("jpg") || ext.equals("png") || ext.equals("bmp");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +202,6 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-
     private void init() {
         runOnUiThread(new Runnable() {
             @Override
@@ -217,7 +227,9 @@ public class ChatActivity extends BaseActivity {
             if (requestCode == PICKFILE_REQUEST_CODE) {
                 sendAttachment(data.getData());
             }
-
+            if (requestCode == IMAGE_CAPTURE_REQUEST_CODE) {
+                sendAttachment(mPhotoUri);
+            }
 
         }
     }
@@ -393,7 +405,6 @@ public class ChatActivity extends BaseActivity {
         isBusy.set(true);
     }
 
-
     private void onBlocked() {
         Toast.makeText(this, getString(R.string.text_you_blocked), Toast.LENGTH_LONG).show();
         messageContainer.setVisibility(View.GONE);
@@ -527,7 +538,66 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void selectFile() {
+        final CharSequence[] items = {
+                getString(R.string.dialog_take_from_camera),
+                getString(R.string.dialog_get_from_gallery),
+                getString(R.string.cancel)};
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle(getString(R.string.dialog_send_file_title));
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(getString(R.string.dialog_take_from_camera))) {
+                    getImgFromCamera();
+                } else if (items[item].equals(getString(R.string.dialog_get_from_gallery))) {
+                    getImgFromGallery();
+                } else if (items[item].equals(getString(R.string.cancel))) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+    }
 
+    private void getImgFromCamera() {
+        int permCameraCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA);
+        int permWriteCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permCameraCheck != PackageManager.PERMISSION_GRANTED || permWriteCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{ Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    PERMISSION_REQUEST);
+            return;
+        }
+        isExternalDialogOpened = true;
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        mPhotoUri = Uri.fromFile(getOutputMediaFile());
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoUri);
+        startActivityForResult(intent, IMAGE_CAPTURE_REQUEST_CODE);
+    }
+
+    private static File getOutputMediaFile() {
+        File mediaStorageDir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PawPads");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+        return new File(mediaStorageDir.getPath() + File.separator
+                + "IMG_" + timeStamp + ".jpg");
+    }
+
+    private void getImgFromGallery() {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -540,8 +610,6 @@ public class ChatActivity extends BaseActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         startActivityForResult(intent, PICKFILE_REQUEST_CODE);
-
-
     }
 
     public void loadData() {
@@ -584,7 +652,6 @@ public class ChatActivity extends BaseActivity {
 
 
     }
-
 
     public void unblockUser() {
         binding.unblock.setEnabled(false);
@@ -650,12 +717,6 @@ public class ChatActivity extends BaseActivity {
                 }
             }
         }
-    }
-
-    public static boolean isImage(File file) {
-        String fileName = file.getName();
-        String ext = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
-        return ext.equals("jpeg") || ext.equals("jpg") || ext.equals("png") || ext.equals("bmp");
     }
 
     @Override
