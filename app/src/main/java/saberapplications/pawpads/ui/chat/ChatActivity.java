@@ -542,12 +542,7 @@ public class ChatActivity extends BaseActivity {
                 getString(R.string.dialog_take_from_camera),
                 getString(R.string.dialog_get_from_gallery),
                 getString(R.string.cancel)};
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(this);
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppAlertDialogTheme);
         builder.setTitle(getString(R.string.dialog_send_file_title));
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
