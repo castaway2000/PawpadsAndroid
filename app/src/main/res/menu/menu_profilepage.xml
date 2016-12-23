@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.profile.ProfileActivity">
+
+    <item
+        android:id="@+id/action_blockUser"
+        android:title="Block User"
+        android:orderInCategory="100"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_unblock"
+        android:title="Unblock User"
+        android:orderInCategory="120"
+        android:visible="true"
+        app:showAsAction="never"
+        />
+
+</menu>

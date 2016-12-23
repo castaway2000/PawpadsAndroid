@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="username"
+            type="String" />
+
+        <variable
+            name="lastMessage"
+            type="String" />
+        <variable
+            name="lastMessageDate"
+            type="String" />
+        <import type="android.view.View" alias="View"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:background="@drawable/list_item_bg"
+        >
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:scaleType="centerCrop"
+            app:riv_border_color="#333333"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            android:src="@drawable/user_placeholder"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_toEndOf="@id/avatar"
+            android:orientation="vertical">
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{username,default=USERNAME}"
+                android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
+                style="@style/list_title"/>
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{lastMessage,default="28 AUG" }'
+                style="@style/list_details"
+                app:typefaceAsset="Proxima_Nova_Regular_Italic.otf"
+                />
+
+        </LinearLayout>
+
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/last_message_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:text='@{lastMessageDate,default="7 JUL" }'
+            style="@style/list_details" />
+
+    </RelativeLayout>
+</layout>

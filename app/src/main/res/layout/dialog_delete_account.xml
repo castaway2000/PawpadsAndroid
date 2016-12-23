@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="dialog"
+            type="saberapplications.pawpads.ui.settings.DeleteAccountConfirmationDialog"/>
+
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:background="#00000000">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/dialog"
+            >
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/delete_account_question"
+                app:typefaceAsset="Proxima_Nova_Semibold.otf"
+                android:textColor="@color/title"
+                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                />
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="@string/delete_account_warning"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:textColor="@color/title"
+                android:clickable="true"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#bcbcbc"/>
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/delete"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:textSize="18sp"
+                android:textColor="#e54d57"
+                android:clickable="true"
+                android:padding="10dp"
+                android:background="@drawable/delete_account_dialog_button"
+                android:id="@+id/fontTextView"
+                android:onClick="@{ () -> dialog.delete()}"
+                />
+        </LinearLayout>
+        <saberapplications.pawpads.views.FontButton
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:background="@drawable/chat_unblock_button"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:gravity="center"
+            android:onClick="@{ () -> dialog.cancel()}"
+            android:padding="10dp"
+            />
+
+    </LinearLayout>
+</layout>

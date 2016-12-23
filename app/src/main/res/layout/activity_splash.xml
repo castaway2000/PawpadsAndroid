@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_splash"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    tools:context="saberapplications.pawpads.ui.home.SplashActivity">
+
+    <ImageView
+        android:src="@drawable/splash"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/bg"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintVertical_bias="1.0"
+        android:contentDescription="@string/pawpads_intro" />
+
+    <saberapplications.pawpads.views.FontTextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="#ffffff"
+        android:textSize="35sp"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginStart="64dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/bg"
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        android:layout_marginLeft="64dp"
+        app:typefaceAsset="Bellota_BoldItalic.otf"/>
+
+    <saberapplications.pawpads.views.FontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chat_with_furies_near_you"
+        android:textColor="#88ffffff"
+        android:textSize="15sp"
+        tools:layout_constraintTop_creator="1"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/title"
+        android:id="@+id/slogan"
+        android:layout_marginTop="8dp"
+        app:typefaceAsset="Proxima_Nova_Regular.otf"
+        />
+
+    <android.support.constraint.Guideline
+        android:layout_width="384dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline2"
+
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="179dp"
+        tools:layout_editor_absoluteX="0dp"
+        app:layout_constraintGuide_percent="0.40" />
+</android.support.constraint.ConstraintLayout>

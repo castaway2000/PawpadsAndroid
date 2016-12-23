@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:padding="10dp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/dialog_avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="5dp"
+            android:src="@drawable/pplogo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/dialogs_username"
+            android:layout_weight="0.06"
+            android:layout_alignTop="@+id/dialog_avatar"
+            android:layout_toRightOf="@+id/dialog_avatar"
+            android:layout_toEndOf="@+id/dialog_avatar" />
+
+        <TextView
+            android:id="@+id/dialog_last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:lines="2"
+            android:maxLines="2"
+            android:text="Large Text"
+            android:ellipsize="end"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/dialogs_username"
+            android:layout_toRightOf="@+id/dialog_avatar"
+            android:layout_toEndOf="@+id/dialog_avatar"
+            android:layout_alignParentBottom="true" />
+
+        <TextView
+            android:textColor="#000000"
+            android:id="@+id/dialog_date_last_message"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.34"
+           android:layout_width="wrap_content"
+            android:text="Small Text"
+            android:textSize="12sp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+</LinearLayout>

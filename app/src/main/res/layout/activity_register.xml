@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.register.RegisterActivity" />
+
+        <import
+            alias="View"
+            type="android.view.View" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_bg">
+
+        <include
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+            <saberapplications.pawpads.views.FontEditText
+                android:id="@+id/etRegUsername"
+                style="@style/login_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="@{!activity.isBusy}"
+                android:hint="Name"
+                android:inputType="text"
+                app:binding2way="@{activity.username}" />
+
+            <saberapplications.pawpads.views.FontEditText
+                android:id="@+id/etEmail"
+                style="@style/login_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:enabled="@{!activity.isBusy}"
+                android:hint="@string/prompt_email"
+                android:inputType="textEmailAddress"
+                app:binding2way="@{activity.email}" />
+
+            <saberapplications.pawpads.views.FontEditText
+                android:id="@+id/etRegPassword"
+                style="@style/login_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:enabled="@{!activity.isBusy}"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                app:binding2way="@{activity.password}" />
+
+            <saberapplications.pawpads.views.FontEditText
+                android:id="@+id/etRegPasswordChk"
+                style="@style/login_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:enabled="@{!activity.isBusy}"
+                android:hint="@string/confirm_password"
+                android:inputType="textPassword"
+                app:binding2way="@{activity.passwordConfirmation}" />
+
+            <saberapplications.pawpads.views.FontButton
+                android:id="@+id/bRegister"
+                style="@style/transparent_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="45dp"
+                android:enabled="@{!activity.isBusy}"
+                android:onClick="@{ () -> activity.register()}"
+                android:text="@string/sign_up" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:visibility="@{activity.isBusy ? View.VISIBLE : View.GONE}" />
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

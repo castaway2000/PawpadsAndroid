@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/blazeimageView"
+            android:scaleType="centerCrop"
+            android:layout_margin="5dp"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:src="@drawable/pplogo" />
+
+        <TextView
+            android:layout_width="105dp"
+            android:layout_height="29dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/geoloc"
+            android:gravity="center"
+            android:layout_row="0"
+            android:layout_column="13"
+            android:textColor="#000000"
+            android:layout_alignBottom="@+id/blazeimageView"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="251dp"
+            android:layout_height="38dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/blazeText"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:gravity="center_vertical"
+            android:textColor="#000000"
+            android:layout_alignTop="@+id/blazeimageView"
+            android:layout_toRightOf="@+id/blazeimageView"
+            android:layout_alignRight="@+id/geoloc"
+            android:layout_alignEnd="@+id/geoloc" />
+    </RelativeLayout>
+
+</LinearLayout>

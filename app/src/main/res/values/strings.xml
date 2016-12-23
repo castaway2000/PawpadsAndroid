@@ -1,0 +1,116 @@
+<resources>
+    <string name="facebook_app_id">1810530139192224</string>
+    <item name="BIND_ID" type="id" />
+    <string name="app_name">PawPads</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_profile">Edit Profile</string>
+    <string name="title_activity_profilepage">Profile Page</string>
+    <string name="title_activity_chat">PawPads Chat</string>
+    <string name="profile" >Profile</string>
+    <string name="show_dialogs">Chat History</string>
+    <string name="About">About</string>
+    <string name="blocked">BLOCKED</string>
+    <string name="user_added_to_block_list">User was added to your block list</string>
+    <string name="user_removed_from_block_list">User was removed from your block list</string>
+    <string name="text_chat_history">CHAT HISTORY</string>
+    <string name="text_chat">CHAT</string>
+    <string name="text_you_blocked">You are blocked</string>
+    <string name="loading_data">Loading data</string>
+    <string name="version">Version:</string>
+    <string name="you_are_blocked">You are blocked</string>
+    <string name="text_you_unblocked">You are unblocked</string>
+    <string name="file_downloaded">File was downloaded</string>
+    <string name="download_started">File download started</string>
+    <string name="chat_with_furies_near_you">Chat with furries near you</string>
+    <string name="pawpads_intro">PawPads Intro</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="log_in">Log In</string>
+    <string name="dont_have_account_register"><![CDATA[Don’t have an account?<font color="#ffffff"><b> Register</b></font>]]></string>
+    <string name="login_with">Login with</string>
+    <string name="twitter_app_required">You need to install Twitter App first</string>
+    <string name="login_required">Login is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="registration">Registration</string>
+    <string name="sign_up">Sign up</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="name_required">Name is required</string>
+    <string name="email_required">Email is required</string>
+    <string name="invalid_email">Email is not valid</string>
+    <string name="password_to_short">Password is to short ( minimum 8 characters)</string>
+    <string name="password_not_match">Passwords do not match</string>
+    <string name="wrong_email_format">Wrong email format</string>
+    <string name="password_recovery">Password recovery</string>
+    <string name="recovery_instructions">Send us your email and we will send you a code to reset your password</string>
+    <string name="recover">Recover</string>
+    <string name="near_by">Near by</string>
+    <string name="chats">Chats</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loading">Loading</string>
+    <string name="edit">Edit</string>
+    <string name="logout">Logout</string>
+    <string name="save">Save</string>
+    <string name="full_name">Full name</string>
+    <string name="age">Age: %1$d</string>
+    <string name="gender">Gender</string>
+    <string name="select_gender">Select gender</string>
+    <string name="cancel">Cancel</string>
+    <string name="hobby">Hobby</string>
+    <string name="write_something_about_you">Write something about you</string>
+    <string name="saving">Saving</string>
+    <string name="block_user">Block user</string>
+    <string name="unblock_user">Unblock user</string>
+    <string name="blocking_user">Blocking user</string>
+    <string name="unblocking_user">Unblocking user</string>
+    <string name="age_hint">Birth year</string>
+    <string name="obtaining_location">Obtaining location</string>
+    <string name="message">Message</string>
+    <string name="unblock">Unblock</string>
+    <string name="unblocking">Unblocking</string>
+    <string name="select_file">Select a File</string>
+    <string name="distance_units">Distance Units</string>
+    <string name="settings">Settings</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="miles">Miles</string>
+    <string name="gps_accuracy">GPS Accuracy</string>
+    <string name="high">High</string>
+    <string name="medium">Medum</string>
+    <string name="low">Low</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="toggle_push_notifications">Toggle Push Notifications</string>
+    <string name="toggle_messaging_popups">Toggle Messaging Popups</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="permanently_delete_account">Permanently delete account</string>
+    <string name="delete_account">Delete account</string>
+    <string name="send_feedback">Send feedback</string>
+    <string name="send_email">Send email...</string>
+    <string name="full_name_too_short">Full name is too short</string>
+    <string name="age_range_check">Age should be in range between 15 and 100</string>
+    <string name="profile_was_removed">Profile was removed successfully</string>
+    <string name="new_chat_message">New Chat Message</string>
+    <string name="near_by_empty">There seems to be no one around. Try visiting this screen later or change your Distance Settings.</string>
+    <string name="empty_chats">You has no active chats.Start a new chat with our users.</string>
+    <string name="full_name_max_len">Full name can not be more than 50 characters</string>
+    <string name="email_not_exists">Email does not exist</string>
+    <string name="user_account_was_deleted">User account was deleted</string>
+    <string name="location_sercice_is_disabled">Location service is not enabled</string>
+    <string name="open_location_settings">Open location settings</string>
+    <string name="copyright">© 2016 Saber Applications Inc.</string>
+    <string name="deleting_profile">Deleting profile</string>
+    <string name="delete_account_warning">If you delete your account you will permanently loose your profile, photos and messages.</string>
+    <string name="delete_account_question">Are you sure you want to delete your account?</string>
+    <string name="delete">Delete</string>
+    <string name="unable_to_get_file">Unable to get specified file</string>
+    <string name="verify_internet_connection">Please verify your internet connection</string>
+    <string name="reconnect_message">Server connection is lost. Trying to reconnect</string>
+    <array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Not set</item>
+    </array>
+
+</resources>
