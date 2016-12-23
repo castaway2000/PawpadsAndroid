@@ -29,7 +29,7 @@ android {
         targetSdkVersion 23
         versionCode 25
 
-        versionName "2.2.25"
+        versionName "2.2.27"
         // Enabling multidex support.
         multiDexEnabled true
 

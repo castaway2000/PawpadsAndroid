@@ -14,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -78,8 +77,6 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
 
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
-
 
 public class ChatActivity extends BaseActivity {
     public static final String DIALOG = "dialog";
@@ -89,7 +86,8 @@ public class ChatActivity extends BaseActivity {
     public static final String CURRENT_USER_ID = "current user id";
     private static final int PICKFILE_REQUEST_CODE = 2;
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
-    private static final int PERMISSION_REQUEST = 200;
+    private static final int READ_STORAGE_PERMISSION_REQUEST = 200;
+    private static final int WRITE_ST_CAMERA_PERMISSION_REQUEST = 205;
     public final BindableBoolean isSendingMessage = new BindableBoolean();
     public final BindableInteger uploadProgress = new BindableInteger(0);
     public final BindableBoolean isBusy = new BindableBoolean(true);
@@ -568,7 +566,7 @@ public class ChatActivity extends BaseActivity {
         if (permCameraCheck != PackageManager.PERMISSION_GRANTED || permWriteCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{ Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                    PERMISSION_REQUEST);
+                    WRITE_ST_CAMERA_PERMISSION_REQUEST);
             return;
         }
         isExternalDialogOpened = true;
@@ -598,7 +596,7 @@ public class ChatActivity extends BaseActivity {
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST);
+                    READ_STORAGE_PERMISSION_REQUEST);
             return;
         }
         isExternalDialogOpened = true;
@@ -706,10 +704,17 @@ public class ChatActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case PERMISSION_REQUEST: {
+            case READ_STORAGE_PERMISSION_REQUEST: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    selectFile();
+                    getImgFromGallery();
                 }
+                 break;
+            }
+            case WRITE_ST_CAMERA_PERMISSION_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getImgFromCamera();
+                }
+                break;
             }
         }
     }
