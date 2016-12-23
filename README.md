@@ -52,7 +52,7 @@ this allows you to make stickers of any image and even import your previous stic
 
 
 
-# how to get up and running:
+# How to get up and running:
 
 ## Edit the following with your own info
 #### Util.java
