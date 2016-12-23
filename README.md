@@ -51,7 +51,7 @@ At this time we are working to develop a xamarin project ported of this project.
 **We will have stickers!** After doing some research I found a decent sticker engine: http://imoji.io/
 this allows you to make stickers of any image and even import your previous sticker packs you already commissioned from artists for places like telegram and use them directly in the app. It also has a very large library of stickers for you to use free of charge!
 
-***We will have Gif support!** As it seems to become industry standard we incorporated the Giphy animated gif engine for use. You can search for new animated Gifs through Giphy and upload your own animated Gifs if you want. https://api.giphy.com/
+**We will have Gif support!** As it seems to become industry standard we incorporated the Giphy animated gif engine for use. You can search for new animated Gifs through Giphy and upload your own animated Gifs if you want. https://api.giphy.com/
 
 
 ### Our backend and chat system:
