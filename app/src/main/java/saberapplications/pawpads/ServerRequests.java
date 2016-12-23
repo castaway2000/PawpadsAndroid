@@ -17,9 +17,8 @@ import retrofit.http.Query;
  * Created by blaze on 10/22/2015.
  */
 public class ServerRequests{
+    //TODO: clean this up, validate that this code is indeed needed
     ProgressDialog progressDialog;
-    //public static final int CONNECTION_TIME = 1000 * 15;
-    public static final String SERVER_ADDRESS = "http://www.szablya.com/saberapps/pawpads/";
     Double LAT;
     Double LNG;
     String USER;
@@ -43,7 +42,7 @@ public class ServerRequests{
     public void storeUserDataInBackground(User user, final GetUserCallback userCallback){
 
         RestAdapter restAdapter= new RestAdapter.Builder()
-                .setEndpoint(SERVER_ADDRESS)
+                .setEndpoint("")
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
 
