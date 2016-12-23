@@ -12,7 +12,7 @@ https://play.google.com/store/apps/details?id=saberapplications.pawpads
 ### Security:
 **I kept secutiy in mind when developing this app**
 * By default ALL Quickblox API calls are made over SSL with logins using token authentication post credential verification.
-* Lcations are by default sent over SSL with accuracy modifications in the medium setting.
+* Locations are by default sent over SSL with accuracy modifications in the medium setting.
 * Chats are SSL/TCP based
 
 
