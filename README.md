@@ -6,6 +6,9 @@ http://www.pawpadsapp.com/
 ## About Pawpads:
 Pawpads is a furry fandom centric geolocation chat application. put simply the app lists out who is near by from closest to farthest and lets you chat with other furries in a one on one setting.
 
+**click here to get pawpads now!**
+https://play.google.com/store/apps/details?id=saberapplications.pawpads
+
 ### Security:
 **I kept secutiy in mind when developing this app**
 * By default ALL Quickblox API calls are made over SSL with logins using token authentication post credential verification.
@@ -16,8 +19,6 @@ Pawpads is a furry fandom centric geolocation chat application. put simply the a
 ### Licenced under the MIT licence:
 https://en.wikipedia.org/wiki/MIT_License
 
-**click here to get pawpads now!**
-https://play.google.com/store/apps/details?id=saberapplications.pawpads
 
 
 ## Future feature requests:
