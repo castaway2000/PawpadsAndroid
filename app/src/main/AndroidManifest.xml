@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <permission
         android:name="saberapplications.pawpads.permission.C2D_MESSAGE"
@@ -28,6 +29,8 @@
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <uses-feature android:name="android.hardware.camera"/>
 
     <uses-feature
         android:name="android.hardware.location.gps"
@@ -81,6 +84,7 @@
             android:name=".ui.chat.ChatActivity"
             android:label="Chat"
             android:parentActivityName=".ui.home.MainActivity"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

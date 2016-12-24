@@ -3,4 +3,5 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen tools:override="true" name="design_fab_image_size">56dp</dimen>
+    <dimen name="margin_for_ad_bottom">50dp</dimen>
 </resources>

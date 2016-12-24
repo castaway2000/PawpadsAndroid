@@ -97,6 +97,7 @@ public class FileUtil {
         }
         // File
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            if((uri.toString()).contains("file:///")) return uri.getPath();
             return uri.getPath();
         }
         return null;
