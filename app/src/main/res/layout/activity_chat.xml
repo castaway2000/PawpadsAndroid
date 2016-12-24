@@ -49,6 +49,7 @@
                         android:layout_marginRight="16dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/user_placeholder"
+                        android:onClick="@{() -> activity.openProfile() }"
                         app:riv_oval="true" />
 
                     <saberapplications.pawpads.views.FontTextView

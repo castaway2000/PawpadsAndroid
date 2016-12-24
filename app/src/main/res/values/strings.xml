@@ -107,6 +107,9 @@
     <string name="unable_to_get_file">Unable to get specified file</string>
     <string name="verify_internet_connection">Please verify your internet connection</string>
     <string name="reconnect_message">Server connection is lost. Trying to reconnect</string>
+    <string name="dialog_take_from_camera">Take from camera</string>
+    <string name="dialog_get_from_gallery">Choose from gallery</string>
+    <string name="dialog_send_file_title">Send file</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
