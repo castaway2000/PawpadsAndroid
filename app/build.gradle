@@ -27,9 +27,9 @@ android {
         minSdkVersion 15
 
         targetSdkVersion 23
-        versionCode 25
+        versionCode 26
 
-        versionName "2.2.27"
+        versionName "2.3.27"
         // Enabling multidex support.
         multiDexEnabled true
 
@@ -86,6 +86,9 @@ dependencies {
     compile 'com.makeramen:roundedimageview:2.2.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
+    }
+    compile ('io.imoji.sdk:imoji-sdk-ui:+@aar') {
+        transitive=true
     }
 
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,6 +31,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -54,17 +57,27 @@ import com.quickblox.customobjects.QBCustomObjects;
 import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.imoji.sdk.grid.HalfScreenWidget;
+import io.imoji.sdk.grid.components.SearchResultAdapter;
+import io.imoji.sdk.grid.components.WidgetDisplayOptions;
+import io.imoji.sdk.grid.components.WidgetListener;
+import io.imoji.sdk.objects.Imoji;
+import io.imoji.sdk.objects.RenderingOptions;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
@@ -103,6 +116,8 @@ public class ChatActivity extends BaseActivity {
     private Uri mPhotoUri;
     //    BroadcastReceiver recieve_chat;
     private QBDialog dialog;
+    private HalfScreenWidget mStickersWidget;
+    private FrameLayout mStickersContainer;
     BroadcastReceiver updateChatReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -198,6 +213,7 @@ public class ChatActivity extends BaseActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateChatReciever, new IntentFilter(C.UPDATE_CHAT));
 
+        initStickersWidget();
     }
 
     private void init() {
@@ -214,6 +230,50 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
+    }
+
+    private void initStickersWidget() {
+        mStickersContainer = binding.stickersContainer;
+        mStickersWidget = new HalfScreenWidget(
+                this,
+                new WidgetDisplayOptions(new RenderingOptions(
+                        RenderingOptions.BorderStyle.Sticker,
+                        RenderingOptions.ImageFormat.Png,
+                        RenderingOptions.Size.Resolution320
+                )),
+                new SearchResultAdapter.ImageLoader() {
+                    @Override
+                    public void loadImage(@NonNull ImageView target, @NonNull Uri uri,
+                                          @NonNull final SearchResultAdapter.ImageLoaderCallback callback) {
+                        Picasso.with(getApplicationContext())
+                                .load(uri.toString())
+                                .into(target, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        callback.updateImageView();
+                                    }
+
+                                    @Override
+                                    public void onError() {
+
+                                    }
+                                });
+                    }
+                }
+        );
+        mStickersWidget.setWidgetListener(new WidgetListener() {
+            @Override
+            public void onCloseButtonTapped() {
+                // not needed
+            }
+
+            @Override
+            public void onStickerTapped(Imoji imoji) {
+                Picasso.with(ChatActivity.this)
+                        .load(imoji.getStandardThumbnailUri())
+                        .into(picassoImageTarget(getApplicationContext(), "stickerDir", "sticker.jpg"));
+            }
+        });
     }
 
     @Override
@@ -377,7 +437,6 @@ public class ChatActivity extends BaseActivity {
         if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
-
         chatAdapter.addItem(message);
     }
 
@@ -460,6 +519,7 @@ public class ChatActivity extends BaseActivity {
         final String path = FileUtil.getPath(this, uri);
         if (path == null) {
             Util.onError(getString(R.string.unable_to_get_file), this);
+            isSendingMessage.set(false);
             return;
         }
         final File filePhoto = new File(path);
@@ -531,8 +591,21 @@ public class ChatActivity extends BaseActivity {
             }
 
         }.execute();
+    }
 
+    public void selectImoji() {
+        if(mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
+            hideSoftKeyboard();
+            mStickersContainer.addView(mStickersWidget);
+        } else {
+            hideStickersContainer();
+        }
+    }
 
+    private void hideStickersContainer() {
+        if(mStickersContainer != null && mStickersContainer.getChildCount() > 0) {
+            mStickersContainer.removeAllViews();
+        }
     }
 
     public void selectFile() {
@@ -761,5 +834,59 @@ public class ChatActivity extends BaseActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mStickersContainer.getChildCount() != 0) {
+            hideStickersContainer();
+            hideSoftKeyboard();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private Target picassoImageTarget(Context context, final String imageDir, final String imageName) {
+        Log.d("picassoImageTarget", " picassoImageTarget");
+        ContextWrapper cw = new ContextWrapper(context);
+        // path to /data/data/yourapp/app_imageDir
+        final File directory = cw.getDir(imageDir, Context.MODE_PRIVATE);
+        return new Target() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Create image file
+                        final File savedStickerImgFile = new File(directory, imageName);
+                        FileOutputStream fos = null;
+                        try {
+                            fos = new FileOutputStream(savedStickerImgFile);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                fos.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.i("image", "image saved to >>>" + savedStickerImgFile.getAbsolutePath());
+                        sendAttachment(Uri.fromFile(savedStickerImgFile));
+
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Log.d("picassoImageTarget", "onBitmapFailed");
+            }
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                if (placeHolderDrawable != null) {}
+            }
+        };
     }
 }

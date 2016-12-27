@@ -106,6 +106,16 @@
                         android:scaleType="fitCenter"
                         android:src="@drawable/paper_clip" />
 
+                    <ImageView
+                        android:id="@+id/imageViewSendImoji"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="10dp"
+                        android:onClick="@{() -> activity.selectImoji() }"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_smile_emotion_face" />
+
                     <saberapplications.pawpads.views.FontEditText
                         android:id="@+id/editText_chat_message"
                         style="@style/Widget.AppCompat.EditText"
@@ -138,6 +148,11 @@
                         android:textSize="20sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
                 </LinearLayout>
+                <!-- Stickers !-->
+                <FrameLayout
+                    android:id="@+id/stickers_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
                 <!-- Blocked !-->
                 <FrameLayout
                     android:id="@+id/block_container"

@@ -37,6 +37,9 @@ public class Util {
 
     public static final String STICKERS_API_KEY = "94c58fc501b259bc84282c44cd278fdf";
 
+    public static final String IMOJI_SDK_CLIENT_ID = "e517f2aa-0ca8-496d-bd22-18cd63edf3e0";
+    public static final String IMOJI_SDK_API_TOKEN = "U2FsdGVkX1/vLM8AKeuOd1AgWow8+d7WThPxuO+VeUHZ4AiqoBv/4FxWE7kGpfsd";
+
     public static String ACCURACY;
     public static int RANGE;
 
