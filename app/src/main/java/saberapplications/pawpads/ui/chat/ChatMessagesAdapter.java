@@ -2,12 +2,15 @@ package saberapplications.pawpads.ui.chat;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,6 +18,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
+import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.databinding.ChatMessageLeftBinding;
 import saberapplications.pawpads.databinding.ChatMessageRightBinding;
@@ -130,6 +134,13 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             }else {
                 attachment=null;
             }
+            if(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.setShowThumbNail(true);
+                Picasso.with(itemView.getContext())
+                        .load(Uri.parse(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY).toString()))
+                        .into(binding.thumb);
+            }
         }
     }
 
@@ -183,7 +194,13 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 attachment=null;
                 binding.setShowThumbNail(false);
             }
-
+            if(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.setShowThumbNail(true);
+                Picasso.with(itemView.getContext())
+                        .load(Uri.parse(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY).toString()))
+                        .into(binding.thumb);
+            }
         }
     }
     public String formatDate(Date date){

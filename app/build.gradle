@@ -27,9 +27,9 @@ android {
         minSdkVersion 15
 
         targetSdkVersion 23
-        versionCode 26
+        versionCode 27
 
-        versionName "2.3.27"
+        versionName "2.3.28"
         // Enabling multidex support.
         multiDexEnabled true
 

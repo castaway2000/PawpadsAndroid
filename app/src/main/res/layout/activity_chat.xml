@@ -112,7 +112,7 @@
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginRight="10dp"
-                        android:onClick="@{() -> activity.selectImoji() }"
+                        android:onClick="@{() -> activity.onClickImoji() }"
                         android:scaleType="fitCenter"
                         app:srcCompat="@drawable/ic_smile_emotion_face" />
 

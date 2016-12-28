@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -59,13 +57,11 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -269,9 +265,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             public void onStickerTapped(Imoji imoji) {
-                Picasso.with(ChatActivity.this)
-                        .load(imoji.getStandardThumbnailUri())
-                        .into(picassoImageTarget(getApplicationContext(), "stickerDir", "sticker.jpg"));
+                sendSticker(imoji.getStandardThumbnailUri());
             }
         });
     }
@@ -593,7 +587,45 @@ public class ChatActivity extends BaseActivity {
         }.execute();
     }
 
-    public void selectImoji() {
+    public void sendSticker(Uri uri) {
+        if (isBusy.get()) {
+            Toast.makeText(this, "Please wait until connection to server restored", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (isSendingMessage.get()) return;
+        isSendingMessage.set(true);
+
+        // send sticker to chat server
+        if (uri.toString().contains("http")) {
+            QBChatMessage msg = new QBChatMessage();
+            msg.setBody("sticker");
+
+            msg.setProperty("save_to_history", "1");
+            msg.setRecipientId(recipient.getId());
+            msg.setDialogId(dialog.getDialogId());
+            msg.setProperty("send_to_chat", "1");
+            msg.setProperty(C.CHAT_MSG_STICKER_PROPERTY, uri.toString());
+
+            try {
+                privateChat.sendMessage(msg);
+                displayChatMessage(msg);
+            } catch (SmackException.NotConnectedException e) {
+                if (!isNetworkAvailable()){
+                    Util.onError(getString(R.string.verify_internet_connection),this);
+                }else {
+                    isReopened=true;
+                    isBusy.set(true);
+                    loginToChat();
+                    Toast.makeText(this, R.string.reconnect_message,Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Util.onError(e, ChatActivity.this);
+            }
+        }
+        isSendingMessage.set(false);
+    }
+
+    public void onClickImoji() {
         if(mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
             hideSoftKeyboard();
             mStickersContainer.addView(mStickersWidget);
@@ -844,49 +876,5 @@ public class ChatActivity extends BaseActivity {
         } else {
             super.onBackPressed();
         }
-    }
-
-    private Target picassoImageTarget(Context context, final String imageDir, final String imageName) {
-        Log.d("picassoImageTarget", " picassoImageTarget");
-        ContextWrapper cw = new ContextWrapper(context);
-        // path to /data/data/yourapp/app_imageDir
-        final File directory = cw.getDir(imageDir, Context.MODE_PRIVATE);
-        return new Target() {
-            @Override
-            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Create image file
-                        final File savedStickerImgFile = new File(directory, imageName);
-                        FileOutputStream fos = null;
-                        try {
-                            fos = new FileOutputStream(savedStickerImgFile);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                fos.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Log.i("image", "image saved to >>>" + savedStickerImgFile.getAbsolutePath());
-                        sendAttachment(Uri.fromFile(savedStickerImgFile));
-
-                    }
-                }).start();
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d("picassoImageTarget", "onBitmapFailed");
-            }
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                if (placeHolderDrawable != null) {}
-            }
-        };
     }
 }
