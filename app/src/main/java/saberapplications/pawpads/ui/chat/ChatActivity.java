@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.imoji.sdk.grid.HalfScreenWidget;
+import io.imoji.sdk.grid.QuarterScreenWidget;
 import io.imoji.sdk.grid.components.SearchResultAdapter;
 import io.imoji.sdk.grid.components.WidgetDisplayOptions;
 import io.imoji.sdk.grid.components.WidgetListener;
@@ -112,7 +113,7 @@ public class ChatActivity extends BaseActivity {
     private Uri mPhotoUri;
     //    BroadcastReceiver recieve_chat;
     private QBDialog dialog;
-    private HalfScreenWidget mStickersWidget;
+    private QuarterScreenWidget mStickersWidget;
     private FrameLayout mStickersContainer;
     BroadcastReceiver updateChatReciever = new BroadcastReceiver() {
         @Override
@@ -195,7 +196,6 @@ public class ChatActivity extends BaseActivity {
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
         }
 
-
         if (recipient != null) {
             init();
         }
@@ -230,13 +230,15 @@ public class ChatActivity extends BaseActivity {
 
     private void initStickersWidget() {
         mStickersContainer = binding.stickersContainer;
-        mStickersWidget = new HalfScreenWidget(
+        RenderingOptions renderingOptions = new RenderingOptions(
+                RenderingOptions.BorderStyle.Sticker,
+                RenderingOptions.ImageFormat.Png,
+                RenderingOptions.Size.Thumbnail
+        );
+        WidgetDisplayOptions options = new WidgetDisplayOptions(renderingOptions);
+        mStickersWidget = new QuarterScreenWidget(
                 this,
-                new WidgetDisplayOptions(new RenderingOptions(
-                        RenderingOptions.BorderStyle.Sticker,
-                        RenderingOptions.ImageFormat.Png,
-                        RenderingOptions.Size.Resolution320
-                )),
+                options,
                 new SearchResultAdapter.ImageLoader() {
                     @Override
                     public void loadImage(@NonNull ImageView target, @NonNull Uri uri,
@@ -265,7 +267,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             public void onStickerTapped(Imoji imoji) {
-                sendSticker(imoji.getStandardThumbnailUri());
+                sendSticker(imoji.getStandardFullSizeUri());
             }
         });
     }
@@ -303,6 +305,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected Void doInBackground(Void... params) {
+                Log.d("CHAT", "doInBackground");
                 try {
                     if (currentQBUser == null) {
                         currentQBUser = QBUsers.getUser(preferences.getInt(C.QB_USERID, 0));
@@ -328,7 +331,12 @@ public class ChatActivity extends BaseActivity {
                         }
                     }
                     if (!userDeleted) {
-                        privateChat = privateChatManager.getChat(recipient.getId());
+                        try {
+                            privateChat = privateChatManager.getChat(recipient.getId());
+                        } catch (NullPointerException e) {
+                            Log.e("QBPrivateChatManager", e.getMessage());
+                            e.printStackTrace();
+                        }
                         if (privateChat == null) {
                             privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
                         } else {
@@ -447,6 +455,14 @@ public class ChatActivity extends BaseActivity {
         outState.putSerializable(DIALOG, dialog);
         outState.putSerializable(RECIPIENT, recipient);
         outState.putInt(CURRENT_USER_ID, currentUserId);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mStickersContainer.getChildCount() != 0) {
+            hideSoftKeyboard();
+        }
     }
 
     @Override
@@ -623,6 +639,7 @@ public class ChatActivity extends BaseActivity {
             }
         }
         isSendingMessage.set(false);
+        isBusy.set(false);
     }
 
     public void onClickImoji() {
@@ -863,8 +880,14 @@ public class ChatActivity extends BaseActivity {
 
     public void hideSoftKeyboard() {
         if(getCurrentFocus()!=null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            Handler h = new Handler();
+            h.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+            }, 50);
         }
     }
 

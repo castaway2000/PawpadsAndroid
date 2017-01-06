@@ -82,6 +82,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:orientation="vertical">
+                <!-- Stickers !-->
+                <FrameLayout
+                    android:id="@+id/stickers_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
                 <!-- send message !-->
                 <LinearLayout
                     android:id="@+id/message_container"
@@ -148,11 +153,6 @@
                         android:textSize="20sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
                 </LinearLayout>
-                <!-- Stickers !-->
-                <FrameLayout
-                    android:id="@+id/stickers_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
                 <!-- Blocked !-->
                 <FrameLayout
                     android:id="@+id/block_container"

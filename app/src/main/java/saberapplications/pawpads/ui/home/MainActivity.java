@@ -321,10 +321,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onQBConnect(boolean isActivityReopened) throws Exception {
-
+        Log.i("MAIN", "onQBConnect");
         QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
+
             @Override
             public void onSuccess(QBUser user, Bundle bundle) {
+                Log.i("MAIN", "onSuccess");
                 float d = getResources().getDisplayMetrics().density;
                 if (user.getFileId() != null) {
 
