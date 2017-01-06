@@ -639,7 +639,6 @@ public class ChatActivity extends BaseActivity {
             }
         }
         isSendingMessage.set(false);
-        isBusy.set(false);
     }
 
     public void onClickImoji() {
