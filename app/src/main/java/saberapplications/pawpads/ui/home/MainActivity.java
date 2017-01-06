@@ -340,6 +340,7 @@ public class MainActivity extends BaseActivity {
 
                 binding.setUsername(Util.getUserName(user));
                 currentQBUser=user;
+
             }
 
             @Override
@@ -371,7 +372,6 @@ public class MainActivity extends BaseActivity {
                 Log.i("MAIN", "No valid Google Play Services APK found.");
             }
         }
-
 
     }
 
@@ -598,10 +598,6 @@ public class MainActivity extends BaseActivity {
         }
         return true;
     }
-
-
-
-
 
 
 }
