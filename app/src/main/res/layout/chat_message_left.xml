@@ -45,14 +45,29 @@
                 android:visibility="@{!showThumbNail}"
                 android:onClick="@{ () -> holder.downloadAttachment()}"
                 />
-            <ImageView
-                android:id="@+id/thumb"
+
+            <FrameLayout
                 android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:visibility="@{showThumbNail}"
-                android:onClick="@{ () -> holder.downloadAttachment()}"
-                android:clickable="true"
-                />
+                android:layout_height="150dp">
+                <ProgressBar
+                    android:id="@+id/sticker_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp" />
+                <ImageView
+                    android:id="@+id/thumb"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:visibility="@{showThumbNail}"
+                    android:onClick="@{ () -> holder.downloadAttachment()}"
+                    android:clickable="true"
+                    />
+            </FrameLayout>
+
         </LinearLayout>
         <saberapplications.pawpads.views.FontTextView
             android:layout_below="@id/text"

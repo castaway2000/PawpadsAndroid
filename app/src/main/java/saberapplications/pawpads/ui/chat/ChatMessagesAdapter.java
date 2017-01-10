@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -137,9 +138,24 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             if(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
                 binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
                 binding.setShowThumbNail(true);
+                binding.stickerProgressBar.setVisibility(View.VISIBLE);
                 Picasso.with(itemView.getContext())
                         .load(Uri.parse(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY).toString()))
-                        .into(binding.thumb);
+                        .into(binding.thumb, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if(binding.stickerProgressBar != null) {
+                                    binding.stickerProgressBar.setVisibility(View.GONE);
+                                }
+                            }
+
+                            @Override
+                            public void onError() {
+                                if(binding.stickerProgressBar != null) {
+                                    binding.stickerProgressBar.setVisibility(View.GONE);
+                                }
+                            }
+                        });
             }
         }
     }
@@ -197,9 +213,24 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             if(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
                 binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
                 binding.setShowThumbNail(true);
+                binding.stickerProgressBar.setVisibility(View.VISIBLE);
                 Picasso.with(itemView.getContext())
                         .load(Uri.parse(item.getProperty(C.CHAT_MSG_STICKER_PROPERTY).toString()))
-                        .into(binding.thumb);
+                        .into(binding.thumb, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if(binding.stickerProgressBar != null) {
+                                    binding.stickerProgressBar.setVisibility(View.GONE);
+                                }
+                            }
+
+                            @Override
+                            public void onError() {
+                                if(binding.stickerProgressBar != null) {
+                                    binding.stickerProgressBar.setVisibility(View.GONE);
+                                }
+                            }
+                        });
             }
         }
     }
