@@ -51,7 +51,7 @@
 
             <FrameLayout
                 android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 >
                 <ProgressBar
                     android:id="@+id/sticker_progress_bar"
