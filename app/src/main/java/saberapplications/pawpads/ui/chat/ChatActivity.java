@@ -286,6 +286,9 @@ public class ChatActivity extends BaseActivity {
             }
 
         }
+        if(resultCode == Activity.RESULT_CANCELED) {
+            isBusy.set(false);
+        }
     }
 
     @Override
