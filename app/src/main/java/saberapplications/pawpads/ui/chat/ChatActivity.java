@@ -77,6 +77,7 @@ import io.imoji.sdk.objects.Imoji;
 import io.imoji.sdk.objects.RenderingOptions;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
@@ -223,6 +224,8 @@ public class ChatActivity extends BaseActivity {
                     AvatarLoaderHelper.loadImage(recipient.getFileId(), binding.recipientAvatar, size, size);
                 }
                 binding.setUsername(Util.getUserName(recipient));
+                binding.setBindStatusVisibility(true);
+                binding.setOnlineStatus(UserStatusHelper.getUserStatus(recipient));
             }
         });
 
