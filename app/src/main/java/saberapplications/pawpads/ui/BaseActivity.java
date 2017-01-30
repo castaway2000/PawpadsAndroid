@@ -41,6 +41,7 @@ import java.util.Date;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.chat.ChatActivity;
@@ -72,8 +73,15 @@ public abstract class BaseActivity extends AppCompatActivity
             if (!createdLocally) {
                 qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
                     @Override
-                    public void processMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
-                        onChatMessage(qbPrivateChat, qbChatMessage);
+                    public void processMessage(final QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        BaseActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                onChatMessage(qbPrivateChat, qbChatMessage);
+                                UserStatusHelper.setUserStatusByNewMessage(qbChatMessage.getSenderId());
+                            }
+                        });
+
                     }
 
                     @Override
@@ -338,7 +346,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
-        if (Util.IM_ALERT == true) {
+        if (Util.IM_ALERT) {
             new AlertDialog.Builder(BaseActivity.this)
                     .setTitle(R.string.new_chat_message)
                     .setMessage(qbChatMessage.getBody())
@@ -347,7 +355,7 @@ public abstract class BaseActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = new Intent(BaseActivity.this, ChatActivity.class);
                             intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
-                            intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId().toString());
+                            intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId());
                             startActivity(intent);
                         }
                     })

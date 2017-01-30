@@ -82,6 +82,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                     }
             }
         }, 5000);
+        adapter.notifyDataSetChanged();
     }
 
     public void loadData() {

@@ -68,7 +68,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import io.imoji.sdk.grid.HalfScreenWidget;
 import io.imoji.sdk.grid.QuarterScreenWidget;
 import io.imoji.sdk.grid.components.SearchResultAdapter;
 import io.imoji.sdk.grid.components.WidgetDisplayOptions;
@@ -446,6 +445,11 @@ public class ChatActivity extends BaseActivity {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
         chatAdapter.addItem(message);
+
+        if ( !message.getSenderId().equals(currentQBUser.getId())) {
+            UserStatusHelper.setUserStatusByNewMessage(message.getSenderId());
+            binding.setOnlineStatus(UserStatusHelper.USER_ONLINE);
+        }
     }
 
     @Override

@@ -75,6 +75,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 locationChanged, new IntentFilter(UserLocationService.LOCATION_CHANGED)
         );
+        adapter.notifyDataSetChanged();
     }
 
     @Override
