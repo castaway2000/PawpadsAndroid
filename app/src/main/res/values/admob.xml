@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admob_app_id">ca-app-pub-5883625079032168~8994051532</string>
+
+
+    <string name="chat_ad_id">ca-app-pub-5883625079032168/7696927136</string>
+    <string name="main_activity_ad_unit_id">ca-app-pub-5883625079032168/1470784739</string>
+    <string name="profile_activity_ad_unit_id">ca-app-pub-5883625079032168/6220193937</string>
+
+    <string name="chat_ad_id2">ca-app-pub-5883625079032168/3446367534</string>
+    <string name="main_activity_ad_unit_id2">ca-app-pub-5883625079032168/9492901130</string>
+    <string name="profile_activity_ad_unit_id2">ca-app-pub-5883625079032168/9353300330</string>
+
+    <string name="chat_ad_id3">ca-app-pub-5883625079032168/4923100735</string>
+    <string name="main_activity_ad_unit_id3">ca-app-pub-5883625079032168/1969634337</string>
+    <string name="profile_activity_ad_unit_id3">ca-app-pub-5883625079032168/1830033536</string>
+</resources>

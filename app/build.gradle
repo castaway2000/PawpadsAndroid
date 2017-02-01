@@ -1,35 +1,94 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+
+
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
+
+repositories {
+    maven { url 'http://maven.stickerpipe.com/artifactory/stickerfactory' }
+    maven { url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/" }
+    maven { url 'https://maven.fabric.io/public' }
+
+}
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
-
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
     defaultConfig {
         applicationId "saberapplications.pawpads"
         minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+
+        targetSdkVersion 23
+        versionCode 30
+
+        versionName "2.4.32"
+        // Enabling multidex support.
+        multiDexEnabled true
+
+        vectorDrawables.useSupportLibrary = true
+
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+//        debug {
+//            debuggable true
+//        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
+    dataBinding {
+        enabled true
+    }
 }
 
 dependencies {
-    //compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
-    compile files('libs/volley.jar')
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.google.android.gms:play-services:8.1.0'
-    compile files('libs/okhttp-1.2.1-jar-with-dependencies.jar')
-    compile files('libs/volley.jar')
-    //compile files('libs/android.jar')
+    
+
+    compile('com.twitter.sdk.android:twitter-core:2.0.0@aar') {
+        transitive = true;
+    }
+
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-core:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-chat:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-messages:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-location:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-content:2.6.1'
+    compile 'com.quickblox:quickblox-android-sdk-customobjects:2.6.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta2'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:gridlayout-v7:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.google.android.gms:play-services:9.6.1'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.google.android.gms:play-services-identity:9.6.1'
+    compile 'com.google.android.gms:play-services-gcm:9.6.1'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.makeramen:roundedimageview:2.2.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+        transitive = true;
+    }
+    compile ('io.imoji.sdk:imoji-sdk-ui:+@aar') {
+        transitive=true
+    }
+
 }

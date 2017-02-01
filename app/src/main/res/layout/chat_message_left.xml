@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="message"
+            type="String"/>
+        <variable
+            name="date"
+            type="String" />
+        <variable
+            name="isLast"
+            type="boolean"/>
+        <variable
+            name="showThumbNail"
+            type="boolean"/>
+        <variable
+            name="holder"
+            type="saberapplications.pawpads.ui.chat.ChatMessagesAdapter.HolderLeft"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/message_left_last"
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="5dp"
+            >
+            <saberapplications.pawpads.views.FontTextView
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{message,default=text}"
+                android:textColor="@color/title"
+                android:textSize="21sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:visibility="@{!showThumbNail}"
+                android:onClick="@{ () -> holder.downloadAttachment()}"
+                />
+
+            <FrameLayout
+                android:layout_width="150dp"
+                android:layout_height="wrap_content">
+                <ProgressBar
+                    android:id="@+id/sticker_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp" />
+                <ImageView
+                    android:id="@+id/thumb"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:visibility="@{showThumbNail}"
+                    android:onClick="@{ () -> holder.downloadAttachment()}"
+                    android:clickable="true"
+                    />
+            </FrameLayout>
+
+        </LinearLayout>
+        <saberapplications.pawpads.views.FontTextView
+            android:layout_below="@id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="#88393939"
+            android:text="@{date}"
+            android:textSize="13sp"
+            android:layout_marginLeft="22dp"
+            android:layout_marginTop="-2dp"
+            android:visibility="@{isLast}"
+            />
+    </RelativeLayout>
+</layout>

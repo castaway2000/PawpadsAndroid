@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.settings.PrefrenceActivity" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                >
+
+                <saberapplications.pawpads.views.FontTextView
+                    style="@style/preferences_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/distance_units"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textStyle="bold" />
+
+
+                <RadioGroup
+                    android:id="@+id/units"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp">
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/rbKM"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:buttonTint="@color/primary"
+                        android:checked="false"
+                        android:text="@string/kilometers"
+                        app:checked='@{activity.unit.equals("KM")}'
+                        />
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/rbMI"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:buttonTint="@color/primary"
+                        android:checked="false"
+                        android:text="@string/miles"
+                        app:checked='@{activity.unit.equals("MI")}'
+                        />
+                </RadioGroup>
+
+                <saberapplications.pawpads.views.FontTextView
+                    style="@style/preferences_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Range" />
+
+
+                <saberapplications.pawpads.views.FontEditText
+                    android:id="@+id/etRange"
+                    style="@style/settings_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
+                    android:hint="Range:"
+                    android:inputType="number"
+                    app:binding2way="@{activity.range}"
+                    android:maxLength="5"/>
+
+
+                <RadioGroup
+                    android:id="@+id/accuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="16dp"
+                    >
+
+                    <saberapplications.pawpads.views.FontTextView
+                        style="@style/preferences_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/gps_accuracy"
+                        />
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/rbHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:buttonTint="@color/primary"
+                        android:checked="true"
+                        android:text="@string/high"
+                        app:checked='@{activity.accuracy.equals("high")}'
+                        />
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/rbMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:buttonTint="@color/primary"
+                        android:text="@string/medium"
+                        app:checked='@{activity.accuracy.equals("medium")}'
+                        />
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/rbLow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:buttonTint="@color/primary"
+                        android:checked="false"
+                        android:text="@string/low"
+                        app:checked='@{activity.accuracy.equals("low")}'
+                        />
+
+                </RadioGroup>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="vertical">
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/NotificationSetting"
+                        style="@style/preferences_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/notification_settings" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/ckPushNotifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:enabled="true"
+                        android:text="@string/toggle_push_notifications"
+                        app:binding2way="@{activity.pushes}"
+                        app:buttonTint="@color/primary"
+                        />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/ckImNotification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:enabled="true"
+                        android:text="@string/toggle_messaging_popups"
+                        app:buttonTint="@color/primary"
+                        app:binding2way="@{activity.popups}"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:orientation="vertical">
+
+                    <saberapplications.pawpads.views.FontTextView
+                        style="@style/preferences_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/account_settings" />
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/tvRemoveProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingLeft="5dp"
+                        android:text="@string/permanently_delete_account"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:textSize="15sp"
+                        android:textColor="@color/title"/>
+
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/btRmProfile"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/delete_account_button"
+                        android:padding="5dp"
+                        android:text="@string/delete_account"
+                        android:onClick="@{ () -> activity.deleteUserProfile()}"/>
+
+                </LinearLayout>
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:layout_marginTop="16dp"
+                    android:id="@+id/app_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:typefaceAsset="Proxima_Nova_Regular.otf"
+                    android:textColor="@color/title"
+                    />
+            </LinearLayout>
+        </ScrollView>
+
+
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

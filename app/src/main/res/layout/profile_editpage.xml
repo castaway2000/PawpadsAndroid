@@ -1,68 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="1"
-    android:background="#59d8ff">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.profile.ProfileEditActivity" />
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.04">
+        android:layout_height="match_parent"
+
+        >
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="180dp"
+                android:orientation="vertical">
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/full_name"
+                    android:inputType="textCapWords"
+                    app:binding2way="@{activity.fullName}" />
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/age_hint"
+                    android:inputType="number"
+                    app:binding2way="@{activity.age}"
+                    android:maxLength="4"/>
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/gender"
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableRight="@drawable/grey_arrow_down"
+                    android:onClick="@{() -> activity.selectGender()}"
+                    android:text="@{ activity.gender }"
+                    android:textColor="@color/hint" />
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hobby"
+                    android:inputType="text"
+                    app:binding2way="@{activity.hobby}" />
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/write_something_about_you"
+                    android:inputType="textMultiLine"
+                    app:binding2way="@{activity.about}" />
+
+
+            </LinearLayout>
+
+
+        </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88ffffff"
+            android:visibility="@{activity.isBusy}">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/textView"
+                    style="@style/list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:indeterminate="true"
+                    android:text="@{activity.progressMessage}"
+                    android:textColor="@color/title" />
+            </LinearLayout>
+        </RelativeLayout>
+        <!-- Header !-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+            <ImageView
+                android:id="@+id/userBackground"
+                android:layout_width="match_parent"
+                android:layout_height="97dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/app_bar_bg" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/userBackground"
+                android:background="@drawable/shadow_gradient"
+                />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:onClick="@{ () -> activity.save()}"
+                android:padding="16dp"
+                android:text="@string/save"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/save"
+                android:clickable="true"
+                android:onClick="@{ () -> activity.changeProfileBackgound()}"
+                android:paddingBottom="16dp"
+                android:paddingRight="5dp"
+                android:paddingTop="19dp"
+                android:src="@drawable/camera_white_icon" />
+        </RelativeLayout>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/userAvatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:clickable="true"
+            android:onClick="@{ () -> activity.changeProfilePicture()}"
+            android:scaleType="centerCrop"
+            android:src="@drawable/user_placeholder"
+            app:borderWidth="0dp"
+            app:riv_mutate_background="true"
+            app:riv_oval="true" />
 
         <ImageView
-            android:layout_width="112dp"
-            android:layout_height="112dp"
-            android:id="@+id/editImageView"
-            android:layout_gravity="left|center_vertical"
-            android:layout_margin="5dp"
-            android:src="@android:drawable/btn_star_big_on" />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New profile pic"
-            android:id="@+id/newPicButton"
-            android:layout_gravity="center" />
-    </FrameLayout>
+            android:layout_below="@id/userAvatar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-5dp"
+            android:clickable="true"
+            android:onClick="@{ () -> activity.changeProfilePicture()}"
+            android:src="@drawable/camera_grey_icon"
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.27">
+            />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="About you:"
-            android:id="@+id/aboutYou"
-            android:layout_gravity="left|top"
-            android:layout_margin="5dp" />
+    </RelativeLayout>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="163dp"
-            android:id="@+id/editProfileText"
-            android:layout_gravity="center_horizontal|bottom"
-            android:background="#ffffff"
-            android:layout_margin="5dp" />
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.39">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save"
-            android:id="@+id/profileSave"
-            android:layout_gravity="center_horizontal|top" />
-    </FrameLayout>
-</LinearLayout>
+</layout>
