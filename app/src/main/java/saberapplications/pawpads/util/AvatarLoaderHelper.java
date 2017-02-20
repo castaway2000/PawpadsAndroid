@@ -7,10 +7,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.quickblox.content.QBContent;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,7 +68,7 @@ public class AvatarLoaderHelper {
         final File file = new File(CacheDir.getAbsolutePath() + "/" + fileId + ".jpg");
         // Trying get image from cache
         if (file.exists()) {
-            Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width, height).into(imageView);
+            Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
             if (callback != null) callback.imageLoaded();
         } else {
 
@@ -97,7 +97,7 @@ public class AvatarLoaderHelper {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Picasso.with(imageView.getContext()).load(file).centerCrop().resize(width, height).into(imageView);
+                            Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
                             if (callback != null) callback.imageLoaded();
 
                         }
