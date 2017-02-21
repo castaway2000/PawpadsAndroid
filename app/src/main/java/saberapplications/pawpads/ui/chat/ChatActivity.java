@@ -64,6 +64,7 @@ import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -765,8 +766,8 @@ public class ChatActivity extends BaseActivity {
         }
         isExternalDialogOpened = true;
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        intent.putExtra("return-data", true);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"),code);
     }
 
@@ -958,12 +959,22 @@ public class ChatActivity extends BaseActivity {
     public void openStickerEditor(Uri uri) {
         isExternalDialogOpened = true;
         final String path = FileUtil.getPath(this, uri);
+        Bitmap bitmap=null;
         if (path == null) {
+            try {
+                bitmap=MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            bitmap=BitmapFactory.decodeFile(path);
+        }
+
+        if (bitmap==null){
             Util.onError(getString(R.string.unable_to_get_file), this);
             isSendingMessage.set(false);
-            return;
         }
-        EditorBitmapCache.getInstance().put(EditorBitmapCache.Keys.INPUT_BITMAP, BitmapFactory.decodeFile(path));
+        EditorBitmapCache.getInstance().put(EditorBitmapCache.Keys.INPUT_BITMAP, bitmap);
         Intent intent = new Intent(this, ImojiEditorActivity.class);
         startActivityForResult(intent, ImojiEditorActivity.START_EDITOR_REQUEST_CODE);
     }
