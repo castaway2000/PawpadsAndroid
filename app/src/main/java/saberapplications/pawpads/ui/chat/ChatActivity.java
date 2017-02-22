@@ -231,6 +231,7 @@ public class ChatActivity extends BaseActivity {
 
     }
 
+
     private void init() {
         runOnUiThread(new Runnable() {
             @Override
@@ -907,12 +908,14 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void openProfile() {
+
         hideSoftKeyboard();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (recipient != null) {
+                    finish();
                     Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
                     intent.putExtra(C.QB_USERID, recipient.getId());
                     intent.putExtra(C.QB_USER, recipient);

@@ -84,7 +84,6 @@
             android:name=".ui.chat.ChatActivity"
             android:label="Chat"
             android:parentActivityName=".ui.home.MainActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
