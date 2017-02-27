@@ -137,6 +137,7 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="14dp"
+                    app:columnCount="6"
                     android:visibility="@{!isBlockedByOther &amp;&amp; !isBlockedByMe &amp;&amp; !isDeleted}">
 
                     <saberapplications.pawpads.views.FontEditText
@@ -147,7 +148,7 @@
                         style="@style/Widget.AppCompat.EditText"
                         app:layout_gravity="fill_horizontal"
                         android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:background="@drawable/chat_field_bg"
                         android:enabled="@{!activity.isSendingMessage.value}"
                         android:hint="@string/message"
@@ -158,6 +159,8 @@
                         android:textColor="@color/title"
                         android:textColorHint="@color/hint"
                         android:textSize="20sp"
+                        android:inputType="textMultiLine"
+                        android:maxLength="500"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
                     <saberapplications.pawpads.views.FontButton
