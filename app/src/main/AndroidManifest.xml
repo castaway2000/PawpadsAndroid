@@ -84,7 +84,6 @@
             android:name=".ui.chat.ChatActivity"
             android:label="Chat"
             android:parentActivityName=".ui.home.MainActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -173,6 +172,12 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="71b41297088b136c5894241c6ffdecec047779a6" />
+        <activity
+            android:windowSoftInputMode="adjustNothing"
+            android:name="io.imoji.sdk.editor.ImojiEditorActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+
+
     </application>
 
 </manifest>

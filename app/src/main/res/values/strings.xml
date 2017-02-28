@@ -110,6 +110,7 @@
     <string name="dialog_take_from_camera">Take from camera</string>
     <string name="dialog_get_from_gallery">Choose from gallery</string>
     <string name="dialog_send_file_title">Send file</string>
+    <string name="please_enter_any_worlds_to_start_search">Please enter any worlds to start search</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
