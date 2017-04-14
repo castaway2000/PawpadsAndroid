@@ -29,6 +29,11 @@ public class Util {
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public final static String SENDER_ID = "PUT GOOGLE PLAY ID HERE";
     public static String GCMREGID = "nothing yet";
+    //quickblox ID
+    public static final String QB_APPID = "PUT YOURS HERE";
+    public static final String QB_AUTH_KEY = "PUT YOURS HERE";
+    public static final String QB_AUTH_SECRET = "PUT YOURS HERE";
+    public static final String QB_ACCOUNT_KEY = "PUT YOURS HERE";
 
     //quickblox ID
     public static final String QB_APPID = "PUT YOURS HERE";

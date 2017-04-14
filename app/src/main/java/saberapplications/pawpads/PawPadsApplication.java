@@ -33,7 +33,7 @@ public class PawPadsApplication extends Application {
         FontManager.init(getAssets());
 //      StickersManager.initialize(Util.STICKERS_API_KEY, this);
         TwitterAuthConfig authConfig =
-                new TwitterAuthConfig("QVH37Z8PrGaEmplLqtvlx9i7c", "WQN8jeA5j1Y9o0WDq23dsDniSCXj6veh8UxCLEVX048YhKQLgP");
+                new TwitterAuthConfig("Consumer Key (API Key)", "Consumer Secret (API Secret)");
         Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
 
 
