@@ -23,15 +23,12 @@ https://en.wikipedia.org/wiki/MIT_License
 
 ## Future feature requests:
 * Friendslist
-* Searchbar(to find users by name)
-* Group chats(localized)
+* Search for users
+* Group chats
 * Posting mapped location to chat
 * World map with pins where everyone is
 * Send to feature (submenu outside of app)
 * Filterable results
-* Online/offline/away indicators
-* Stickers
-* Gif support
 
 
 ## Our Patreon:
