@@ -64,7 +64,7 @@ public class Util {
         for (String error : errors) {
             msg = msg + error + "\n";
         }
-        showAlert(context,msg);
+        showAlert(context, msg);
     }
 
     public static void onError(Exception e, Context context) {
@@ -74,8 +74,10 @@ public class Util {
 
     public static void onError(QBResponseException e, Context context) {
         Crashlytics.getInstance().logException(e);
-        showAlert(context,e.getLocalizedMessage());
-
+        String message =  e.getLocalizedMessage();
+        if(!message.contains("Subscription with such UDID already exists")){
+            showAlert(context, e.getLocalizedMessage());
+        }
     }
     public static void onError(String error, Context context) {
         showAlert(context,error);
