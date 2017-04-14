@@ -321,10 +321,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onQBConnect(boolean isActivityReopened) throws Exception {
-
+        Log.i("MAIN", "onQBConnect");
         QBUsers.getUser(currentUserId, new QBEntityCallback<QBUser>() {
+
             @Override
             public void onSuccess(QBUser user, Bundle bundle) {
+                Log.i("MAIN", "onSuccess");
                 float d = getResources().getDisplayMetrics().density;
                 if (user.getFileId() != null) {
 
@@ -338,6 +340,7 @@ public class MainActivity extends BaseActivity {
 
                 binding.setUsername(Util.getUserName(user));
                 currentQBUser=user;
+
             }
 
             @Override
@@ -369,7 +372,6 @@ public class MainActivity extends BaseActivity {
                 Log.i("MAIN", "No valid Google Play Services APK found.");
             }
         }
-
 
     }
 
@@ -474,7 +476,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onError(QBResponseException responseException) {
-                Util.onError(responseException, MainActivity.this);
+                    Util.onError(responseException, MainActivity.this);
             }
 
 
@@ -596,10 +598,6 @@ public class MainActivity extends BaseActivity {
         }
         return true;
     }
-
-
-
-
 
 
 }

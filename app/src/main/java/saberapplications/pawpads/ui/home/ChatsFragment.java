@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -70,6 +71,18 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     @Override
     public void onStart() {
         super.onStart();
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                    if(adapter.isShowInitialLoad()) {
+                        adapter.clear();
+                        currentPage = 0;
+                        loadData();
+                    }
+            }
+        }, 5000);
+        adapter.notifyDataSetChanged();
     }
 
     public void loadData() {

@@ -35,8 +35,15 @@ public class Util {
     public static final String QB_AUTH_SECRET = "PUT YOURS HERE";
     public static final String QB_ACCOUNT_KEY = "PUT YOURS HERE";
 
+    //quickblox ID
+    public static final String QB_APPID = "PUT YOURS HERE";
+    public static final String QB_AUTH_KEY = "PUT YOURS HERE";
+    public static final String QB_AUTH_SECRET = "PUT YOURS HERE";
+    public static final String QB_ACCOUNT_KEY = "PUT YOURS HERE";
 
-    public static final String STICKERS_API_KEY = "PUT YOURS HERE";
+    public static final String STICKERS_API_KEY = "PUT YOUR IMOJI KEY HERE";
+    public static final String IMOJI_SDK_CLIENT_ID = "PUT YOUR IMOJI CLIENT ID HERE";
+    public static final String IMOJI_SDK_API_TOKEN = "PUT YOUR IMOJI API TOKEN HERE";
 
     public static String ACCURACY;
     public static int RANGE;
@@ -62,7 +69,7 @@ public class Util {
         for (String error : errors) {
             msg = msg + error + "\n";
         }
-        showAlert(context,msg);
+        showAlert(context, msg);
     }
 
     public static void onError(Exception e, Context context) {
@@ -72,8 +79,10 @@ public class Util {
 
     public static void onError(QBResponseException e, Context context) {
         Crashlytics.getInstance().logException(e);
-        showAlert(context,e.getLocalizedMessage());
-
+        String message =  e.getLocalizedMessage();
+        if(!message.contains("Subscription with such UDID already exists")){
+            showAlert(context, e.getLocalizedMessage());
+        }
     }
     public static void onError(String error, Context context) {
         showAlert(context,error);

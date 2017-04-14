@@ -30,4 +30,5 @@ public class C {
     public static final String USER_DATA_CHANGED = "user_data_changed";
     public static final String UPDATE_CHAT = "update_chat";
     public static final long LOCATION_PUSH_INTERVAL = 120000;
+    public static final String CHAT_MSG_STICKER_PROPERTY = "STICKER";
 }

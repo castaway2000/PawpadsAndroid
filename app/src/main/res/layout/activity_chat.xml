@@ -21,6 +21,22 @@
         <variable
             name="isDeleted"
             type="boolean" />
+
+        <variable
+            name="bindStatusVisibility"
+            type="boolean">
+        </variable>
+
+        <import type="saberapplications.pawpads.R" />
+
+        <variable
+            name="onlineStatus"
+            type="int" />
+
+        <variable
+            name="showGiphy"
+            type="boolean" />
+
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -52,6 +68,21 @@
                         android:onClick="@{() -> activity.openProfile() }"
                         app:riv_oval="true" />
 
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/online_status"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="@{bindStatusVisibility}"
+                        app:backgroundResource="@{onlineStatus==1 ? R.color.user_offline_status_color : (onlineStatus==2 ? R.color.user_away_status_color : R.color.user_online_status_color)}"
+                        app:riv_border_width="1dp"
+                        app:riv_border_color="@color/accent"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true"
+                        android:layout_alignRight="@+id/recipient_avatar"
+                        android:layout_alignEnd="@+id/recipient_avatar"
+                        android:layout_marginTop="26dp"/>
+
                     <saberapplications.pawpads.views.FontTextView
                         android:id="@+id/toolbar_title"
                         android:layout_width="match_parent"
@@ -82,45 +113,54 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:orientation="vertical">
+                <saberapplications.pawpads.views.giphyselector.GiphySelector
+                    android:id="@+id/giphy_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="115dp"
+                    android:visibility="@{showGiphy}"
+                    />
+                <!-- Stickers !-->
+
+                <FrameLayout
+                    android:id="@+id/stickers_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
                 <!-- send message !-->
-                <LinearLayout
+                <!-- Blocked !-->
+                <android.support.v7.widget.GridLayout
                     android:id="@+id/message_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#EFEFEF"
-                    android:orientation="horizontal"
+                    app:orientation="horizontal"
                     android:paddingBottom="14dp"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="14dp"
+                    app:columnCount="6"
                     android:visibility="@{!isBlockedByOther &amp;&amp; !isBlockedByMe &amp;&amp; !isDeleted}">
 
-                    <ImageView
-                        android:id="@+id/imageViewSendFile"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:layout_marginRight="10dp"
-                        android:enabled="@{!activity.isSendingMessage.value}"
-                        android:onClick="@{() -> activity.selectFile() }"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/paper_clip" />
-
                     <saberapplications.pawpads.views.FontEditText
+                        app:layout_column="0"
+                        app:layout_row="0"
+                        app:layout_columnSpan="5"
                         android:id="@+id/editText_chat_message"
                         style="@style/Widget.AppCompat.EditText"
-                        android:layout_width="0dp"
+                        app:layout_gravity="fill_horizontal"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_width="0dp"
                         android:background="@drawable/chat_field_bg"
                         android:enabled="@{!activity.isSendingMessage.value}"
                         android:hint="@string/message"
                         android:paddingBottom="5dp"
                         android:paddingLeft="10dp"
                         android:paddingTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:textColor="@color/title"
                         android:textColorHint="@color/hint"
                         android:textSize="20sp"
+                        android:inputType="textMultiLine"
+                        android:maxLength="500"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
                     <saberapplications.pawpads.views.FontButton
@@ -137,8 +177,48 @@
                         android:text=":3"
                         android:textSize="20sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
-                </LinearLayout>
-                <!-- Blocked !-->
+                    <ImageView
+                        android:id="@+id/imageViewSendFile"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        app:layout_column="0"
+                        android:layout_marginRight="10dp"
+                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:onClick="@{() -> activity.selectFile() }"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/paper_clip" />
+
+                    <ImageView
+                        android:id="@+id/imageViewSendImoji"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:layout_marginRight="10dp"
+                        android:onClick="@{() -> activity.onClickImoji() }"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_smile_emotion_face" />
+                    <ImageView
+                        android:id="@+id/imageViewSendGiphy"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:onClick="@{() -> activity.onClickGiphy() }"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/giphy" />
+
+                    <ImageView
+                        android:id="@+id/createSticker"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:layout_marginLeft="10dp"
+                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:onClick="@{() -> activity.onCLickCreateSticker() }"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/add_imoji" />
+                </android.support.v7.widget.GridLayout>
+
                 <FrameLayout
                     android:id="@+id/block_container"
                     android:layout_width="match_parent"

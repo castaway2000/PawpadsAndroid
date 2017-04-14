@@ -14,6 +14,7 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.databinding.RowChatsBinding;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -71,6 +72,21 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
             }else {
                 AvatarLoaderHelper.loadImage(adapter.userCache.get(userId).getFileId(), binding.avatar, size, size);
             }
+
+            QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+                @Override
+                public void onSuccess(QBUser qbUser, Bundle bundle) {
+                    if (qbUser != null) {
+                        binding.setBindStatusVisibility(true);
+                        binding.setOnlineStatus(UserStatusHelper.getUserStatus(qbUser));
+                    }
+                }
+
+                @Override
+                public void onError(QBResponseException e) {
+
+                }
+            });
         }
     }
 

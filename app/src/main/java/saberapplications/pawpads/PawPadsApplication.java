@@ -11,7 +11,10 @@ import com.quickblox.core.QBSettings;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
+import java.util.UUID;
+
 import io.fabric.sdk.android.Fabric;
+import io.imoji.sdk.ImojiSDK;
 import saberapplications.pawpads.views.FontManager;
 
 
@@ -36,6 +39,8 @@ public class PawPadsApplication extends Application {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
+
+        ImojiSDK.getInstance().setCredentials(UUID.fromString(Util.IMOJI_SDK_CLIENT_ID), Util.IMOJI_SDK_API_TOKEN);
     }
 
     @Override

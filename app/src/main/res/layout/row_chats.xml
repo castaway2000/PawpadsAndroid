@@ -14,7 +14,19 @@
         <variable
             name="lastMessageDate"
             type="String" />
+
         <import type="android.view.View" alias="View"/>
+
+        <variable
+            name="bindStatusVisibility"
+            type="boolean">
+        </variable>
+
+        <import type="saberapplications.pawpads.R" />
+
+        <variable
+            name="onlineStatus"
+            type="int" />
     </data>
 
     <RelativeLayout
@@ -35,6 +47,21 @@
             app:riv_oval="true"
             android:src="@drawable/user_placeholder"
             android:layout_centerVertical="true"/>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/online_status"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:scaleType="centerCrop"
+            android:visibility="@{bindStatusVisibility}"
+            app:backgroundResource="@{onlineStatus==1 ? R.color.user_offline_status_color : (onlineStatus==2 ? R.color.user_away_status_color : R.color.user_online_status_color)}"
+            app:riv_border_width="2dp"
+            app:riv_border_color="@color/accent"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            android:layout_alignBottom="@+id/avatar"
+            android:layout_alignRight="@+id/avatar"
+            android:layout_alignEnd="@+id/avatar" />
 
         <LinearLayout
             android:layout_width="wrap_content"

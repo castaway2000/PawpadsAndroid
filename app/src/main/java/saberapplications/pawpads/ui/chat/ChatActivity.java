@@ -25,13 +25,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -59,14 +64,25 @@ import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.imoji.sdk.editor.ImojiCreateService;
+import io.imoji.sdk.editor.ImojiEditorActivity;
+import io.imoji.sdk.editor.util.EditorBitmapCache;
+import io.imoji.sdk.grid.QuarterScreenWidget;
+import io.imoji.sdk.grid.components.SearchResultAdapter;
+import io.imoji.sdk.grid.components.WidgetDisplayOptions;
+import io.imoji.sdk.grid.components.WidgetListener;
+import io.imoji.sdk.objects.Imoji;
+import io.imoji.sdk.objects.RenderingOptions;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
@@ -76,6 +92,8 @@ import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
+import saberapplications.pawpads.views.giphyselector.Giphy;
+import saberapplications.pawpads.views.giphyselector.GiphySelector;
 
 
 public class ChatActivity extends BaseActivity {
@@ -88,6 +106,7 @@ public class ChatActivity extends BaseActivity {
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
     private static final int READ_STORAGE_PERMISSION_REQUEST = 200;
     private static final int WRITE_ST_CAMERA_PERMISSION_REQUEST = 205;
+    private static final int PICK_FILE_FOR_EDIT_REQUEST = 3;
     public final BindableBoolean isSendingMessage = new BindableBoolean();
     public final BindableInteger uploadProgress = new BindableInteger(0);
     public final BindableBoolean isBusy = new BindableBoolean(true);
@@ -103,6 +122,8 @@ public class ChatActivity extends BaseActivity {
     private Uri mPhotoUri;
     //    BroadcastReceiver recieve_chat;
     private QBDialog dialog;
+    private QuarterScreenWidget mStickersWidget;
+    private FrameLayout mStickersContainer;
     BroadcastReceiver updateChatReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -111,10 +132,12 @@ public class ChatActivity extends BaseActivity {
             }
         }
     };
+
+
     private QBUser recipient;
     private ChatMessagesAdapter chatAdapter;
     private FrameLayout blockedContainer;
-    private LinearLayout messageContainer;
+    private ViewGroup messageContainer;
     private QBMessageListener messageListener = new QBMessageListener() {
         @Override
         public void processMessage(QBChat qbChat, final QBChatMessage qbChatMessage) {
@@ -146,6 +169,7 @@ public class ChatActivity extends BaseActivity {
 
     private boolean isBlocked;
     private boolean userDeleted;
+    private int currentCode;
 
     public static boolean isImage(File file) {
         String fileName = file.getName();
@@ -184,7 +208,6 @@ public class ChatActivity extends BaseActivity {
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
         }
 
-
         if (recipient != null) {
             init();
         }
@@ -194,11 +217,20 @@ public class ChatActivity extends BaseActivity {
 
         button_send_chat = (Button) findViewById(R.id.button_send_chat);
         blockedContainer = (FrameLayout) findViewById(R.id.block_container);
-        messageContainer = (LinearLayout) findViewById(R.id.message_container);
+        messageContainer = (ViewGroup) findViewById(R.id.message_container);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateChatReciever, new IntentFilter(C.UPDATE_CHAT));
+        binding.giphySelector.setCallback(new GiphySelector.Callback() {
+            @Override
+            public void onSelected(Giphy giphy) {
+                sendSticker(Uri.parse(giphy.getFull().getUrl()));
+            }
+        });
+        initStickersWidget();
+
 
     }
+
 
     private void init() {
         runOnUiThread(new Runnable() {
@@ -211,9 +243,57 @@ public class ChatActivity extends BaseActivity {
                     AvatarLoaderHelper.loadImage(recipient.getFileId(), binding.recipientAvatar, size, size);
                 }
                 binding.setUsername(Util.getUserName(recipient));
+                binding.setBindStatusVisibility(true);
+                binding.setOnlineStatus(UserStatusHelper.getUserStatus(recipient));
             }
         });
 
+    }
+
+    private void initStickersWidget() {
+        mStickersContainer = binding.stickersContainer;
+        RenderingOptions renderingOptions = new RenderingOptions(
+                RenderingOptions.BorderStyle.Sticker,
+                RenderingOptions.ImageFormat.Png,
+                RenderingOptions.Size.Thumbnail
+        );
+        WidgetDisplayOptions options = new WidgetDisplayOptions(renderingOptions);
+        mStickersWidget = new QuarterScreenWidget(
+                this,
+                options,
+                new SearchResultAdapter.ImageLoader() {
+                    @Override
+                    public void loadImage(@NonNull ImageView target, @NonNull Uri uri,
+                                          @NonNull final SearchResultAdapter.ImageLoaderCallback callback) {
+                        Glide.with(getApplicationContext())
+                                .load(uri.toString())
+                                .listener(new RequestListener<String, GlideDrawable>() {
+                                    @Override
+                                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                        callback.updateImageView();
+                                        return false;
+                                    }
+                                })
+                                .into(target);
+                    }
+                }
+        );
+        mStickersWidget.setWidgetListener(new WidgetListener() {
+            @Override
+            public void onCloseButtonTapped() {
+                // not needed
+            }
+
+            @Override
+            public void onStickerTapped(Imoji imoji) {
+                sendSticker(imoji.getStandardFullSizeUri());
+            }
+        });
     }
 
     @Override
@@ -221,14 +301,26 @@ public class ChatActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         isExternalDialogOpened = false;
         if (resultCode == Activity.RESULT_OK) {
-
-            if (requestCode == PICKFILE_REQUEST_CODE) {
-                sendAttachment(data.getData());
+            switch (requestCode) {
+                case PICKFILE_REQUEST_CODE:
+                    sendAttachment(data.getData());
+                    break;
+                case IMAGE_CAPTURE_REQUEST_CODE:
+                    sendAttachment(mPhotoUri);
+                    break;
+                case PICK_FILE_FOR_EDIT_REQUEST:
+                    openStickerEditor(data.getData());
+                    break;
+                case ImojiEditorActivity.START_EDITOR_REQUEST_CODE:
+                    if (data.hasExtra(ImojiCreateService.IMOJI_MODEL_BUNDLE_ARG_KEY)) {
+                        Imoji imoji = data.getParcelableExtra(ImojiCreateService.IMOJI_MODEL_BUNDLE_ARG_KEY);
+                        sendSticker(imoji.getStandardFullSizeUri());
+                    }
+                    break;
             }
-            if (requestCode == IMAGE_CAPTURE_REQUEST_CODE) {
-                sendAttachment(mPhotoUri);
-            }
-
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            isBusy.set(false);
         }
     }
 
@@ -249,6 +341,7 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             protected Void doInBackground(Void... params) {
+                Log.d("CHAT", "doInBackground");
                 try {
                     if (currentQBUser == null) {
                         currentQBUser = QBUsers.getUser(preferences.getInt(C.QB_USERID, 0));
@@ -274,7 +367,12 @@ public class ChatActivity extends BaseActivity {
                         }
                     }
                     if (!userDeleted) {
-                        privateChat = privateChatManager.getChat(recipient.getId());
+                        try {
+                            privateChat = privateChatManager.getChat(recipient.getId());
+                        } catch (NullPointerException e) {
+                            Log.e("QBPrivateChatManager", e.getMessage());
+                            e.printStackTrace();
+                        }
                         if (privateChat == null) {
                             privateChat = privateChatManager.createChat(recipient.getId(), messageListener);
                         } else {
@@ -377,14 +475,19 @@ public class ChatActivity extends BaseActivity {
         if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<QBAttachment>());
         }
-
         chatAdapter.addItem(message);
+
+        if (!message.getSenderId().equals(currentQBUser.getId())) {
+            UserStatusHelper.setUserStatusByNewMessage(message.getSenderId());
+            binding.setOnlineStatus(UserStatusHelper.USER_ONLINE);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateChatReciever);
+
 
     }
 
@@ -397,10 +500,20 @@ public class ChatActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mStickersContainer.getChildCount() != 0) {
+            hideSoftKeyboard();
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         paused = System.currentTimeMillis();
-        isBusy.set(true);
+        if (!isExternalDialogOpened) {
+            isBusy.set(true);
+        }
     }
 
     private void onBlocked() {
@@ -436,13 +549,13 @@ public class ChatActivity extends BaseActivity {
                 privateChat.sendMessage(msg);
                 displayChatMessage(msg);
             } catch (SmackException.NotConnectedException e) {
-                if (!isNetworkAvailable()){
-                    Util.onError(getString(R.string.verify_internet_connection),this);
-                }else {
-                    isReopened=true;
+                if (!isNetworkAvailable()) {
+                    Util.onError(getString(R.string.verify_internet_connection), this);
+                } else {
+                    isReopened = true;
                     isBusy.set(true);
                     loginToChat();
-                    Toast.makeText(this, R.string.reconnect_message,Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.reconnect_message, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
                 Util.onError(e, ChatActivity.this);
@@ -460,6 +573,7 @@ public class ChatActivity extends BaseActivity {
         final String path = FileUtil.getPath(this, uri);
         if (path == null) {
             Util.onError(getString(R.string.unable_to_get_file), this);
+            isSendingMessage.set(false);
             return;
         }
         final File filePhoto = new File(path);
@@ -531,8 +645,59 @@ public class ChatActivity extends BaseActivity {
             }
 
         }.execute();
+    }
 
+    public void sendSticker(Uri uri) {
+        if (isBusy.get()) {
+            Toast.makeText(this, "Please wait until connection to server restored", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (isSendingMessage.get()) return;
+        isSendingMessage.set(true);
 
+        // send sticker to chat server
+        if (uri.toString().contains("http")) {
+            QBChatMessage msg = new QBChatMessage();
+            msg.setBody("sticker");
+
+            msg.setProperty("save_to_history", "1");
+            msg.setRecipientId(recipient.getId());
+            msg.setDialogId(dialog.getDialogId());
+            msg.setProperty("send_to_chat", "1");
+            msg.setProperty(C.CHAT_MSG_STICKER_PROPERTY, uri.toString());
+
+            try {
+                privateChat.sendMessage(msg);
+                displayChatMessage(msg);
+            } catch (SmackException.NotConnectedException e) {
+                if (!isNetworkAvailable()) {
+                    Util.onError(getString(R.string.verify_internet_connection), this);
+                } else {
+                    isReopened = true;
+                    isBusy.set(true);
+                    loginToChat();
+                    Toast.makeText(this, R.string.reconnect_message, Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Util.onError(e, ChatActivity.this);
+            }
+        }
+        isSendingMessage.set(false);
+    }
+
+    public void onClickImoji() {
+        if (mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
+            hideSoftKeyboard();
+            mStickersContainer.addView(mStickersWidget);
+        } else {
+            hideStickersContainer();
+        }
+    }
+
+    private void hideStickersContainer() {
+        if (mStickersContainer != null && mStickersContainer.getChildCount() > 0) {
+            mStickersContainer.removeAllViews();
+        }
     }
 
     public void selectFile() {
@@ -548,7 +713,7 @@ public class ChatActivity extends BaseActivity {
                 if (items[item].equals(getString(R.string.dialog_take_from_camera))) {
                     getImgFromCamera();
                 } else if (items[item].equals(getString(R.string.dialog_get_from_gallery))) {
-                    getImgFromGallery();
+                    getImgFromGallery(PICKFILE_REQUEST_CODE);
                 } else if (items[item].equals(getString(R.string.cancel))) {
                     dialog.dismiss();
                 }
@@ -565,7 +730,7 @@ public class ChatActivity extends BaseActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permCameraCheck != PackageManager.PERMISSION_GRANTED || permWriteCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{ Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     WRITE_ST_CAMERA_PERMISSION_REQUEST);
             return;
         }
@@ -590,10 +755,11 @@ public class ChatActivity extends BaseActivity {
                 + "IMG_" + timeStamp + ".jpg");
     }
 
-    private void getImgFromGallery() {
+    private void getImgFromGallery(int code) {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            currentCode = code;
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     READ_STORAGE_PERMISSION_REQUEST);
@@ -601,8 +767,9 @@ public class ChatActivity extends BaseActivity {
         }
         isExternalDialogOpened = true;
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),code);
     }
 
     public void loadData() {
@@ -706,9 +873,9 @@ public class ChatActivity extends BaseActivity {
         switch (requestCode) {
             case READ_STORAGE_PERMISSION_REQUEST: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getImgFromGallery();
+                    getImgFromGallery(currentCode);
                 }
-                 break;
+                break;
             }
             case WRITE_ST_CAMERA_PERMISSION_REQUEST: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -741,12 +908,14 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void openProfile() {
+
         hideSoftKeyboard();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(recipient != null) {
+                if (recipient != null) {
+                    finish();
                     Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
                     intent.putExtra(C.QB_USERID, recipient.getId());
                     intent.putExtra(C.QB_USER, recipient);
@@ -757,9 +926,61 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void hideSoftKeyboard() {
-        if(getCurrentFocus()!=null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        if (getCurrentFocus() != null) {
+            Handler h = new Handler();
+            h.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+            }, 50);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (mStickersContainer.getChildCount() != 0) {
+            hideStickersContainer();
+            hideSoftKeyboard();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void onClickGiphy() {
+        hideSoftKeyboard();
+        hideStickersContainer();
+        binding.setShowGiphy(!binding.getShowGiphy());
+    }
+
+    public void onCLickCreateSticker() {
+        getImgFromGallery(PICK_FILE_FOR_EDIT_REQUEST);
+
+    }
+
+    public void openStickerEditor(Uri uri) {
+        isExternalDialogOpened = true;
+        final String path = FileUtil.getPath(this, uri);
+        Bitmap bitmap=null;
+        if (path == null) {
+            try {
+                bitmap=MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            bitmap=BitmapFactory.decodeFile(path);
+        }
+
+        if (bitmap==null){
+            Util.onError(getString(R.string.unable_to_get_file), this);
+            isSendingMessage.set(false);
+        }
+        EditorBitmapCache.getInstance().put(EditorBitmapCache.Keys.INPUT_BITMAP, bitmap);
+        Intent intent = new Intent(this, ImojiEditorActivity.class);
+        startActivityForResult(intent, ImojiEditorActivity.START_EDITOR_REQUEST_CODE);
+    }
+
+
 }

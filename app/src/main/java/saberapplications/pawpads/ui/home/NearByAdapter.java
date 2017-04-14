@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.RowNearByBinding;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
@@ -84,6 +85,7 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
             binding.setLastMessage(data.model.get().getLastMessageDateFmt());
             binding.setUsername(Util.getUserName(data.model.get().location.getUser()));
             binding.setDistance(getDistance(data.model.get().getLocation()));
+            binding.setOnlineStatus(UserStatusHelper.getUserStatus(data.model.get().getLocation().getUser()));
 
             QBUser user=data.model.get().getLocation().getUser();
             if (user.getFileId() != null) {

@@ -147,5 +147,6 @@ public class FileUtil {
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority())
         || "com.google.android.apps.docs.storage".equals(uri.getAuthority());
+
     }
 }
