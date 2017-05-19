@@ -86,6 +86,7 @@
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
             <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/block_user_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/list_item_bg"
@@ -189,6 +190,7 @@
                >
 
                 <ImageView
+                    android:id="@+id/open_chat_button"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:src="@drawable/chat_button"

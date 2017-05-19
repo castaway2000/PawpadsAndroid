@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +82,14 @@ public class ProfileActivity extends BaseActivity {
         isBlockedView = (TextView) findViewById(R.id.is_blocked);
         qbUser= (QBUser) getIntent().getSerializableExtra(C.QB_USER);
         binding.setUser(qbUser);
+
+        if(qbUser != null && qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) {
+            binding.blockUserView.setVisibility(View.GONE);
+            binding.blockUserView.setText("");
+            binding.blockUserView.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+            binding.openChatButton.setVisibility(View.GONE);
+        }
+
         //banner ad
         AdView adView = (AdView)findViewById(R.id.profileAdView);
         adView.loadAd(requestNewAd());
@@ -174,8 +183,8 @@ public class ProfileActivity extends BaseActivity {
 
                 binding.age.invalidate();
 
-
                 setBlockedUI(isBlockedByMe.get());
+
             }
         }.execute();
     }

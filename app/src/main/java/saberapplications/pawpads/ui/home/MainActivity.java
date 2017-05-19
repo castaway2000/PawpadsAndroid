@@ -553,6 +553,13 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    public void openProfile() {
+        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra(C.QB_USERID, currentQBUser.getId());
+        intent.putExtra(C.QB_USER, currentQBUser);
+        startActivity(intent);
+    }
 
     public void editProfile() {
         binding.navigationDrawer.closeDrawer(Gravity.LEFT);

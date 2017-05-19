@@ -113,6 +113,7 @@
                 android:layout_height="80dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
+                android:onClick="@{() -> activity.openProfile()}"
                 android:scaleType="fitCenter"
                 app:riv_border_color="#333333"
                 app:riv_oval="true"
