@@ -82,6 +82,7 @@ public class MainActivity extends BaseActivity {
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
     ChatsFragment chatsFragment;
+    FriendsFragment friendsFragment;
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
@@ -145,6 +146,7 @@ public class MainActivity extends BaseActivity {
 
         nearByFragment = new NearByFragment();
         chatsFragment = new ChatsFragment();
+        friendsFragment = new FriendsFragment();
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -162,7 +164,15 @@ public class MainActivity extends BaseActivity {
                             chatsFragment.loadData();
                         }
                     },50);
-
+                }
+                if (position == 2 && (friendsFragment.adapter==null || friendsFragment.adapter.getItemCount()==0)) {
+                    Handler handler=new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            friendsFragment.loadData();
+                        }
+                    },50);
                 }
             }
 
@@ -172,6 +182,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.viewPager.setOffscreenPageLimit(2);
         binding.tabLayout.setupWithViewPager(binding.viewPager);
 
         //banner ad
@@ -530,15 +541,16 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return nearByFragment;
-            } else {
+            } else if(position == 1){
                 return chatsFragment;
+            } else {
+                return friendsFragment;
             }
-
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
 
@@ -546,8 +558,10 @@ public class MainActivity extends BaseActivity {
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
                 return getString(R.string.near_by);
-            } else {
+            } else if(position == 1) {
                 return getString(R.string.chats);
+            } else {
+                return getString(R.string.friends);
             }
         }
 
