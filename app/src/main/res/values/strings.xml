@@ -112,6 +112,13 @@
     <string name="dialog_get_from_gallery">Choose from gallery</string>
     <string name="dialog_send_file_title">Send file</string>
     <string name="please_enter_any_worlds_to_start_search">Please enter any worlds to start search</string>
+    <string name="remove_from_friends">Remove from friends</string>
+    <string name="send_request">Send request</string>
+    <string name="dialog_add_friend_add">You are about to add</string>
+    <string name="dialog_add_to_friend">to friends</string>
+    <string name="dialog_remove_friend">You are about to remove</string>
+    <string name="dialog_remove_from_friend">from friends</string>
+    <string name="friend_request">friend request</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

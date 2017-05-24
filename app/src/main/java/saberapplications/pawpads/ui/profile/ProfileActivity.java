@@ -5,14 +5,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +32,8 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.QBRoster;
+import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
@@ -33,6 +44,8 @@ import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -52,6 +65,7 @@ import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.ChatRosterHelper;
 
 public class ProfileActivity extends BaseActivity {
 
@@ -66,6 +80,8 @@ public class ProfileActivity extends BaseActivity {
 
     UserProfile profile;
     ActivityProfilepageBinding binding;
+    QBRoster chatRoster;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,11 +99,15 @@ public class ProfileActivity extends BaseActivity {
         qbUser= (QBUser) getIntent().getSerializableExtra(C.QB_USER);
         binding.setUser(qbUser);
 
+        initChatRoster();
+        setFriendsUI();
+
         if(qbUser != null && qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) {
             binding.blockUserView.setVisibility(View.GONE);
             binding.blockUserView.setText("");
             binding.blockUserView.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
             binding.openChatButton.setVisibility(View.GONE);
+            binding.addToFriendsButton.setVisibility(View.GONE);
         }
 
         //banner ad
@@ -171,6 +191,9 @@ public class ProfileActivity extends BaseActivity {
                 if (qbUser.getFileId()!=null){
                     AvatarLoaderHelper.loadImage(qbUser.getFileId(), binding.userAvatar,
                             Math.round(density*100), Math.round(density*100));
+
+                    AvatarLoaderHelper.loadImage(qbUser.getFileId(), binding.avatarHolder,
+                            Math.round(density*60), Math.round(density*60));
                 }
 
 
@@ -185,6 +208,7 @@ public class ProfileActivity extends BaseActivity {
 
                 setBlockedUI(isBlockedByMe.get());
 
+                setFriendsUI();
             }
         }.execute();
     }
@@ -395,5 +419,142 @@ public class ProfileActivity extends BaseActivity {
         }.execute();
 
 
+    }
+
+    private void initChatRoster() {
+        if(chatRoster == null) {
+            chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
+                @Override
+                public void subscriptionRequested(int userId) {
+                    // nothing to do
+                }
+            });
+        }
+    }
+
+    private void setFriendsUI() {
+        if(chatRoster == null) return;
+        if (chatRoster.contains(qbUser.getId())) {
+            binding.addToFriendsButton.setImageResource(R.drawable.added_to_friend);
+            binding.deleteFromFriends.setVisibility(View.VISIBLE);
+        } else {
+            binding.addToFriendsButton.setImageResource(R.drawable.add_to_friend);
+            binding.deleteFromFriends.setVisibility(View.GONE);
+        }
+    }
+
+    public void addUserToFriends() {
+        if(qbUser.getId() == null || qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) return;
+        if(chatRoster.contains(qbUser.getId())) return;
+
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this)
+                .setCancelable(true);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_to_friends, null);
+        ImageView dialogAvatar = (ImageView) view.findViewById(R.id.dialog_avatar);
+        dialogAvatar.setImageDrawable(binding.avatarHolder.getDrawable());
+
+        TextView messageText = (TextView) view.findViewById(R.id.message_text);
+        String sourceString = getString(R.string.dialog_add_friend_add) + " <b>" + qbUser.getFullName() + "</b> " + getString(R.string.dialog_add_to_friend);
+        messageText.setText(Html.fromHtml(sourceString));
+
+        builder.setView(view);
+
+        final android.app.AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+
+        TextView sendButton = (TextView) view.findViewById(R.id.send_friend_request);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                addToFriends();
+            }
+        });
+
+        TextView cancelButton = (TextView) view.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void addToFriends() {
+        int userId = qbUser.getId();
+        if (chatRoster.contains(userId)) {
+            try {
+                chatRoster.subscribe(userId);
+                setFriendsUI();
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                chatRoster.createEntry(userId, null);
+                setFriendsUI();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            } catch (SmackException.NotLoggedInException e) {
+                e.printStackTrace();
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            } catch (SmackException.NoResponseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void removeUserFromFriends() {
+        if(qbUser.getId() == null || qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) return;
+        if( !chatRoster.contains(qbUser.getId())) return;
+
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this)
+                .setCancelable(true);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_to_friends, null);
+        ImageView dialogAvatar = (ImageView) view.findViewById(R.id.dialog_avatar);
+        dialogAvatar.setImageDrawable(binding.avatarHolder.getDrawable());
+
+        TextView messageText = (TextView) view.findViewById(R.id.message_text);
+        String sourceString = getString(R.string.dialog_remove_friend) + " <b>" + qbUser.getFullName() + "</b> " + getString(R.string.dialog_remove_from_friend);
+        messageText.setText(Html.fromHtml(sourceString));
+
+        builder.setView(view);
+
+        final android.app.AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+
+        TextView sendButton = (TextView) view.findViewById(R.id.send_friend_request);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                removeFromFriends();
+            }
+        });
+
+        TextView cancelButton = (TextView) view.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void removeFromFriends() {
+        int userId = qbUser.getId();
+        try {
+            chatRoster.unsubscribe(userId);
+            setFriendsUI();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
     }
 }

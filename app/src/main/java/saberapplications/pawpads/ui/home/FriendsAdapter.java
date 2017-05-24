@@ -7,15 +7,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quickblox.chat.QBRoster;
+import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.roster.packet.RosterPacket;
+
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.databinding.RowFriendsBinding;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
@@ -31,6 +36,12 @@ public class FriendsAdapter extends BaseListAdapter<QBUser> {
         private final int size;
         RowFriendsBinding binding;
         FriendsAdapter adapter;
+        QBRoster chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
+            @Override
+            public void subscriptionRequested(int userId) {
+                // nothing to do
+            }
+        });
 
         public FriendsDialogHolder(View v, BaseListAdapter<QBUser> adapter) {
             super(v, adapter);
@@ -46,6 +57,13 @@ public class FriendsAdapter extends BaseListAdapter<QBUser> {
             String userName = data.model.get().getFullName() == null ? data.model.get().getLogin() : data.model.get().getFullName();
             binding.setUsername(userName);
             int userId=user.getId();
+
+            binding.newFriendRequest.setVisibility(View.GONE);
+            binding.newFriendRequestIndicator.setVisibility(View.GONE);
+            if(chatRoster.getEntry(userId).getType() == RosterPacket.ItemType.from) {
+                binding.newFriendRequest.setVisibility(View.VISIBLE);
+                binding.newFriendRequestIndicator.setVisibility(View.VISIBLE);
+            }
 
             binding.avatar.setImageResource(R.drawable.user_placeholder);
             if(!adapter.userCache.containsKey(userId)) {

@@ -75,6 +75,18 @@
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
             <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/delete_from_friends"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/remove_from_friends"
+                android:textColor="#28A7BB"
+                android:textSize="20sp"
+                app:layout_gravity="center"
+                android:visibility="gone"
+                android:onClick="@{() -> activity.removeUserFromFriends()}"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+            <saberapplications.pawpads.views.FontTextView
                 android:id="@+id/is_blocked"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,11 +178,34 @@
             app:columnCount="3"
             app:orientation="horizontal"
             >
-            <android.support.v4.widget.Space
+            <!--<android.support.v4.widget.Space-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="10dp"-->
+                <!--app:layout_columnWeight="1"-->
+                <!--/>-->
+
+            <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="10dp"
+                android:layout_height="100dp"
                 app:layout_columnWeight="1"
-                />
+                >
+
+                <ImageView
+                    android:id="@+id/add_to_friends_button"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:padding="7dp"
+                    android:src="@drawable/add_to_friend"
+                    android:layout_centerInParent="true" />
+
+                <View
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/add_to_friend_btn_bg"
+                    android:clickable="true"
+                    android:onClick="@{() -> activity.addUserToFriends()}"
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/userAvatar"
@@ -193,7 +228,7 @@
                     android:id="@+id/open_chat_button"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:src="@drawable/chat_button"
+                    android:src="@drawable/chat_button_new"
                     android:layout_centerInParent="true" />
 
                 <View
@@ -244,6 +279,18 @@
                     android:textColor="@color/title" />
             </LinearLayout>
         </RelativeLayout>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/avatar_holder"
+            android:visibility="gone"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:clickable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/user_placeholder"
+            app:borderWidth="0dp"
+            app:riv_mutate_background="true"
+            app:riv_oval="true" />
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/profileAdView"

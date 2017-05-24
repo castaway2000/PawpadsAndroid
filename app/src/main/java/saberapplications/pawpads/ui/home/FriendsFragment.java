@@ -2,6 +2,7 @@ package saberapplications.pawpads.ui.home;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentFriendsBinding;
+import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
@@ -142,13 +145,13 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
             chatRoster.confirmSubscription(userId);
             loadData();
         } catch (SmackException.NotConnectedException e) {
-
+            e.printStackTrace();
         } catch (SmackException.NotLoggedInException e) {
-
+            e.printStackTrace();
         } catch (XMPPException e) {
-
+            e.printStackTrace();
         } catch (SmackException.NoResponseException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -156,7 +159,7 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
         try {
             chatRoster.reject(userId);
         } catch (SmackException.NotConnectedException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -166,13 +169,8 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
             Collection<QBRosterEntry> entries = chatRoster.getEntries();
             Log.d(TAG, "Collection<QBRosterEntry> entries " + entries.toString());
             for(QBRosterEntry entry : entries) {
-                if(entry.getRosterEntry().getType() == RosterPacket.ItemType.none) {
-                    showSubscriptionRequestDialog(entry.getUserId());
-                } else {
-                    usersIds.add(entry.getUserId());
-                }
+                usersIds.add(entry.getUserId());
             }
-            //addUserToFriendsList(28003081);
         }
         if(usersIds.size() > 0) {
             QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
@@ -205,28 +203,6 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
         }
     }
 
-    private void addUserToFriendsList(int userId) {
-        if (chatRoster.contains(userId)) {
-            try {
-                chatRoster.subscribe(userId);
-            } catch (SmackException.NotConnectedException e) {
-
-            }
-        } else {
-            try {
-                chatRoster.createEntry(userId, null);
-            } catch (XMPPException e) {
-
-            } catch (SmackException.NotLoggedInException e) {
-
-            } catch (SmackException.NotConnectedException e) {
-
-            } catch (SmackException.NoResponseException e) {
-
-            }
-        }
-    }
-
     @Override
     public void onLoadMore() {
         loadData();
@@ -234,6 +210,16 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
 
     @Override
     public void onItemClick(final QBUser user) {
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (user != null) {
+                    Intent intent = new Intent(getActivity(), ProfileActivity.class);
+                    intent.putExtra(C.QB_USERID, user.getId());
+                    intent.putExtra(C.QB_USER, user);
+                    startActivity(intent);
+                }
+            }
+        }, 50);
     }
 }
