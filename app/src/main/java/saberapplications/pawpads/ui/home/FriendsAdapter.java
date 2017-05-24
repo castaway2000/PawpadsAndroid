@@ -60,7 +60,9 @@ public class FriendsAdapter extends BaseListAdapter<QBUser> {
 
             binding.newFriendRequest.setVisibility(View.GONE);
             binding.newFriendRequestIndicator.setVisibility(View.GONE);
-            if(chatRoster.getEntry(userId).getType() == RosterPacket.ItemType.from) {
+            if(chatRoster != null && chatRoster.getEntry(userId) != null &&
+                    chatRoster.getEntry(userId).getType() == RosterPacket.ItemType.none &&
+                    chatRoster.getEntry(userId).getStatus() == null) {
                 binding.newFriendRequest.setVisibility(View.VISIBLE);
                 binding.newFriendRequestIndicator.setVisibility(View.VISIBLE);
             }

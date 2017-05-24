@@ -5,21 +5,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRoster;
-import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
-import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -38,8 +40,8 @@ import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentFriendsBinding;
-import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
@@ -107,43 +109,71 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
                 @Override
                 public void subscriptionRequested(int userId) {
                     Log.d(TAG, "subscriptionRequested " + userId);
-                    showSubscriptionRequestDialog(userId);
+                    loadDataAfterChanges();
                 }
             });
         }
     }
 
-    private void showSubscriptionRequestDialog(final int userId) {
-        if(getActivity() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    if(requestDialog != null && requestDialog.isShowing()) return;
-                    requestDialog = new AlertDialog.Builder(getActivity())
-                            .setTitle("Subscription Request")
-                            .setMessage("User " + userId + " wants to add your in friends list")
-                            .setPositiveButton("Reject", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    rejectRequest(userId);
-                                }
-                            })
-                            .setNegativeButton("Accept", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    confirmRequest(userId);
-                                }
-                            })
-                            .create();
-                    requestDialog.show();
-                }
-            });
+    private void showAddToFriendsRequestDialog(final QBUser user) {
+        if(user == null) return;
+
+        if(requestDialog != null && requestDialog.isShowing()) return;
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity())
+                .setCancelable(true);
+
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_add_to_friends, null);
+        ImageView dialogAvatar = (ImageView) view.findViewById(R.id.dialog_avatar);
+        if(user.getFileId() != null) {
+            float density = getResources().getDisplayMetrics().density;
+            AvatarLoaderHelper.loadImage(user.getFileId(), dialogAvatar,
+                    Math.round(density * 60), Math.round(density * 60));
         }
+
+        TextView messageText = (TextView) view.findViewById(R.id.message_text);
+        String userName = user.getFullName() == null ? user.getLogin() : user.getFullName();
+        String sourceString = getString(R.string.user) + " <b>" + userName + "</b> " + getString(R.string.wants_to_add_you_to_friendlist);
+        messageText.setText(Html.fromHtml(sourceString));
+
+        builder.setView(view);
+
+        requestDialog = builder.create();
+        requestDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        requestDialog.show();
+
+        TextView acceptButton = (TextView) view.findViewById(R.id.send_friend_request);
+        acceptButton.setText(getString(R.string.accept_invite));
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acceptRequest(user.getId());
+                requestDialog.dismiss();
+            }
+        });
+
+        TextView rejectButton = (TextView) view.findViewById(R.id.cancel_button);
+        rejectButton.setText(getString(R.string.reject_invite));
+        rejectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rejectRequest(user.getId());
+                requestDialog.dismiss();
+            }
+        });
     }
 
-    private void confirmRequest(int userId) {
+    private void loadDataAfterChanges() {
+        adapter.clear();
+        currentPage = 0;
+        loadData();
+        binding.swipelayout.setRefreshing(false);
+    }
+
+    private void acceptRequest(int userId) {
         try {
             chatRoster.confirmSubscription(userId);
-            loadData();
+            loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         } catch (SmackException.NotLoggedInException e) {
@@ -158,6 +188,7 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
     private void rejectRequest(int userId) {
         try {
             chatRoster.reject(userId);
+            loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
@@ -214,10 +245,16 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
             @Override
             public void run() {
                 if (user != null) {
-                    Intent intent = new Intent(getActivity(), ProfileActivity.class);
-                    intent.putExtra(C.QB_USERID, user.getId());
-                    intent.putExtra(C.QB_USER, user);
-                    startActivity(intent);
+                    if(chatRoster != null && chatRoster.getEntry(user.getId()) != null &&
+                            chatRoster.getEntry(user.getId()).getType() == RosterPacket.ItemType.none &&
+                            chatRoster.getEntry(user.getId()).getStatus() == null) {
+                        showAddToFriendsRequestDialog(user);
+                    } else {
+                        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+                        intent.putExtra(C.QB_USERID, user.getId());
+                        intent.putExtra(C.QB_USER, user);
+                        startActivity(intent);
+                    }
                 }
             }
         }, 50);

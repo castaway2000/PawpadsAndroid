@@ -46,6 +46,7 @@ import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -435,11 +436,22 @@ public class ProfileActivity extends BaseActivity {
     private void setFriendsUI() {
         if(chatRoster == null) return;
         if (chatRoster.contains(qbUser.getId())) {
-            binding.addToFriendsButton.setImageResource(R.drawable.added_to_friend);
-            binding.deleteFromFriends.setVisibility(View.VISIBLE);
+            int userId = qbUser.getId();
+            if(chatRoster != null && chatRoster.getEntry(userId) != null &&
+                    chatRoster.getEntry(userId).getType() == RosterPacket.ItemType.none &&
+                    chatRoster.getEntry(userId).getStatus() == RosterPacket.ItemStatus.subscribe) {
+                binding.addToFriendsButton.setVisibility(View.GONE);
+                binding.deleteFromFriends.setVisibility(View.GONE);
+                binding.userStatusInfo.setVisibility(View.VISIBLE);
+            } else {
+                binding.addToFriendsButton.setImageResource(R.drawable.added_to_friend);
+                binding.deleteFromFriends.setVisibility(View.VISIBLE);
+                binding.userStatusInfo.setVisibility(View.GONE);
+            }
         } else {
             binding.addToFriendsButton.setImageResource(R.drawable.add_to_friend);
             binding.deleteFromFriends.setVisibility(View.GONE);
+            binding.userStatusInfo.setVisibility(View.GONE);
         }
     }
 
@@ -469,8 +481,8 @@ public class ProfileActivity extends BaseActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
                 addToFriends();
+                dialog.dismiss();
             }
         });
 

@@ -119,6 +119,11 @@
     <string name="dialog_remove_friend">You are about to remove</string>
     <string name="dialog_remove_from_friend">from friends</string>
     <string name="friend_request">friend request</string>
+    <string name="you_have_sent_friend_request">You have sent a friend request</string>
+    <string name="accept_invite">Accept invite</string>
+    <string name="reject_invite">Reject invite</string>
+    <string name="user">User</string>
+    <string name="wants_to_add_you_to_friendlist">wants to add your to friends list</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
