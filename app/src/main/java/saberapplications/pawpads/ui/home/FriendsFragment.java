@@ -82,13 +82,13 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
                 binding.swipelayout.setRefreshing(false);
             }
         });
-        initChatRoster();
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        initChatRoster();
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
@@ -104,15 +104,13 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
     }
 
     private void initChatRoster() {
-        if(chatRoster == null) {
-            chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
-                @Override
-                public void subscriptionRequested(int userId) {
-                    Log.d(TAG, "subscriptionRequested " + userId);
-                    loadDataAfterChanges();
-                }
-            });
-        }
+        chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
+            @Override
+            public void subscriptionRequested(int userId) {
+                Log.d(TAG, "subscriptionRequested " + userId);
+                loadDataAfterChanges();
+            }
+        });
     }
 
     private void showAddToFriendsRequestDialog(final QBUser user) {
@@ -164,6 +162,7 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
     }
 
     private void loadDataAfterChanges() {
+        initChatRoster();
         adapter.clear();
         currentPage = 0;
         loadData();
@@ -188,8 +187,18 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
     private void rejectRequest(int userId) {
         try {
             chatRoster.reject(userId);
+            chatRoster.unsubscribe(userId);
+            if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
+                chatRoster.removeEntry(chatRoster.getEntry(userId));
+            }
             loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotLoggedInException e) {
+            e.printStackTrace();
+        } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         }
     }

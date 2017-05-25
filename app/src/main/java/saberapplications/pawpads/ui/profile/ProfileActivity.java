@@ -564,8 +564,17 @@ public class ProfileActivity extends BaseActivity {
         int userId = qbUser.getId();
         try {
             chatRoster.unsubscribe(userId);
+            if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
+                chatRoster.removeEntry(chatRoster.getEntry(userId));
+            }
             setFriendsUI();
         } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotLoggedInException e) {
+            e.printStackTrace();
+        } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         }
     }
