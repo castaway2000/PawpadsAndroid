@@ -11,4 +11,6 @@
     <color name="user_offline_status_color">#E6E6E6</color>
     <color name="user_away_status_color">#EFDF67</color>
     <color name="user_online_status_color">#87E062</color>
+    <color name="blocked_red">#CF3715</color>
+    <color name="transparent">@android:color/transparent</color>
 </resources>

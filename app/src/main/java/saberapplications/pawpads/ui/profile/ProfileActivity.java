@@ -208,6 +208,7 @@ public class ProfileActivity extends BaseActivity {
                 binding.age.invalidate();
 
                 setBlockedUI(isBlockedByMe.get());
+                if(isBlockedByMe.get()) binding.userBackground.setImageResource(R.color.blocked_red);
 
                 setFriendsUI();
             }
@@ -350,6 +351,7 @@ public class ProfileActivity extends BaseActivity {
                                 }
                             }).show();
                 } else {
+                    binding.userBackground.setImageResource(R.color.blocked_red);
                     setBlockedUI(true);
                     Toast.makeText(ProfileActivity.this, R.string.user_added_to_block_list, Toast.LENGTH_LONG).show();
                 }
@@ -411,6 +413,7 @@ public class ProfileActivity extends BaseActivity {
             protected void onPostExecute(Boolean result) {
                 isBusy.set(false);
                 if (result) {
+                    binding.userBackground.setImageResource(R.drawable.app_bar_bg);
                     setBlockedUI(false);
                     Toast.makeText(ProfileActivity.this, R.string.user_removed_from_block_list, Toast.LENGTH_LONG).show();
                 } else {

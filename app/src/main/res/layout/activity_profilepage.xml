@@ -103,11 +103,11 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/list_item_bg"
                 android:clickable="true"
-                android:drawableTop="@drawable/unblock_icon"
+                android:drawableTop="@drawable/block_icon"
                 android:onClick="@{() -> activity.blockUser()}"
                 android:padding="15dp"
                 android:text="@string/block_user"
-                android:textColor="#28A7BB"
+                android:textColor="#EA5734"
                 android:textSize="20sp"
                 android:visibility="@{activity.isBlockedByMe.not}"
                 app:layout_gravity="center_horizontal"
@@ -118,11 +118,11 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/list_item_bg"
                 android:clickable="true"
-                android:drawableTop="@drawable/block_icon"
+                android:drawableTop="@drawable/unblock_icon"
                 android:onClick="@{() -> activity.unblockUser()}"
                 android:padding="15dp"
                 android:text="@string/unblock_user"
-                android:textColor="#EA5734"
+                android:textColor="#28A7BB"
                 android:textSize="20sp"
                 android:visibility="@{activity.isBlockedByMe}"
                 app:layout_gravity="center_horizontal"
@@ -184,6 +184,23 @@
                 app:layout_rowWeight="1"
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/user_blocked_header_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{activity.isBlockedByMe}"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="55dp"
+                android:gravity="top|center_horizontal"
+                android:text="@string/you_have_blocked_this_user"
+                android:textColor="#FFFFFF"
+                android:alpha="0.6"
+                android:textSize="16sp"
+                app:layout_gravity="center_horizontal|fill_vertical"
+                app:layout_rowWeight="1"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
         </RelativeLayout>
 
         <!-- user avatar!-->
@@ -213,6 +230,7 @@
                     android:layout_height="70dp"
                     android:padding="7dp"
                     android:src="@drawable/add_to_friend"
+                    android:visibility="@{activity.isBlockedByMe.not}"
                     android:layout_centerInParent="true" />
 
                 <View
@@ -246,6 +264,7 @@
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:src="@drawable/chat_button_new"
+                    android:visibility="@{activity.isBlockedByMe.not}"
                     android:layout_centerInParent="true" />
 
                 <View
