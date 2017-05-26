@@ -27,6 +27,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentChatsBinding;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
@@ -50,6 +51,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         binding = DataBindingUtil.bind(view);
+        binding.setFragment(this);
         adapter = new ChatsAdapter();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         currentUserId = prefs.getInt(C.QB_USERID, 0);
@@ -103,7 +105,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                     adapter.disableLoadMore();
                 }
                 binding.swipelayout.setRefreshing(false);
-
             }
 
             @Override
@@ -112,8 +113,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                 Util.onError(e, getContext());
 
             }
-
-
         });
     }
 
@@ -125,7 +124,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     @Override
     public void onItemClick(final QBDialog dialog) {
 
-
         List<Integer> occupansts = dialog.getOccupants();
         Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
 
@@ -134,5 +132,10 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
         startActivity(intent);
 
+    }
+
+    public void createNewChatOrGroup() {
+        Intent intent = new Intent(getContext(), CreateChatActivity.class);
+        startActivity(intent);
     }
 }

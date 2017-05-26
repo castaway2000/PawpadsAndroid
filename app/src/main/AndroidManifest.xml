@@ -121,6 +121,12 @@
             android:label="@string/About"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ui.chat.CreateChatActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
         <receiver
             android:name=".GcmBroadcastReceiver"
             android:exported="true"
