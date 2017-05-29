@@ -24,9 +24,11 @@ import com.quickblox.auth.QBAuth;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.core.QBEntityCallback;
@@ -74,6 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
                     @Override
                     public void processMessage(final QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        if(isFinishing()) return;
                         BaseActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -86,11 +89,34 @@ public abstract class BaseActivity extends AppCompatActivity
 
                     @Override
                     public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
+                        if(isFinishing()) return;
                         Util.onError(e, BaseActivity.this);
                     }
 
                 });
             }
+        }
+    };
+
+    private QBSystemMessagesManager systemMessagesManager;
+
+    private QBSystemMessageListener systemMessageListener = new QBSystemMessageListener() {
+        @Override
+        public void processMessage(final QBChatMessage qbChatMessage) {
+            if(isFinishing()) return;
+            BaseActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onChatMessage(null, qbChatMessage);
+                    UserStatusHelper.setUserStatusByNewMessage(qbChatMessage.getSenderId());
+                }
+            });
+        }
+
+        @Override
+        public void processError(QBChatException e, QBChatMessage qbChatMessage) {
+            if(isFinishing()) return;
+            Util.onError(e, BaseActivity.this);
         }
     };
 
@@ -169,6 +195,8 @@ public abstract class BaseActivity extends AppCompatActivity
             reconnectToChat();
         }else{
             QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+            systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+            systemMessagesManager.addSystemMessageListener(systemMessageListener);
         }
 
 
@@ -259,6 +287,8 @@ public abstract class BaseActivity extends AppCompatActivity
                 }
 
                 QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+                systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+                systemMessagesManager.addSystemMessageListener(systemMessageListener);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

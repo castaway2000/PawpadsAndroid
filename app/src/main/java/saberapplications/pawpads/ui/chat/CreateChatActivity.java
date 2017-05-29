@@ -10,10 +10,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -191,13 +193,34 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
     @Override
     public void onItemClick(final QBUser user) {
-        QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
-        if (chatManager == null) return;
-        Intent i = new Intent(CreateChatActivity.this, ChatActivity.class);
+    }
 
-        i.putExtra(ChatActivity.RECIPIENT, user);
-        i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
-        startActivity(i);
-        finish();
+    public void createChat() {
+        if(adapter == null || adapter.getSelectedUsers().size() == 0) return;
+        List<QBUser> usersList = adapter.getSelectedUsers();
+        if(usersList.size() > 1) {
+            ArrayList<Integer> occupantIdsList = new ArrayList<>();
+            for (QBUser user : usersList) {
+                occupantIdsList.add(user.getId());
+            }
+
+            QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+            if (groupChatManager == null) return;
+            Intent i = new Intent(CreateChatActivity.this, ChatGroupActivity.class);
+
+            i.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupantIdsList);
+            startActivity(i);
+            finish();
+        } else if(usersList.size() == 1) {
+            QBUser user = usersList.get(0);
+            QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
+            if (chatManager == null) return;
+            Intent i = new Intent(CreateChatActivity.this, ChatActivity.class);
+
+            i.putExtra(ChatActivity.RECIPIENT, user);
+            i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
+            startActivity(i);
+            finish();
+        }
     }
 }

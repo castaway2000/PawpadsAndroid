@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
@@ -27,6 +28,7 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentChatsBinding;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.chat.ChatGroupActivity;
 import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.views.BaseListAdapter;
 
@@ -123,15 +125,21 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     @Override
     public void onItemClick(final QBDialog dialog) {
+        if(dialog.getType() == QBDialogType.GROUP) {
+            ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
+            Intent intent = new Intent(getContext(), ChatGroupActivity.class);
+            intent.putExtra(ChatGroupActivity.DIALOG, dialog);
+            intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
+            startActivity(intent);
+        } else {
+            List<Integer> occupansts = dialog.getOccupants();
+            Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
 
-        List<Integer> occupansts = dialog.getOccupants();
-        Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
-
-        Intent intent = new Intent(getContext(), ChatActivity.class);
-        intent.putExtra(ChatActivity.DIALOG, dialog);
-        intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
-        startActivity(intent);
-
+            Intent intent = new Intent(getContext(), ChatActivity.class);
+            intent.putExtra(ChatActivity.DIALOG, dialog);
+            intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
+            startActivity(intent);
+        }
     }
 
     public void createNewChatOrGroup() {

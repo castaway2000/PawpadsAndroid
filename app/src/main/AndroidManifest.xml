@@ -123,8 +123,16 @@
 
         <activity
             android:name=".ui.chat.CreateChatActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".ui.chat.ChatGroupActivity"
+            android:label="ChatGroup"
+            android:parentActivityName=".ui.home.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.home.MainActivity" />
         </activity>
 
         <receiver

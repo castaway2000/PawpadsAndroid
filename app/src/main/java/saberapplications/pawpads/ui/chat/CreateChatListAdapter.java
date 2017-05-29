@@ -6,6 +6,7 @@ import android.support.v4.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
@@ -14,7 +15,8 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.roster.packet.RosterPacket;
+import java.util.ArrayList;
+import java.util.List;
 
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserStatusHelper;
@@ -30,6 +32,8 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
 
     int currentUserId;
     ArrayMap<Integer,QBUser> userCache=new ArrayMap<>();
+    static List<QBUser> selectedUsers = new ArrayList<>();
+
     public static class CreateChatListHolder extends DataHolder<QBUser>{
 
         private final int size;
@@ -45,8 +49,8 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
         }
 
         @Override
-        public void showData(DataItem<QBUser> data,int position) {
-            QBUser user = data.model.get();
+        public void showData(final DataItem<QBUser> data, int position) {
+            final QBUser user = data.model.get();
             String userName = data.model.get().getFullName() == null ? data.model.get().getLogin() : data.model.get().getFullName();
             binding.setUsername(userName);
             int userId=user.getId();
@@ -85,6 +89,17 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
 
                 }
             });
+
+            binding.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked) {
+                        if(!selectedUsers.contains(user)) selectedUsers.add(user);
+                    } else {
+                        if(selectedUsers.contains(user)) selectedUsers.remove(user);
+                    }
+                }
+            });
         }
     }
 
@@ -101,5 +116,9 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
     @Override
     protected int getEmptyStateResId() {
         return R.layout.empty_state_create_chat;
+    }
+
+    static List<QBUser> getSelectedUsers() {
+        return selectedUsers;
     }
 }

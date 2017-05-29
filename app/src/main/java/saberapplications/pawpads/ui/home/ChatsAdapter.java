@@ -6,8 +6,10 @@ import android.support.v4.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
@@ -54,12 +56,41 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
             }
 
             binding.avatar.setImageResource(R.drawable.user_placeholder);
-            if(!adapter.userCache.containsKey(userId)) {
+            binding.avatarLastMessage.setImageResource(R.drawable.user_placeholder);
+            binding.avatarLastMessage.setVisibility(View.GONE);
+
+            if(dialog.getType() == QBDialogType.GROUP) {
+                int lastMsgUserId = data.model.get().getLastMessageUserId();
+                float d= view.getResources().getDisplayMetrics().density;
+                binding.avatarLastMessage.setVisibility(View.VISIBLE);
+                loadUserAvatar(lastMsgUserId, binding.avatarLastMessage, Math.round(25 * d));
+            } else {
+                loadUserAvatar(userId, binding.avatar, size);
+
+                QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+                    @Override
+                    public void onSuccess(QBUser qbUser, Bundle bundle) {
+                        if (qbUser != null) {
+                            binding.setBindStatusVisibility(true);
+                            binding.setOnlineStatus(UserStatusHelper.getUserStatus(qbUser));
+                        }
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+
+                    }
+                });
+            }
+        }
+
+        private void loadUserAvatar(int userId, final ImageView avatar, final int avatarSize) {
+            if (!adapter.userCache.containsKey(userId)) {
                 QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser qbUser, Bundle bundle) {
                         if (qbUser.getFileId() != null) {
-                            AvatarLoaderHelper.loadImage(qbUser.getFileId(), binding.avatar, size, size);
+                            AvatarLoaderHelper.loadImage(qbUser.getFileId(), avatar, avatarSize, avatarSize);
                             adapter.userCache.put(qbUser.getId(), qbUser);
                         }
                     }
@@ -69,24 +100,9 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
 
                     }
                 });
-            }else {
-                AvatarLoaderHelper.loadImage(adapter.userCache.get(userId).getFileId(), binding.avatar, size, size);
+            } else {
+                AvatarLoaderHelper.loadImage(adapter.userCache.get(userId).getFileId(), avatar, avatarSize, avatarSize);
             }
-
-            QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
-                @Override
-                public void onSuccess(QBUser qbUser, Bundle bundle) {
-                    if (qbUser != null) {
-                        binding.setBindStatusVisibility(true);
-                        binding.setOnlineStatus(UserStatusHelper.getUserStatus(qbUser));
-                    }
-                }
-
-                @Override
-                public void onError(QBResponseException e) {
-
-                }
-            });
         }
     }
 
