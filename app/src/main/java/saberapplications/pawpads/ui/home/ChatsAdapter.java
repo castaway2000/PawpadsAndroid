@@ -64,6 +64,13 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
                 float d= view.getResources().getDisplayMetrics().density;
                 binding.avatarLastMessage.setVisibility(View.VISIBLE);
                 loadUserAvatar(lastMsgUserId, binding.avatarLastMessage, Math.round(25 * d));
+
+                try {
+                    AvatarLoaderHelper.loadImage(Integer.parseInt(dialog.getPhoto()), binding.avatar, size, size, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                binding.setBindStatusVisibility(false);
             } else {
                 loadUserAvatar(userId, binding.avatar, size);
 

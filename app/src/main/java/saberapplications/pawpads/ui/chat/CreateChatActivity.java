@@ -15,7 +15,6 @@ import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -223,4 +222,5 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
             finish();
         }
     }
+
 }

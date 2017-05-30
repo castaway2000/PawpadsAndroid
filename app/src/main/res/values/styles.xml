@@ -1,4 +1,4 @@
-   <resources>
+<resources>
 
     <declare-styleable name="FontText">
         <attr name="typefaceAsset" format="string" />
@@ -89,6 +89,19 @@
     <style name="profile_edit_text" parent="Widget.AppCompat.EditText">
         <item name="android:textColor">#28A7BB</item>
         <item name="android:drawableRight">@drawable/pencil_icon</item>
+        <item name="android:textColorHint">@color/hint</item>
+        <item name="android:background">@drawable/edit_text_border</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="typefaceAsset">Proxima_Nova_Regular.otf</item>
+    </style>
+
+    <style name="group_edit_text" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">#28A7BB</item>
         <item name="android:textColorHint">@color/hint</item>
         <item name="android:background">@drawable/edit_text_border</item>
         <item name="android:textSize">20sp</item>

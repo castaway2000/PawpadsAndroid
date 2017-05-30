@@ -103,6 +103,15 @@ public class ProfileActivity extends BaseActivity {
         initChatRoster();
         setFriendsUI();
 
+        checkIsOwnProfile();
+
+        //banner ad
+        AdView adView = (AdView)findViewById(R.id.profileAdView);
+        adView.loadAd(requestNewAd());
+
+    }
+
+    private void checkIsOwnProfile() {
         if(qbUser != null && qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) {
             binding.blockUserView.setVisibility(View.GONE);
             binding.blockUserView.setText("");
@@ -110,11 +119,6 @@ public class ProfileActivity extends BaseActivity {
             binding.openChatButton.setVisibility(View.GONE);
             binding.addToFriendsButton.setVisibility(View.GONE);
         }
-
-        //banner ad
-        AdView adView = (AdView)findViewById(R.id.profileAdView);
-        adView.loadAd(requestNewAd());
-
     }
 
     @Override
@@ -211,6 +215,7 @@ public class ProfileActivity extends BaseActivity {
                 if(isBlockedByMe.get()) binding.userBackground.setImageResource(R.color.blocked_red);
 
                 setFriendsUI();
+                checkIsOwnProfile();
             }
         }.execute();
     }

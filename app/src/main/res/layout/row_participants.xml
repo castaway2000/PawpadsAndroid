@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="username"
+            type="String" />
+
+        <import type="android.view.View" alias="View"/>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        >
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="16dp"
+            android:scaleType="centerCrop"
+            app:riv_border_color="#333333"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            android:src="@drawable/user_placeholder"
+            android:layout_centerVertical="true"/>
+
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{username,default=USERNAME}"
+            style="@style/list_title"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/user_avatar"
+            android:layout_toEndOf="@+id/user_avatar"/>
+
+    </RelativeLayout>
+
+</layout>

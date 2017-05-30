@@ -97,6 +97,7 @@ import saberapplications.pawpads.databinding.ActivityChatGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.GroupEditActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
@@ -107,9 +108,7 @@ import saberapplications.pawpads.views.giphyselector.GiphySelector;
 
 public class ChatGroupActivity extends BaseActivity {
     public static final String DIALOG = "dialog";
-    public static final String RECIPIENT = "recipient";
     public static final String DIALOG_ID = "dialog_id";
-    public static final String RECIPIENT_ID = "user_id";
     public static final String CURRENT_USER_ID = "current user id";
     public static final String RECIPIENT_IDS_LIST = "recipient_ids_list";
     private static final int PICKFILE_REQUEST_CODE = 2;
@@ -260,6 +259,7 @@ public class ChatGroupActivity extends BaseActivity {
             @Override
             public void run() {
                 binding.setGroupName(dialog.getName());
+                binding.privateGroupChatIc.setVisibility(dialog.getType() == QBDialogType.GROUP ? View.VISIBLE : View.GONE);
             }
         });
 
@@ -383,7 +383,7 @@ public class ChatGroupActivity extends BaseActivity {
 
                     if (dialog == null) {
                         QBDialog groupDialog = new QBDialog();
-                        groupDialog.setName("Group");
+                        groupDialog.setName("Group chat");
                         groupDialog.setType(QBDialogType.GROUP);
                         groupDialog.setOccupantsIds(userIdsList);
                         dialog = groupChatManager.createDialog(groupDialog);
@@ -566,7 +566,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-            msg.setProperty("send_to_chat", "1");
+            //msg.setProperty("send_to_chat", "1");
 
 
             try {
@@ -686,7 +686,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-            msg.setProperty("send_to_chat", "1");
+//            msg.setProperty("send_to_chat", "1");
             msg.setProperty(C.CHAT_MSG_STICKER_PROPERTY, uri.toString());
 
             try {
@@ -951,6 +951,17 @@ public class ChatGroupActivity extends BaseActivity {
                 Util.onError(errors, getApplicationContext());
             }
         });
+    }
+
+    public void editGroupSettings() {
+        Intent intent = new Intent(ChatGroupActivity.this, GroupEditActivity.class);
+        intent.putExtra(GroupEditActivity.DIALOG, dialog);
+        startActivity(intent);
+    }
+
+    public void addGroupMember() {
+        Intent intent = new Intent(ChatGroupActivity.this, CreateChatActivity.class);
+        startActivity(intent);
     }
 
 }
