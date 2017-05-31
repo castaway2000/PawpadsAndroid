@@ -37,7 +37,7 @@
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
                         android:text="Create chat or group"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
                     <saberapplications.pawpads.views.FontTextView
@@ -46,14 +46,26 @@
                         android:layout_height="wrap_content"
                         android:padding="10dp"
                         android:text="Done"
-                        android:textSize="16dp"
+                        android:textSize="16sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf"
-                        android:onClick="@{() -> activity.createChat()}"
-                        android:layout_centerVertical="true"
+                        android:onClick="@{() -> activity.createChatOrAddMember()}"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
-                        android:layout_marginRight="13dp"
-                        android:layout_marginEnd="13dp" />
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginEnd="10dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/selectedAvatarsList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="10dp"
+                        app:layoutManager="LinearLayoutManager"
+                        android:orientation="horizontal"
+                        android:layout_below="@+id/toolbar_title"
+                        />
                 </RelativeLayout>
 
             </android.support.v7.widget.Toolbar>

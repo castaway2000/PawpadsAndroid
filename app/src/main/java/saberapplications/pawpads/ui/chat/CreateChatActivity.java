@@ -6,8 +6,11 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
@@ -20,6 +23,8 @@ import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.customobjects.QBCustomObjects;
+import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -35,7 +40,10 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityCreateChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
+import saberapplications.pawpads.databinding.RowSelectedAvatarBinding;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.GroupEditActivity;
+import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
@@ -43,7 +51,8 @@ import saberapplications.pawpads.views.BaseListAdapter;
  * Created by developer on 26.05.17.
  */
 
-public class CreateChatActivity extends BaseActivity implements BaseListAdapter.Callback<QBUser> {
+public class CreateChatActivity extends BaseActivity implements BaseListAdapter.Callback<QBUser>, CreateChatListAdapter.OnUserSelectedListener {
+    public static final String DIALOG_USERS_LIST = "DIALOG_USERS_LIST";
     ActivityCreateChatBinding binding;
     CreateChatListAdapter adapter;
     int dialogsLoadCurrentPage = 0;
@@ -54,6 +63,10 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     public final BindableString progressMessage=new BindableString();
     Set<Integer> userIdsSet = new HashSet<>();
     QBRoster chatRoster;
+    List<Integer> existDialogUserIds = new ArrayList<>();
+    List<QBUser> selectedUsersList = new ArrayList<>();
+    private SelectedAvatarsAdapter selectedAvatarsAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +75,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_chat);
         binding.setActivity(this);
         adapter = new CreateChatListAdapter();
+        adapter.setUserSelectedListener(this);
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -88,6 +102,15 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
             }
         });
         initChatRoster();
+
+        selectedAvatarsAdapter = new SelectedAvatarsAdapter();
+        selectedAvatarsAdapter.setShowInitialLoad(false);
+        selectedAvatarsAdapter.disableLoadMore();
+        binding.selectedAvatarsList.setAdapter(selectedAvatarsAdapter);
+
+        if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
+            existDialogUserIds = getIntent().getIntegerArrayListExtra(DIALOG_USERS_LIST);
+        }
     }
 
     @Override
@@ -133,8 +156,8 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (dialogs.size() > 0) {
                     for(QBDialog dialog : dialogs) {
-                        List<Integer> occupansts = dialog.getOccupants();
-                        Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
+                        List<Integer> occupants = dialog.getOccupants();
+                        Integer recipientId = occupants.get(0) == currentUserId ? occupants.get(1) : occupants.get(0);
                         userIdsSet.add(recipientId);
                     }
                     getUsers();
@@ -155,6 +178,13 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
     private void getUsers() {
         if(userIdsSet.size() > 0) {
+
+            if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
+                for(Integer id : existDialogUserIds) {
+                    if(userIdsSet.contains(id)) userIdsSet.remove(id);
+                }
+            }
+
             QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
             pagedRequestBuilder.setPage(usersLoadCurrentPage);
             pagedRequestBuilder.setPerPage(10);
@@ -194,9 +224,22 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     public void onItemClick(final QBUser user) {
     }
 
-    public void createChat() {
-        if(adapter == null || adapter.getSelectedUsers().size() == 0) return;
-        List<QBUser> usersList = adapter.getSelectedUsers();
+    public void createChatOrAddMember() {
+        if(adapter == null || selectedUsersList.size() == 0) return;
+        List<QBUser> usersList = selectedUsersList;
+
+        if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
+            Intent resultIntent = new Intent();
+            ArrayList<Integer> ids = new ArrayList<>();
+            for (QBUser user : usersList) {
+                ids.add(user.getId());
+            }
+            resultIntent.putIntegerArrayListExtra(GroupEditActivity.NEW_ADDED_USERS_LIST, ids);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+            return;
+        }
+
         if(usersList.size() > 1) {
             ArrayList<Integer> occupantIdsList = new ArrayList<>();
             for (QBUser user : usersList) {
@@ -220,6 +263,79 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
             i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
             startActivity(i);
             finish();
+        }
+    }
+
+    @Override
+    public void userSelected(QBUser user) {
+        if(selectedUsersList.contains(user)) {
+            selectedUsersList.remove(user);
+            selectedAvatarsAdapter.removeItem(user);
+        } else {
+            selectedUsersList.add(user);
+            selectedAvatarsAdapter.addItem(user);
+        }
+    }
+
+    private class SelectedAvatarsAdapter extends BaseListAdapter<QBUser> {
+
+        int currentUserId;
+        ArrayMap<Integer,QBUser> userCache=new ArrayMap<>();
+
+        class SelectedAvatarsHolder extends DataHolder<QBUser>{
+
+            private final int size;
+            private RowSelectedAvatarBinding avatarBinding;
+            private SelectedAvatarsAdapter adapter;
+
+            SelectedAvatarsHolder(View v, BaseListAdapter<QBUser> adapter) {
+                super(v, adapter);
+                avatarBinding= DataBindingUtil.bind(v);
+                this.adapter= (SelectedAvatarsAdapter) adapter;
+                float d= view.getResources().getDisplayMetrics().density;
+                size=Math.round(35 * d);
+            }
+
+            @Override
+            public void showData(DataItem<QBUser> data,int position) {
+                QBUser user = data.model.get();
+                int userId=user.getId();
+
+                avatarBinding.userAvatar.setImageResource(R.drawable.user_placeholder);
+                if(!adapter.userCache.containsKey(userId)) {
+                    QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+                        @Override
+                        public void onSuccess(QBUser qbUser, Bundle bundle) {
+                            if (qbUser.getFileId() != null) {
+                                AvatarLoaderHelper.loadImage(qbUser.getFileId(), avatarBinding.userAvatar, size, size);
+                                adapter.userCache.put(qbUser.getId(), qbUser);
+                            }
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }else {
+                    AvatarLoaderHelper.loadImage(adapter.userCache.get(userId).getFileId(), avatarBinding.userAvatar, size, size);
+                }
+            }
+        }
+
+        @Override
+        public DataHolder<QBUser> getItemHolder(ViewGroup parent) {
+            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.row_selected_avatar,parent,false);
+            return new SelectedAvatarsAdapter.SelectedAvatarsHolder(v,this);
+        }
+
+        public void setCurrentUserId(int currentUserId) {
+            this.currentUserId = currentUserId;
+        }
+
+        @Override
+        protected int getEmptyStateResId() {
+            return R.layout.empty_state_participants;
         }
     }
 

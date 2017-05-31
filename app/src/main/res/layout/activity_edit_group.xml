@@ -23,6 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="160dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="vertical">
 
                 <saberapplications.pawpads.views.FontEditText
@@ -98,14 +99,13 @@
                         android:textColor="#393939"
                         app:binding2way="@{activity.groupParticipants}" />
 
-                    <saberapplications.pawpads.views.FontEditText
+                    <saberapplications.pawpads.views.FontTextView
                         style="@style/group_edit_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Add"
-                        android:enabled="false"
-                        android:inputType="text"
                         android:background="@android:color/transparent"
+                        android:onClick="@{ () -> activity.addGroupMember()}"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
                         android:textSize="18sp"
@@ -117,9 +117,19 @@
                     android:id="@+id/participantsListView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
+                    android:clickable="false"
                     app:layoutManager="LinearLayoutManager"
+                    android:layout_marginBottom="10dp"
                     />
+
+                <saberapplications.pawpads.views.FontTextView
+                    style="@style/group_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Leave and delete"
+                    android:onClick="@{ () -> activity.leaveAndDeleteGroup()}"
+                    android:layout_gravity="center"
+                    android:textColor="#EA5734" />
 
 
             </LinearLayout>

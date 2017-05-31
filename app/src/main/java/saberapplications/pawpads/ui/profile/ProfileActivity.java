@@ -450,7 +450,7 @@ public class ProfileActivity extends BaseActivity {
                     chatRoster.getEntry(userId).getStatus() == RosterPacket.ItemStatus.subscribe) {
                 binding.addToFriendsButton.setVisibility(View.GONE);
                 binding.deleteFromFriends.setVisibility(View.GONE);
-                binding.userStatusInfo.setVisibility(View.VISIBLE);
+                binding.userStatusInfo.setVisibility(isBlockedByMe.get() ? View.GONE : View.VISIBLE);
             } else {
                 binding.addToFriendsButton.setImageResource(R.drawable.added_to_friend);
                 binding.deleteFromFriends.setVisibility(View.VISIBLE);

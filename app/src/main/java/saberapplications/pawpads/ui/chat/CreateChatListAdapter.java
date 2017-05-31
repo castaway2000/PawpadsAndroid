@@ -32,7 +32,15 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
 
     int currentUserId;
     ArrayMap<Integer,QBUser> userCache=new ArrayMap<>();
-    static List<QBUser> selectedUsers = new ArrayList<>();
+    private static OnUserSelectedListener mSelectedListener;
+
+    public interface OnUserSelectedListener {
+        public void userSelected(QBUser user);
+    }
+
+    public void setUserSelectedListener(OnUserSelectedListener selectedListener) {
+        mSelectedListener = selectedListener;
+    }
 
     public static class CreateChatListHolder extends DataHolder<QBUser>{
 
@@ -93,11 +101,7 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
             binding.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) {
-                        if(!selectedUsers.contains(user)) selectedUsers.add(user);
-                    } else {
-                        if(selectedUsers.contains(user)) selectedUsers.remove(user);
-                    }
+                    mSelectedListener.userSelected(user);
                 }
             });
         }
@@ -116,9 +120,5 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
     @Override
     protected int getEmptyStateResId() {
         return R.layout.empty_state_create_chat;
-    }
-
-    static List<QBUser> getSelectedUsers() {
-        return selectedUsers;
     }
 }

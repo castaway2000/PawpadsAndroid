@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -38,6 +39,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,6 +56,7 @@ import saberapplications.pawpads.databinding.ActivityEditGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.RowParticipantsBinding;
+import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -65,6 +70,8 @@ public class GroupEditActivity extends BaseActivity {
     private static final int PERMISSION_REQUEST = 200;
     private static final int CHANGE_PROFILE_PICTURE = 1;
     public static final String DIALOG = "dialog";
+    public static final int ADD_NEW_GROUP_MEMBER = 25;
+    public static final String NEW_ADDED_USERS_LIST = "NEW_ADDED_USERS_LIST";
     String selectedImagePath;
 
     Uri avatarImagePath;
@@ -83,8 +90,9 @@ public class GroupEditActivity extends BaseActivity {
 
     private int imageAction;
     private QBDialog dialog;
-    private List<QBUser> recipientList = new ArrayList<>();
+    private ArrayList<Integer> selectedNewGroupUserList;
     private ParticipantsAdapter adapter;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +104,9 @@ public class GroupEditActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        currentUserId = prefs.getInt(C.QB_USERID, 0);
 
         progressMessage.set(getString(R.string.loading));
 
@@ -111,6 +122,7 @@ public class GroupEditActivity extends BaseActivity {
     private void loadData() {
         if(dialog == null) return;
         isBusy.set(true);
+        if(adapter != null) adapter.clear();
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(GroupEditActivity.this);
 
         groupName.set(dialog.getName());
@@ -122,7 +134,9 @@ public class GroupEditActivity extends BaseActivity {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
 
-                adminName.set(qbUser.getFullName() == null ? qbUser.getLogin() : qbUser.getFullName());
+                String username = qbUser.getFullName() == null ? qbUser.getLogin() : qbUser.getFullName();
+                if(currentUserId == qbUser.getId()) username = "You (" + username + ")";
+                adminName.set(username);
                 if (qbUser.getFileId() != null) {
                     AvatarLoaderHelper.loadImage(qbUser.getFileId(), binding.adminAvatar,
                             binding.adminAvatar.getWidth(), binding.adminAvatar.getHeight()
@@ -165,6 +179,7 @@ public class GroupEditActivity extends BaseActivity {
         if (message != null) {
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         }
+        loadData();
     }
 
     @Override
@@ -178,6 +193,11 @@ public class GroupEditActivity extends BaseActivity {
                 avatarImagePath = selectedImageUri;
 
                 displayBitmap(avatarImagePath, binding.groupAvatar);
+            }
+            if (requestCode == ADD_NEW_GROUP_MEMBER) {
+                selectedNewGroupUserList = data.getIntegerArrayListExtra(NEW_ADDED_USERS_LIST);
+                System.out.println("ADD_NEW_GROUP_MEMBER RESULT OK");
+                save();
             }
         }
     }
@@ -271,12 +291,18 @@ public class GroupEditActivity extends BaseActivity {
                         avatarImagePath = null;
                     }
 
-                    QBDialogRequestBuilder requestBuilder = new QBDialogRequestBuilder();
                     QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+                    QBDialogRequestBuilder requestBuilder = new QBDialogRequestBuilder();
+                    if(selectedNewGroupUserList != null) {
+                        for(Integer id : selectedNewGroupUserList) {
+                            requestBuilder.addUsers(id);
+                        }
+                    }
                     if( !groupName.get().equals(dialog.getName())) {
                         dialog.setName(groupName.get());
                     }
                     dialog = groupChatManager.updateDialog(dialog, requestBuilder);
+                    selectedNewGroupUserList = null;
 
                     return true;
                 } catch (Exception e) {
@@ -357,7 +383,6 @@ public class GroupEditActivity extends BaseActivity {
             @Override
             public void onSuccess(ArrayList<QBUser> users, Bundle params) {
                 if (users.size() > 0) {
-                    recipientList = users;
                     adapter.addItems(users);
                 }
                 adapter.disableLoadMore();
@@ -397,6 +422,7 @@ public class GroupEditActivity extends BaseActivity {
             public void showData(DataItem<QBUser> data,int position) {
                 QBUser user = data.model.get();
                 String userName = data.model.get().getFullName() == null ? data.model.get().getLogin() : data.model.get().getFullName();
+                if(currentUserId == user.getId()) userName = "You (" + userName + ")";
                 binding.setUsername(userName);
                 int userId=user.getId();
 
@@ -435,6 +461,25 @@ public class GroupEditActivity extends BaseActivity {
         @Override
         protected int getEmptyStateResId() {
             return R.layout.empty_state_participants;
+        }
+    }
+
+    public void addGroupMember() {
+        Intent intentAddGroupMember = new Intent(this, CreateChatActivity.class);
+        intentAddGroupMember.putIntegerArrayListExtra(CreateChatActivity.DIALOG_USERS_LIST, ((ArrayList<Integer>) dialog.getOccupants()));
+        startActivityForResult(intentAddGroupMember, ADD_NEW_GROUP_MEMBER);
+    }
+
+    public void leaveAndDeleteGroup() {
+        QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+        QBGroupChat currentChatRoom = groupChatManager.getGroupChat(dialog.getRoomJid());
+        try {
+            currentChatRoom.leave();
+            currentChatRoom = null;
+        } catch (XMPPException e) {
+
+        } catch (SmackException.NotConnectedException e) {
+
         }
     }
 }

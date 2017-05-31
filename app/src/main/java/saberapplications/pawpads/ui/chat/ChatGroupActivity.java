@@ -55,6 +55,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
+import com.quickblox.chat.request.QBDialogRequestBuilder;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
@@ -111,6 +112,8 @@ public class ChatGroupActivity extends BaseActivity {
     public static final String DIALOG_ID = "dialog_id";
     public static final String CURRENT_USER_ID = "current user id";
     public static final String RECIPIENT_IDS_LIST = "recipient_ids_list";
+    public static final String NEW_ADDED_USERS_LIST = "NEW_ADDED_USERS_LIST";
+    public static final int ADD_NEW_GROUP_MEMBER = 25;
     private static final int PICKFILE_REQUEST_CODE = 2;
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
     private static final int READ_STORAGE_PERMISSION_REQUEST = 200;
@@ -143,8 +146,9 @@ public class ChatGroupActivity extends BaseActivity {
     };
 
     private ArrayList<Integer> userIdsList;
-    private List<QBUser> recipientList = new ArrayList<>();
-    private ChatMessagesAdapter chatAdapter;
+    private ArrayList<QBUser> recipientList;
+    private ArrayList<Integer> selectedNewGroupUserList;
+    private ChatGroupMessagesAdapter chatAdapter;
     private FrameLayout blockedContainer;
     private ViewGroup messageContainer;
 
@@ -210,7 +214,7 @@ public class ChatGroupActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        chatAdapter = new ChatMessagesAdapter(ChatGroupActivity.this, currentUserId);
+        chatAdapter = new ChatGroupMessagesAdapter(ChatGroupActivity.this, currentUserId);
 
         binding.listViewChatMessages.setAdapter(chatAdapter);
         chatAdapter.setCallback(new BaseListAdapter.Callback<QBChatMessage>() {
@@ -332,10 +336,34 @@ public class ChatGroupActivity extends BaseActivity {
                         sendSticker(imoji.getStandardFullSizeUri());
                     }
                     break;
+                case ADD_NEW_GROUP_MEMBER :
+                    if (data.hasExtra(NEW_ADDED_USERS_LIST)) {
+                        selectedNewGroupUserList = data.getIntegerArrayListExtra(NEW_ADDED_USERS_LIST);
+                        addNewMembers();
+                    }
+                    break;
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
             isBusy.set(false);
+        }
+    }
+
+    private void addNewMembers() {
+        QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+        QBDialogRequestBuilder requestBuilder = new QBDialogRequestBuilder();
+        if(selectedNewGroupUserList != null) {
+            for(Integer id : selectedNewGroupUserList) {
+                requestBuilder.addUsers(id);
+            }
+
+            try {
+                dialog = groupChatManager.updateDialog(dialog, requestBuilder);
+            } catch (QBResponseException e) {
+                e.printStackTrace();
+            }
+            notifyGroupUsers(selectedNewGroupUserList);
+            selectedNewGroupUserList = null;
         }
     }
 
@@ -387,8 +415,7 @@ public class ChatGroupActivity extends BaseActivity {
                         groupDialog.setType(QBDialogType.GROUP);
                         groupDialog.setOccupantsIds(userIdsList);
                         dialog = groupChatManager.createDialog(groupDialog);
-
-                        notifyGroupUsers();
+                        notifyGroupUsers(groupDialog.getOccupants());
                     }
 
                     try {
@@ -455,16 +482,16 @@ public class ChatGroupActivity extends BaseActivity {
 
     }
 
-    private void notifyGroupUsers() {
-        for (Integer userID : dialog.getOccupants()) {
+    private void notifyGroupUsers(List<Integer> list) {
+        for (Integer userID : list) {
             QBChatMessage chatMessage = createChatNotificationForGroupChatCreation(dialog);
             chatMessage.setRecipientId(userID);
             try {
                 systemMessagesManager.sendSystemMessage(chatMessage);
             } catch (SmackException.NotConnectedException e) {
-
+                e.printStackTrace();
             } catch (IllegalStateException ee){
-
+                ee.printStackTrace();
             }
         }
     }
@@ -477,10 +504,9 @@ public class ChatGroupActivity extends BaseActivity {
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
         QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody("optional text");
+        chatMessage.setBody("You added to group");
 
         // Add notification_type=1 to extra params when you created a group chat
-        //
         chatMessage.setProperty("notification_type", "1");
 
         chatMessage.setProperty("_id", dialogId);
@@ -960,8 +986,9 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     public void addGroupMember() {
-        Intent intent = new Intent(ChatGroupActivity.this, CreateChatActivity.class);
-        startActivity(intent);
+        Intent intentAddGroupMember = new Intent(this, CreateChatActivity.class);
+        intentAddGroupMember.putIntegerArrayListExtra(CreateChatActivity.DIALOG_USERS_LIST, ((ArrayList<Integer>) dialog.getOccupants()));
+        startActivityForResult(intentAddGroupMember, ADD_NEW_GROUP_MEMBER);
     }
 
 }
