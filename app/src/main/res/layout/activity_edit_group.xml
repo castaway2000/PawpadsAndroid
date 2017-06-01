@@ -100,6 +100,7 @@
                         app:binding2way="@{activity.groupParticipants}" />
 
                     <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/add_group_member_tv"
                         style="@style/group_edit_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -126,6 +127,7 @@
                     style="@style/group_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="Leave and delete"
                     android:onClick="@{ () -> activity.leaveAndDeleteGroup()}"
                     android:layout_gravity="center"

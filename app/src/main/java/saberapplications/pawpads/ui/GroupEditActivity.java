@@ -57,6 +57,7 @@ import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.RowParticipantsBinding;
 import saberapplications.pawpads.ui.chat.CreateChatActivity;
+import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -116,6 +117,7 @@ public class GroupEditActivity extends BaseActivity {
         if (getIntent().hasExtra(DIALOG)) {
             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
         }
+        if(dialog != null && dialog.getType() == QBDialogType.PUBLIC_GROUP) binding.addGroupMemberTv.setVisibility(View.GONE);
         loadData();
     }
 
@@ -127,7 +129,8 @@ public class GroupEditActivity extends BaseActivity {
 
         groupName.set(dialog.getName());
         groupType.set(dialog.getType() == QBDialogType.GROUP ? "Private group" : "Public group");
-        groupParticipants.set("Participants (" + (dialog.getOccupants().size()-1) + ")");
+        int ocupantsSize = dialog.getOccupants().size();
+        groupParticipants.set("Participants (" + (ocupantsSize == 0 ? ocupantsSize : ocupantsSize-1) + ")");
         binding.groupAvatar.setImageResource(R.drawable.user_placeholder);
 
         QBUsers.getUser(dialog.getUserId(), new QBEntityCallback<QBUser>() {
@@ -374,7 +377,10 @@ public class GroupEditActivity extends BaseActivity {
     }
 
     private void getUsers(List<Integer> userIdsList) {
-        if(userIdsList == null || userIdsList.size() == 0) return;
+        if(userIdsList == null || userIdsList.size() == 0) {
+            adapter.disableLoadMore();
+            return;
+        }
         if(userIdsList.contains(dialog.getUserId())) userIdsList.remove(dialog.getUserId());
         isBusy.set(true);
 
@@ -471,15 +477,37 @@ public class GroupEditActivity extends BaseActivity {
     }
 
     public void leaveAndDeleteGroup() {
+        isBusy.set(true);
         QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
         QBGroupChat currentChatRoom = groupChatManager.getGroupChat(dialog.getRoomJid());
         try {
             currentChatRoom.leave();
             currentChatRoom = null;
         } catch (XMPPException e) {
-
+            e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
-
+            e.printStackTrace();
         }
+        boolean forceDelete = false;
+        if(currentUserId == dialog.getUserId()) {
+            forceDelete = true;
+        }
+
+        groupChatManager.deleteDialog(dialog.getDialogId(), forceDelete, new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                isBusy.set(false);
+                Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                isBusy.set(false);
+                if (getApplicationContext()==null) return;
+                Util.onError(e, getApplicationContext());
+            }
+        });
     }
 }

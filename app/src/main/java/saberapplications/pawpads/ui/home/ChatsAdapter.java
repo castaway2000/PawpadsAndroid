@@ -61,10 +61,14 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
             binding.privateGroupChatIc.setVisibility(View.GONE);
 
             if(dialog.getType() == QBDialogType.GROUP || dialog.getType() == QBDialogType.PUBLIC_GROUP) {
-                int lastMsgUserId = data.model.get().getLastMessageUserId();
-                float d= view.getResources().getDisplayMetrics().density;
-                binding.avatarLastMessage.setVisibility(View.VISIBLE);
-                loadUserAvatar(lastMsgUserId, binding.avatarLastMessage, Math.round(25 * d));
+                try {
+                    int lastMsgUserId = data.model.get().getLastMessageUserId();
+                    float d= view.getResources().getDisplayMetrics().density;
+                    binding.avatarLastMessage.setVisibility(View.VISIBLE);
+                    loadUserAvatar(lastMsgUserId, binding.avatarLastMessage, Math.round(25 * d));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 try {
                     AvatarLoaderHelper.loadImage(Integer.parseInt(dialog.getPhoto()), binding.avatar, size, size, null);

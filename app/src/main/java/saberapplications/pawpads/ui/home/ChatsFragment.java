@@ -125,7 +125,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     @Override
     public void onItemClick(final QBDialog dialog) {
-        if(dialog.getType() == QBDialogType.GROUP) {
+        if(dialog.getType() == QBDialogType.GROUP || dialog.getType() == QBDialogType.PUBLIC_GROUP) {
             ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
             Intent intent = new Intent(getContext(), ChatGroupActivity.class);
             intent.putExtra(ChatGroupActivity.DIALOG, dialog);

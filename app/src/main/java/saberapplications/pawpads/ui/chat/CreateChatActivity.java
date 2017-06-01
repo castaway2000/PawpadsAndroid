@@ -18,6 +18,7 @@ import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -157,8 +158,12 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
                 if (dialogs.size() > 0) {
                     for(QBDialog dialog : dialogs) {
                         List<Integer> occupants = dialog.getOccupants();
-                        Integer recipientId = occupants.get(0) == currentUserId ? occupants.get(1) : occupants.get(0);
-                        userIdsSet.add(recipientId);
+                        try {
+                            Integer recipientId = occupants.get(0) == currentUserId ? occupants.get(1) : occupants.get(0);
+                            userIdsSet.add(recipientId);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     getUsers();
                     dialogsLoadCurrentPage++;
@@ -225,7 +230,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     }
 
     public void createChatOrAddMember() {
-        if(adapter == null || selectedUsersList.size() == 0) return;
+        if(adapter == null) return;
         List<QBUser> usersList = selectedUsersList;
 
         if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
@@ -241,6 +246,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
         }
 
         if(usersList.size() > 1) {
+            // PRIVATE GROUP
             ArrayList<Integer> occupantIdsList = new ArrayList<>();
             for (QBUser user : usersList) {
                 occupantIdsList.add(user.getId());
@@ -250,10 +256,12 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
             if (groupChatManager == null) return;
             Intent i = new Intent(CreateChatActivity.this, ChatGroupActivity.class);
 
+            i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.GROUP);
             i.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupantIdsList);
             startActivity(i);
             finish();
         } else if(usersList.size() == 1) {
+            // PRIVATE CHAT 1-1
             QBUser user = usersList.get(0);
             QBPrivateChatManager chatManager = QBChatService.getInstance().getPrivateChatManager();
             if (chatManager == null) return;
@@ -261,6 +269,15 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
             i.putExtra(ChatActivity.RECIPIENT, user);
             i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
+            startActivity(i);
+            finish();
+        } else if(usersList.size() == 0) {
+            // PUBLIC GROUP
+            QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+            if (groupChatManager == null) return;
+            Intent i = new Intent(CreateChatActivity.this, ChatGroupActivity.class);
+
+            i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
             startActivity(i);
             finish();
         }

@@ -30,8 +30,8 @@ import saberapplications.pawpads.views.BaseListAdapter;
 
 public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
 
-    int currentUserId;
-    ArrayMap<Integer,QBUser> userCache=new ArrayMap<>();
+    private int currentUserId;
+    private ArrayMap<Integer,QBUser> userCache = new ArrayMap<>();
     private static OnUserSelectedListener mSelectedListener;
 
     public interface OnUserSelectedListener {

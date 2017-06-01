@@ -113,6 +113,7 @@ public class ChatGroupActivity extends BaseActivity {
     public static final String CURRENT_USER_ID = "current user id";
     public static final String RECIPIENT_IDS_LIST = "recipient_ids_list";
     public static final String NEW_ADDED_USERS_LIST = "NEW_ADDED_USERS_LIST";
+    public static final String DIALOG_GROUP_TYPE = "DIALOG_GROUP_TYPE";
     public static final int ADD_NEW_GROUP_MEMBER = 25;
     private static final int PICKFILE_REQUEST_CODE = 2;
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
@@ -158,16 +159,7 @@ public class ChatGroupActivity extends BaseActivity {
             ChatGroupActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (qbChatMessage.getProperties().containsKey("blocked")) {
-                        if (qbChatMessage.getProperty("blocked").equals("1")) {
-                            onBlocked();
-                        } else if (qbChatMessage.getProperty("blocked").equals("0")) {
-                            onUnBlocked();
-                        }
-                    } else {
-                        displayChatMessage(qbChatMessage);
-                    }
-
+                    displayChatMessage(qbChatMessage);
                 }
             });
         }
@@ -264,6 +256,7 @@ public class ChatGroupActivity extends BaseActivity {
             public void run() {
                 binding.setGroupName(dialog.getName());
                 binding.privateGroupChatIc.setVisibility(dialog.getType() == QBDialogType.GROUP ? View.VISIBLE : View.GONE);
+                binding.addGroupMember.setVisibility(dialog.getType() == QBDialogType.GROUP ? View.VISIBLE : View.GONE);
             }
         });
 
@@ -406,14 +399,23 @@ public class ChatGroupActivity extends BaseActivity {
                             Bundle bundle = new Bundle();
                             ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.GROUP, requestBuilder, bundle);
                             dialog = dialogs.get(0);
+
+                            if(userIdsList == null && dialog != null && dialog.getOccupants() != null) {
+                                userIdsList = (ArrayList<Integer>) dialog.getOccupants();
+                            }
                         }
                     }
 
                     if (dialog == null) {
                         QBDialog groupDialog = new QBDialog();
                         groupDialog.setName("Group chat");
-                        groupDialog.setType(QBDialogType.GROUP);
-                        groupDialog.setOccupantsIds(userIdsList);
+                        if (getIntent().hasExtra(DIALOG_GROUP_TYPE) &&
+                                getIntent().getSerializableExtra(DIALOG_GROUP_TYPE) == QBDialogType.PUBLIC_GROUP) {
+                            groupDialog.setType(QBDialogType.PUBLIC_GROUP);
+                        } else {
+                            groupDialog.setType(QBDialogType.GROUP);
+                            groupDialog.setOccupantsIds(userIdsList);
+                        }
                         dialog = groupChatManager.createDialog(groupDialog);
                         notifyGroupUsers(groupDialog.getOccupants());
                     }
@@ -426,9 +428,9 @@ public class ChatGroupActivity extends BaseActivity {
                     }
                     if (groupChat == null) {
                         groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
-                    } else {
-                        groupChat.addMessageListener(groupChatMessageListener);
                     }
+                    groupChat.addMessageListener(groupChatMessageListener);
+
                     DiscussionHistory history = new DiscussionHistory();
                     history.setMaxStanzas(0);
                     groupChat.join(history);
@@ -483,6 +485,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     private void notifyGroupUsers(List<Integer> list) {
+        if(list == null || list.size() == 0) return;
         for (Integer userID : list) {
             QBChatMessage chatMessage = createChatNotificationForGroupChatCreation(dialog);
             chatMessage.setRecipientId(userID);
@@ -504,7 +507,7 @@ public class ChatGroupActivity extends BaseActivity {
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
         QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody("You added to group");
+        chatMessage.setBody("You was been added to group");
 
         // Add notification_type=1 to extra params when you created a group chat
         chatMessage.setProperty("notification_type", "1");
@@ -882,7 +885,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     @Override
-    public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+    public void onGroupChatMessage(QBGroupChat qbGroupChat, final QBChatMessage qbChatMessage) {
         if (dialog == null) return;
         if (!qbChatMessage.getDialogId().equals(dialog.getDialogId())) return;
         ChatGroupActivity.this.runOnUiThread(new Runnable() {

@@ -234,6 +234,7 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
                 @Override
                 public void onError(QBResponseException errors) {
                     if (getContext()==null) return;
+                    adapter.disableLoadMore();
                     Util.onError(errors, getContext());
                 }
             });

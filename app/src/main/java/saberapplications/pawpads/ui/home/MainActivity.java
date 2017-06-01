@@ -320,6 +320,9 @@ public class MainActivity extends BaseActivity {
             if (QBChatService.getInstance() != null && QBChatService.getInstance().getPrivateChatManager() != null && chatListener != null) {
                 QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
             }
+            if (QBChatService.getInstance() != null && QBChatService.getInstance().getGroupChatManager() != null && groupChatListener != null) {
+                QBChatService.getInstance().getGroupChatManager().removeGroupChatManagerListener(groupChatListener);
+            }
         }
 
     }
