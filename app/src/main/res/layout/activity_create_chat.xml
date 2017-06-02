@@ -72,13 +72,63 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <RelativeLayout
+            android:id="@+id/search_panel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/appbar" >
+
+            <ImageView
+                android:id="@+id/searchImg"
+                android:layout_width="49dp"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:alpha="0.7"
+                android:src="@android:drawable/ic_menu_search" />
+
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/search_autocomplete_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search"
+                android:textColorHint="#C8C8C8"
+                android:textColor="@android:color/black"
+                android:inputType="text"
+                android:padding="10dp"
+                android:imeOptions="actionSearch"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginEnd="40dp"
+                />
+
+            <ImageView
+                android:id="@+id/voiceSearch"
+                android:layout_width="45dp"
+                android:layout_height="49dp"
+                android:padding="10dp"
+                android:alpha="0.7"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@android:drawable/ic_menu_search" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="3dp"
+                android:layout_below="@+id/search_autocomplete_text"/>
+
+        </RelativeLayout>
+
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipelayout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/appbar">
+            android:layout_below="@+id/search_panel">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listView"

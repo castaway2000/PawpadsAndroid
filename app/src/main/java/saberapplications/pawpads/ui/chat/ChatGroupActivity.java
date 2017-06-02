@@ -507,7 +507,7 @@ public class ChatGroupActivity extends BaseActivity {
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
         QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody("You was been added to group");
+        chatMessage.setBody("You were added to group");
 
         // Add notification_type=1 to extra params when you created a group chat
         chatMessage.setProperty("notification_type", "1");
@@ -595,7 +595,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-            //msg.setProperty("send_to_chat", "1");
+            msg.setProperty("send_to_chat", "1");
 
 
             try {
@@ -715,7 +715,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-//            msg.setProperty("send_to_chat", "1");
+            msg.setProperty("send_to_chat", "1");
             msg.setProperty(C.CHAT_MSG_STICKER_PROPERTY, uri.toString());
 
             try {

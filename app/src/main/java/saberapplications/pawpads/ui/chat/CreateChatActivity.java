@@ -1,16 +1,27 @@
 package saberapplications.pawpads.ui.chat;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
@@ -24,8 +35,6 @@ import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.customobjects.QBCustomObjects;
-import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -44,6 +53,7 @@ import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.RowSelectedAvatarBinding;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.GroupEditActivity;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -58,6 +68,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     CreateChatListAdapter adapter;
     int dialogsLoadCurrentPage = 0;
     int usersLoadCurrentPage = 0;
+    int searchUsersLoadCurrentPage = 1;
     private int currentUserId;
     public final BindableBoolean isBlockedByMe=new BindableBoolean();
     public final BindableBoolean isBusy=new BindableBoolean();
@@ -67,6 +78,8 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     List<Integer> existDialogUserIds = new ArrayList<>();
     List<QBUser> selectedUsersList = new ArrayList<>();
     private SelectedAvatarsAdapter selectedAvatarsAdapter;
+    List<QBUser> localUsers = new ArrayList<>();
+    private Set<QBUser> filteredUsers;
 
 
     @Override
@@ -98,6 +111,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
                 adapter.clear();
                 dialogsLoadCurrentPage = 0;
                 usersLoadCurrentPage = 0;
+                searchUsersLoadCurrentPage = 1;
                 loadData();
                 binding.swipelayout.setRefreshing(false);
             }
@@ -112,6 +126,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
         if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
             existDialogUserIds = getIntent().getIntegerArrayListExtra(DIALOG_USERS_LIST);
         }
+        initSearchPanel();
     }
 
     @Override
@@ -125,6 +140,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
                     adapter.clear();
                     dialogsLoadCurrentPage = 0;
                     usersLoadCurrentPage = 0;
+                    searchUsersLoadCurrentPage = 1;
                     loadData();
                 }
             }
@@ -136,6 +152,39 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
         chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
             @Override
             public void subscriptionRequested(int userId) {
+            }
+        });
+    }
+
+    private void initSearchPanel() {
+        binding.searchAutocompleteText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String query = v.getText().toString();
+                    if(query.length() > 0) {
+                        hideSoftKeyboard();
+                        loadDataBySearchQuery(query);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        binding.searchAutocompleteText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() == 0) {
+                    adapter.clear();
+                    adapter.addItems(localUsers);
+                    adapter.disableLoadMore();
+                }
             }
         });
     }
@@ -181,6 +230,92 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
     }
 
+    private void loadDataBySearchQuery(final String searchQuery) {
+        adapter.clear();
+        adapter.setShowInitialLoad(true);
+        filteredUsers = new HashSet<>();
+        for (QBUser user : localUsers) {
+            if (user.getFullName() != null && user.getFullName().contains(searchQuery) ||
+                    user.getLogin() != null && user.getLogin().contains(searchQuery) ||
+                    user.getEmail() != null && user.getEmail().contains(searchQuery))
+                filteredUsers.add(user);
+        }
+
+        new AsyncTask<Void, View, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+
+                QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
+                Bundle bundle = new Bundle();
+                try {
+                    ArrayList<QBUser> resultByFullNameUsers = QBUsers.getUsersByFullName(searchQuery, pagedRequestBuilder, bundle);
+                    if (resultByFullNameUsers.size() > 0) {
+                        for (QBUser user : resultByFullNameUsers) {
+                            if (user.getFullName() != null && user.getFullName().contains(searchQuery))
+                                filteredUsers.add(user);
+                        }
+                    }
+                } catch (QBResponseException e) {
+                    e.printStackTrace();
+                }
+
+                ArrayList<String> usersLogins = new ArrayList<>();
+                usersLogins.add(searchQuery);
+                try {
+                    ArrayList<QBUser> resultByLoginUsers = QBUsers.getUsersByLogins(usersLogins, pagedRequestBuilder, bundle);
+                    if (resultByLoginUsers.size() > 0) {
+                        for (QBUser user : resultByLoginUsers) {
+                            if (user.getLogin() != null && user.getLogin().contains(searchQuery))
+                                filteredUsers.add(user);
+                        }
+                    }
+                } catch (QBResponseException e) {
+                    e.printStackTrace();
+                }
+
+                ArrayList<String> usersEmails = new ArrayList<>();
+                usersEmails.add(searchQuery);
+                try {
+                    ArrayList<QBUser> resultByEmailUsers = QBUsers.getUsersByEmails(usersEmails, pagedRequestBuilder, bundle);
+                    if (resultByEmailUsers.size() > 0) {
+                        for (QBUser user : resultByEmailUsers) {
+                            if (user.getEmail() != null && user.getEmail().contains(searchQuery))
+                                filteredUsers.add(user);
+                        }
+                    }
+                } catch (QBResponseException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                processSearchComplete(filteredUsers);
+            }
+        }.execute();
+    }
+
+    private void processSearchComplete(Set<QBUser> users) {
+        if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
+            for(QBUser user : filteredUsers) {
+                if(existDialogUserIds.contains(user.getId())) {
+                    filteredUsers.remove(user);
+                }
+            }
+        }
+
+        if (users.size() > 0) {
+            adapter.addItems(new ArrayList<>(users));
+        }
+
+        if (users.size() == 0 || users.size() < 10) {
+            adapter.disableLoadMore();
+        }
+        binding.swipelayout.setRefreshing(false);
+    }
+
     private void getUsers() {
         if(userIdsSet.size() > 0) {
 
@@ -199,6 +334,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
                     if (adapter==null) return;
                     if (users.size() > 0) {
                         adapter.addItems(users);
+                        localUsers.addAll(users);
                         usersLoadCurrentPage++;
                     }
 
@@ -227,6 +363,17 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
     @Override
     public void onItemClick(final QBUser user) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (user != null) {
+                    Intent intent = new Intent(CreateChatActivity.this, ProfileActivity.class);
+                    intent.putExtra(C.QB_USERID, user.getId());
+                    intent.putExtra(C.QB_USER, user);
+                    startActivity(intent);
+                }
+            }
+        }, 50);
     }
 
     public void createChatOrAddMember() {
