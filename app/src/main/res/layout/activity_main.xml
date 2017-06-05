@@ -47,15 +47,36 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <saberapplications.pawpads.views.FontTextView
-                        android:id="@+id/toolbar_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start|center_vertical"
-                        android:paddingBottom="7dp"
-                        android:text="@string/app_name"
-                        android:textSize="25dp"
-                        app:typefaceAsset="Bellota_BoldItalic.otf" />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <saberapplications.pawpads.views.FontTextView
+                            android:id="@+id/toolbar_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="start|center_vertical"
+                            android:paddingBottom="7dp"
+                            android:text="@string/app_name"
+                            android:textSize="25dp"
+                            app:typefaceAsset="Bellota_BoldItalic.otf" />
+
+                        <ImageView
+                            android:id="@+id/search_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:paddingLeft="30dp"
+                            android:paddingStart="30dp"
+                            android:paddingRight="20dp"
+                            android:paddingEnd="20dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:onClick="@{() -> activity.search()}"
+                            android:src="@drawable/search_white" />
+
+                    </RelativeLayout>
 
                 </android.support.v7.widget.Toolbar>
 
@@ -117,7 +138,7 @@
                 android:scaleType="fitCenter"
                 app:riv_border_color="#333333"
                 app:riv_oval="true"
-                 />
+                />
 
             <saberapplications.pawpads.views.FontTextView
                 android:id="@+id/username"
@@ -160,13 +181,13 @@
                     android:src="@drawable/settings_icon"
                     app:layout_gravity="center"/>
 
-                    <saberapplications.pawpads.views.FontTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/action_settings"
-                        style="@style/navigation_item"
-                        android:onClick="@{ () -> activity.openSettings()}"
-                        />
+                <saberapplications.pawpads.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_settings"
+                    style="@style/navigation_item"
+                    android:onClick="@{ () -> activity.openSettings()}"
+                    />
 
                 <ImageView
                     android:layout_width="wrap_content"

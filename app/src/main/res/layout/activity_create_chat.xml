@@ -80,11 +80,10 @@
 
             <ImageView
                 android:id="@+id/searchImg"
-                android:layout_width="49dp"
+                android:layout_width="45dp"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:alpha="0.7"
-                android:src="@android:drawable/ic_menu_search" />
+                android:padding="14dp"
+                android:src="@drawable/search_grey" />
 
             <android.support.v7.widget.AppCompatAutoCompleteTextView
                 android:id="@+id/search_autocomplete_text"
@@ -95,6 +94,7 @@
                 android:textColor="@android:color/black"
                 android:inputType="text"
                 android:padding="10dp"
+                android:layout_marginTop="5dp"
                 android:imeOptions="actionSearch"
                 android:layout_marginLeft="40dp"
                 android:layout_marginStart="40dp"
@@ -105,12 +105,11 @@
             <ImageView
                 android:id="@+id/voiceSearch"
                 android:layout_width="45dp"
-                android:layout_height="49dp"
-                android:padding="10dp"
-                android:alpha="0.7"
+                android:layout_height="match_parent"
+                android:padding="15dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:src="@android:drawable/ic_menu_search" />
+                android:src="@drawable/mic_grey" />
 
             <View
                 android:id="@+id/divider"

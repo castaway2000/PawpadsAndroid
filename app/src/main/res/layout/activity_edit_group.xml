@@ -27,6 +27,7 @@
                 android:orientation="vertical">
 
                 <saberapplications.pawpads.views.FontEditText
+                    android:id="@+id/group_title_text"
                     style="@style/profile_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -128,6 +129,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:focusableInTouchMode="false"
                     android:text="Leave and delete"
                     android:onClick="@{ () -> activity.leaveAndDeleteGroup()}"
                     android:layout_gravity="center"

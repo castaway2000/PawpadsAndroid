@@ -623,6 +623,11 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    public void search() {
+        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+        startActivity(intent);
+    }
+
 
 }
 

@@ -1,9 +1,11 @@
 package saberapplications.pawpads.ui.home;
 
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -12,8 +14,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
@@ -143,7 +148,38 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     }
 
     public void createNewChatOrGroup() {
-        Intent intent = new Intent(getContext(), CreateChatActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(getContext(), CreateChatActivity.class);
+//        startActivity(intent);
+
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity())
+                .setCancelable(true);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_create_group_or_chat, null);
+        builder.setView(view);
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        alertDialog.show();
+
+        view.findViewById(R.id.public_group).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+                if (groupChatManager == null) return;
+                Intent i = new Intent(getActivity(), ChatGroupActivity.class);
+
+                i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
+                startActivity(i);
+                alertDialog.dismiss();
+            }
+        });
+        view.findViewById(R.id.private_group_or_chat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CreateChatActivity.class);
+                startActivity(intent);
+                alertDialog.dismiss();
+            }
+        });
     }
 }

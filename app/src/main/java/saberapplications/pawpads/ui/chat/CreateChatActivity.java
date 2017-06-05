@@ -379,6 +379,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     public void createChatOrAddMember() {
         if(adapter == null) return;
         List<QBUser> usersList = selectedUsersList;
+        if(usersList.size() == 0) return;
 
         if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
             Intent resultIntent = new Intent();
@@ -416,15 +417,6 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
             i.putExtra(ChatActivity.RECIPIENT, user);
             i.putExtra(Util.IS_BLOCKED, isBlockedByMe.get());
-            startActivity(i);
-            finish();
-        } else if(usersList.size() == 0) {
-            // PUBLIC GROUP
-            QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
-            if (groupChatManager == null) return;
-            Intent i = new Intent(CreateChatActivity.this, ChatGroupActivity.class);
-
-            i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
             startActivity(i);
             finish();
         }

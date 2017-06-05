@@ -159,7 +159,9 @@ public class ChatGroupActivity extends BaseActivity {
             ChatGroupActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    displayChatMessage(qbChatMessage);
+                    if(currentUserId != null && qbChatMessage.getSenderId().intValue() != currentUserId.intValue()) {
+                        displayChatMessage(qbChatMessage);
+                    }
                 }
             });
         }
@@ -595,7 +597,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-            msg.setProperty("send_to_chat", "1");
+            //msg.setProperty("send_to_chat", "1");
 
 
             try {
@@ -715,7 +717,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             msg.setProperty("save_to_history", "1");
             msg.setDialogId(dialog.getDialogId());
-            msg.setProperty("send_to_chat", "1");
+            //msg.setProperty("send_to_chat", "1");
             msg.setProperty(C.CHAT_MSG_STICKER_PROPERTY, uri.toString());
 
             try {

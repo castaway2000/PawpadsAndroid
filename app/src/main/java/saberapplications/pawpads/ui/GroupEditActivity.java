@@ -118,6 +118,11 @@ public class GroupEditActivity extends BaseActivity {
             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
         }
         if(dialog != null && dialog.getType() == QBDialogType.PUBLIC_GROUP) binding.addGroupMemberTv.setVisibility(View.GONE);
+        if(dialog != null && currentUserId != dialog.getUserId()) {
+            binding.groupAvatar.setClickable(false);
+            binding.groupTitleText.setClickable(false);
+            binding.groupTitleText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+        }
         loadData();
     }
 

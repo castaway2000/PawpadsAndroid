@@ -38,7 +38,6 @@
             app:riv_border_color="#333333"
             app:riv_mutate_background="true"
             app:riv_oval="true"
-            android:layout_toRightOf="@+id/checkbox_layout"
             android:src="@drawable/user_placeholder"
             android:layout_centerVertical="true"/>
 
@@ -74,35 +73,6 @@
                 style="@style/list_title"/>
 
         </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/checkbox_layout"
-            android:layout_width="50dp"
-            android:layout_height="60dp"
-            android:minHeight="60dp"
-            android:minWidth="40dp"
-            android:clickable="true"
-            android:paddingRight="6dp"
-            android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true">
-            <RelativeLayout
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/rounded_checkbox_bg">
-
-                <CheckBox
-                    android:id="@+id/checkbox"
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:padding="10dp"
-                    android:clickable="false"
-                    android:layout_centerInParent="true"
-                    android:button="@drawable/rounded_checkbox"
-                    android:foregroundGravity="center"
-                    />
-            </RelativeLayout>
-        </RelativeLayout>
 
     </RelativeLayout>
 </layout>
