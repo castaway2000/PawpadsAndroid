@@ -33,7 +33,9 @@ public class PawPadsApplication extends Application {
         FontManager.init(getAssets());
 //      StickersManager.initialize(Util.STICKERS_API_KEY, this);
         TwitterAuthConfig authConfig =
-                new TwitterAuthConfig("QVH37Z8PrGaEmplLqtvlx9i7c", "WQN8jeA5j1Y9o0WDq23dsDniSCXj6veh8UxCLEVX048YhKQLgP");
+                new TwitterAuthConfig("EFDjjwR4lsTtUAoSx950ae7sC", "EbfKLPRpBh3GWP8xuDyjp3Ck6egRGS73UMr2P3I9Lmw0TDseu0");
+
+//                new TwitterAuthConfig("QVH37Z8PrGaEmplLqtvlx9i7c", "WQN8jeA5j1Y9o0WDq23dsDniSCXj6veh8UxCLEVX048YhKQLgP");
         Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
 
 
