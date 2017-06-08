@@ -38,13 +38,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
-import com.quickblox.chat.QBPrivacyListsManager;
-import com.quickblox.chat.QBPrivateChat;
-import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBMessageListener;
@@ -53,8 +49,6 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.chat.model.QBPrivacyList;
-import com.quickblox.chat.model.QBPrivacyListItem;
 import com.quickblox.chat.request.QBDialogRequestBuilder;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -63,8 +57,6 @@ import com.quickblox.core.QBProgressCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.customobjects.QBCustomObjects;
-import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -91,16 +83,12 @@ import io.imoji.sdk.objects.Imoji;
 import io.imoji.sdk.objects.RenderingOptions;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.ActivityChatGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.GroupEditActivity;
-import saberapplications.pawpads.ui.profile.ProfileActivity;
-import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.FileUtil;
 import saberapplications.pawpads.views.BaseListAdapter;
 import saberapplications.pawpads.views.giphyselector.Giphy;
@@ -113,9 +101,11 @@ public class ChatGroupActivity extends BaseActivity {
     public static final String CURRENT_USER_ID = "current user id";
     public static final String RECIPIENT_IDS_LIST = "recipient_ids_list";
     public static final String NEW_ADDED_USERS_LIST = "NEW_ADDED_USERS_LIST";
+    public static final String CHANGED_GROUP_NAME = "CHANGED_GROUP_NAME";
     public static final String DIALOG_GROUP_TYPE = "DIALOG_GROUP_TYPE";
     public static final String IS_FIRST_OPENED = "IS_FIRST_OPENED";
     public static final int ADD_NEW_GROUP_MEMBER = 25;
+    public static final int GROUP_SETTINGS_CHANGE = 26;
     private static final int PICKFILE_REQUEST_CODE = 2;
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
     private static final int READ_STORAGE_PERMISSION_REQUEST = 200;
@@ -338,6 +328,11 @@ public class ChatGroupActivity extends BaseActivity {
                         addNewMembers();
                     }
                     break;
+                case GROUP_SETTINGS_CHANGE:
+                    if (data.hasExtra(CHANGED_GROUP_NAME)) {
+                        binding.setGroupName(data.getStringExtra(CHANGED_GROUP_NAME));
+                    }
+                    break;
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
@@ -366,6 +361,10 @@ public class ChatGroupActivity extends BaseActivity {
     @Override
     public void onQBConnect(final boolean isActivityReopened) {
         // init recipient and dialog if intent contains only their ids
+        reloadData(isActivityReopened);
+    }
+
+    private void reloadData(final boolean isActivityReopened) {
         isBusy.set(true);
 
         final QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
@@ -485,7 +484,6 @@ public class ChatGroupActivity extends BaseActivity {
 
             }
         }.execute();
-
     }
 
     private void checkIsOpenedFirst() {
@@ -999,7 +997,7 @@ public class ChatGroupActivity extends BaseActivity {
     public void editGroupSettings() {
         Intent intent = new Intent(ChatGroupActivity.this, GroupEditActivity.class);
         intent.putExtra(GroupEditActivity.DIALOG, dialog);
-        startActivity(intent);
+        startActivityForResult(intent, GROUP_SETTINGS_CHANGE);
     }
 
     public void addGroupMember() {

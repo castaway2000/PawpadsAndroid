@@ -57,6 +57,7 @@ import saberapplications.pawpads.databinding.ActivityEditGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.RowParticipantsBinding;
+import saberapplications.pawpads.ui.chat.ChatGroupActivity;
 import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
@@ -335,6 +336,9 @@ public class GroupEditActivity extends BaseActivity {
                 handler.removeCallbacks(timeOutRunnable);
                 if (aBoolean) {
                     onGroupSettingsSaved("group settings saved");
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra(ChatGroupActivity.CHANGED_GROUP_NAME, dialog.getName());
+                    setResult(RESULT_OK, resultIntent);
                 } else {
                     Util.onError(e, GroupEditActivity.this);
                 }
