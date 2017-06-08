@@ -20,6 +20,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -113,14 +114,22 @@ public class GroupEditActivity extends BaseActivity {
 
         adapter = new ParticipantsAdapter();
         binding.participantsListView.setAdapter(adapter);
+        binding.participantsListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
         if (getIntent().hasExtra(DIALOG)) {
             dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
         }
-        if(dialog != null && dialog.getType() == QBDialogType.PUBLIC_GROUP) binding.addGroupMemberTv.setVisibility(View.GONE);
+        if(dialog != null && dialog.getType() == QBDialogType.PUBLIC_GROUP) {
+            binding.participantsLayout.setVisibility(View.GONE);
+        }
         if(dialog != null && currentUserId != dialog.getUserId()) {
-            binding.groupAvatar.setClickable(false);
-            binding.groupTitleText.setClickable(false);
+            binding.groupAvatar.setEnabled(false);
+            binding.groupTitleText.setEnabled(false);
             binding.groupTitleText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
         }
         loadData();
@@ -133,7 +142,7 @@ public class GroupEditActivity extends BaseActivity {
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(GroupEditActivity.this);
 
         groupName.set(dialog.getName());
-        groupType.set(dialog.getType() == QBDialogType.GROUP ? "Private group" : "Public group");
+        groupType.set(dialog.getType() == QBDialogType.GROUP ? "Private group" : "Channel");
         int ocupantsSize = dialog.getOccupants().size();
         groupParticipants.set("Participants (" + (ocupantsSize == 0 ? ocupantsSize : ocupantsSize-1) + ")");
         binding.groupAvatar.setImageResource(R.drawable.user_placeholder);

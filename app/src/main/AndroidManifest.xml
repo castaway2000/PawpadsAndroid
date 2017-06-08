@@ -130,6 +130,11 @@
             android:screenOrientation="portrait"/>
 
         <activity
+            android:name=".ui.home.FriendsActivity"
+            android:label="@string/friends"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".ui.chat.ChatGroupActivity"
             android:label="ChatGroup"
             android:parentActivityName=".ui.home.MainActivity"

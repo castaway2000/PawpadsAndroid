@@ -7,55 +7,28 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBGroupChatManager;
-import com.quickblox.chat.QBPrivateChatManager;
-import com.quickblox.chat.QBRoster;
-import com.quickblox.chat.listeners.QBSubscriptionListener;
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
-import saberapplications.pawpads.Util;
-import saberapplications.pawpads.databinding.ActivityCreateChatBinding;
 import saberapplications.pawpads.databinding.ActivitySearchBinding;
-import saberapplications.pawpads.databinding.BindableBoolean;
-import saberapplications.pawpads.databinding.BindableString;
-import saberapplications.pawpads.databinding.RowSelectedAvatarBinding;
 import saberapplications.pawpads.ui.BaseActivity;
-import saberapplications.pawpads.ui.GroupEditActivity;
-import saberapplications.pawpads.ui.chat.ChatActivity;
-import saberapplications.pawpads.ui.chat.ChatGroupActivity;
-import saberapplications.pawpads.ui.chat.CreateChatActivity;
-import saberapplications.pawpads.ui.chat.CreateChatListAdapter;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
-import saberapplications.pawpads.util.AvatarLoaderHelper;
-import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**

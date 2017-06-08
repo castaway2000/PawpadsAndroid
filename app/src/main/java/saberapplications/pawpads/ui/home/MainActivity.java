@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity {
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
     ChatsFragment chatsFragment;
-    FriendsFragment friendsFragment;
+    ChannelsFragment channelsFragment;
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
@@ -146,7 +146,7 @@ public class MainActivity extends BaseActivity {
 
         nearByFragment = new NearByFragment();
         chatsFragment = new ChatsFragment();
-        friendsFragment = new FriendsFragment();
+        channelsFragment = new ChannelsFragment();
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -165,12 +165,12 @@ public class MainActivity extends BaseActivity {
                         }
                     },50);
                 }
-                if (position == 2 && (friendsFragment.adapter==null || friendsFragment.adapter.getItemCount()==0)) {
+                if (position == 2 && (channelsFragment.adapter==null || channelsFragment.adapter.getItemCount()==0)) {
                     Handler handler=new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            friendsFragment.loadData();
+                            channelsFragment.loadData();
                         }
                     },50);
                 }
@@ -547,7 +547,7 @@ public class MainActivity extends BaseActivity {
             } else if(position == 1){
                 return chatsFragment;
             } else {
-                return friendsFragment;
+                return channelsFragment;
             }
         }
 
@@ -564,13 +564,14 @@ public class MainActivity extends BaseActivity {
             } else if(position == 1) {
                 return getString(R.string.chats);
             } else {
-                return getString(R.string.friends);
+                return getString(R.string.channels);
             }
         }
 
     }
 
     public void openProfile() {
+        if(currentQBUser == null) return;
         binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra(C.QB_USERID, currentQBUser.getId());
@@ -628,6 +629,10 @@ public class MainActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    public void openFriendsActivity() {
+        Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
+        startActivity(intent);
+    }
 
 }
 

@@ -78,6 +78,7 @@
                         android:layout_marginLeft="10dp"
                         android:scaleType="fitCenter"
                         app:srcCompat="@drawable/lock"
+                        android:visibility="gone"
                         android:layout_alignParentBottom="true"
                         android:layout_marginBottom="5dp"
                         android:layout_toRightOf="@+id/toolbar_title"

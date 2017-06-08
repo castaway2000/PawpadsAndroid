@@ -41,6 +41,7 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -299,9 +300,10 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
     private void processSearchComplete(Set<QBUser> users) {
         if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
-            for(QBUser user : filteredUsers) {
+            for (Iterator<QBUser> i = filteredUsers.iterator(); i.hasNext();) {
+                QBUser user = i.next();
                 if(existDialogUserIds.contains(user.getId())) {
-                    filteredUsers.remove(user);
+                    i.remove();
                 }
             }
         }

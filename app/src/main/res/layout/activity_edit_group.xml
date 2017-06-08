@@ -50,7 +50,7 @@
                     style="@style/group_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Chat admin"
+                    android:text="@string/chat_admin"
                     android:enabled="false"
                     android:inputType="text"
                     android:textColor="#393939" />
@@ -87,6 +87,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/participants_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -105,7 +106,8 @@
                         style="@style/group_edit_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add"
+                        android:focusableInTouchMode="false"
+                        android:text="@string/add"
                         android:background="@android:color/transparent"
                         android:onClick="@{ () -> activity.addGroupMember()}"
                         android:layout_alignParentRight="true"

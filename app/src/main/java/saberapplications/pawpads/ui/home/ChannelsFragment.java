@@ -1,11 +1,8 @@
 package saberapplications.pawpads.ui.home;
 
-
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -14,8 +11,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
@@ -26,28 +21,26 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.databinding.FragmentChatsBinding;
-import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.databinding.FragmentChannelsBinding;
 import saberapplications.pawpads.ui.chat.ChatGroupActivity;
-import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by developer on 08.06.17.
  */
-public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<QBDialog> {
 
-    FragmentChatsBinding binding;
+public class ChannelsFragment extends Fragment implements BaseListAdapter.Callback<QBDialog> {
+
+    FragmentChannelsBinding binding;
     ChatsAdapter adapter;
     int currentPage = 0;
     private int currentUserId;
 
-    public ChatsFragment() {
+    public ChannelsFragment() {
         // Required empty public constructor
     }
 
@@ -56,7 +49,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_chats, container, false);
+        View view = inflater.inflate(R.layout.fragment_channels, container, false);
         binding = DataBindingUtil.bind(view);
         binding.setFragment(this);
         adapter = new ChatsAdapter();
@@ -84,11 +77,11 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                    if(adapter.isShowInitialLoad()) {
-                        adapter.clear();
-                        currentPage = 0;
-                        loadData();
-                    }
+                if(adapter.isShowInitialLoad()) {
+                    adapter.clear();
+                    currentPage = 0;
+                    loadData();
+                }
             }
         }, 5000);
         adapter.notifyDataSetChanged();
@@ -99,16 +92,12 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         requestBuilder.setLimit(10);
         requestBuilder.setSkip(currentPage * 10);
         requestBuilder.sortDesc("last_message_date_sent");
-        QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
+        QBChatService.getChatDialogs(QBDialogType.PUBLIC_GROUP, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (adapter==null) return;
                 if (dialogs.size() > 0) {
-                    ArrayList<QBDialog> privateDialogs = new ArrayList<>();
-                    for(QBDialog dialog : dialogs) {
-                        if( !dialog.getType().equals(QBDialogType.PUBLIC_GROUP)) privateDialogs.add(dialog);
-                    }
-                    adapter.addItems(privateDialogs);
+                    adapter.addItems(dialogs);
                     currentPage++;
                 }
 
@@ -122,7 +111,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
             public void onError(QBResponseException e) {
                 if (getContext()==null) return;
                 Util.onError(e, getContext());
-
             }
         });
     }
@@ -134,25 +122,18 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     @Override
     public void onItemClick(final QBDialog dialog) {
-        if(dialog.getType() == QBDialogType.GROUP) {
-            ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
-            Intent intent = new Intent(getContext(), ChatGroupActivity.class);
-            intent.putExtra(ChatGroupActivity.DIALOG, dialog);
-            intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
-            startActivity(intent);
-        } else {
-            List<Integer> occupansts = dialog.getOccupants();
-            Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
-
-            Intent intent = new Intent(getContext(), ChatActivity.class);
-            intent.putExtra(ChatActivity.DIALOG, dialog);
-            intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
-            startActivity(intent);
-        }
+        ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
+        Intent intent = new Intent(getContext(), ChatGroupActivity.class);
+        intent.putExtra(ChatGroupActivity.DIALOG, dialog);
+        intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
+        startActivity(intent);
     }
 
-    public void createNewChatOrGroup() {
-        Intent intent = new Intent(getContext(), CreateChatActivity.class);
-        startActivity(intent);
+    public void createNewPublicGroup() {
+        QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+        if (groupChatManager == null) return;
+        Intent i = new Intent(getActivity(), ChatGroupActivity.class);
+        i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
+        startActivity(i);
     }
 }

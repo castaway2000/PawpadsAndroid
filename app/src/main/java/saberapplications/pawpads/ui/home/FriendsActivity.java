@@ -1,7 +1,6 @@
 package saberapplications.pawpads.ui.home;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -9,13 +8,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,36 +36,40 @@ import java.util.Collection;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
-import saberapplications.pawpads.databinding.FragmentFriendsBinding;
+import saberapplications.pawpads.databinding.ActivityFriendsBinding;
+import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FriendsFragment extends Fragment implements BaseListAdapter.Callback<QBUser> {
-    public static final String TAG = FriendsFragment.class.getSimpleName();
-    FragmentFriendsBinding binding;
+public class FriendsActivity extends BaseActivity implements BaseListAdapter.Callback<QBUser> {
+    public static final String TAG = FriendsActivity.class.getSimpleName();
+    ActivityFriendsBinding binding;
     FriendsAdapter adapter;
     int currentPage = 1;
     private int currentUserId;
     QBRoster chatRoster;
     AlertDialog requestDialog;
 
-    public FriendsFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_friends, container, false);
-        binding = DataBindingUtil.bind(view);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_friends);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_friends);
+        binding.setActivity(this);
         adapter = new FriendsAdapter();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         currentUserId = prefs.getInt(C.QB_USERID, 0);
         adapter.setCurrentUserId(currentUserId);
         binding.friendsListView.setAdapter(adapter);
@@ -82,7 +83,6 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
                 binding.swipelayout.setRefreshing(false);
             }
         });
-        return view;
     }
 
     @Override
@@ -117,10 +117,10 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
         if(user == null) return;
 
         if(requestDialog != null && requestDialog.isShowing()) return;
-        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity())
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this)
                 .setCancelable(true);
 
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_add_to_friends, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_to_friends, null);
         ImageView dialogAvatar = (ImageView) view.findViewById(R.id.dialog_avatar);
         if(user.getFileId() != null) {
             float density = getResources().getDisplayMetrics().density;
@@ -233,9 +233,9 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
 
                 @Override
                 public void onError(QBResponseException errors) {
-                    if (getContext()==null) return;
+                    if (getApplicationContext()==null) return;
                     adapter.disableLoadMore();
-                    Util.onError(errors, getContext());
+                    Util.onError(errors, getApplicationContext());
                 }
             });
         } else {
@@ -260,7 +260,7 @@ public class FriendsFragment extends Fragment implements BaseListAdapter.Callbac
                             chatRoster.getEntry(user.getId()).getStatus() == null) {
                         showAddToFriendsRequestDialog(user);
                     } else {
-                        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+                        Intent intent = new Intent(FriendsActivity.this, ProfileActivity.class);
                         intent.putExtra(C.QB_USERID, user.getId());
                         intent.putExtra(C.QB_USER, user);
                         startActivity(intent);
