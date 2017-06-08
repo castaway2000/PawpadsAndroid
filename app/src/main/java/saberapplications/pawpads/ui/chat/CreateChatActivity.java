@@ -408,6 +408,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
             i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.GROUP);
             i.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupantIdsList);
+            i.putExtra(ChatGroupActivity.IS_FIRST_OPENED, true);
             startActivity(i);
             finish();
         } else if(usersList.size() == 1) {

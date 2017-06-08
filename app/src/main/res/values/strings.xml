@@ -128,6 +128,7 @@
     <string name="channels">Channels</string>
     <string name="chat_admin">Chat admin</string>
     <string name="add">Add</string>
+    <string name="sorry_cannot_create_more_three_channels">Sorry, you cannot have more than 3 channels.</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

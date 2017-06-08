@@ -114,6 +114,7 @@ public class ChatGroupActivity extends BaseActivity {
     public static final String RECIPIENT_IDS_LIST = "recipient_ids_list";
     public static final String NEW_ADDED_USERS_LIST = "NEW_ADDED_USERS_LIST";
     public static final String DIALOG_GROUP_TYPE = "DIALOG_GROUP_TYPE";
+    public static final String IS_FIRST_OPENED = "IS_FIRST_OPENED";
     public static final int ADD_NEW_GROUP_MEMBER = 25;
     private static final int PICKFILE_REQUEST_CODE = 2;
     private static final int IMAGE_CAPTURE_REQUEST_CODE = 33;
@@ -480,10 +481,20 @@ public class ChatGroupActivity extends BaseActivity {
                     gotMessagesInOffline = false;
                 }
 
+                checkIsOpenedFirst();
 
             }
         }.execute();
 
+    }
+
+    private void checkIsOpenedFirst() {
+        if(getIntent().hasExtra(IS_FIRST_OPENED) &&
+                getIntent().getBooleanExtra(IS_FIRST_OPENED, false)) {
+            Intent intent = new Intent(ChatGroupActivity.this, GroupEditActivity.class);
+            intent.putExtra(GroupEditActivity.DIALOG, dialog);
+            startActivity(intent);
+        }
     }
 
     private void notifyGroupUsers(List<Integer> list) {

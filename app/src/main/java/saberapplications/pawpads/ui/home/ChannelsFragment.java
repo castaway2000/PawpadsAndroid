@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
@@ -35,10 +36,12 @@ import saberapplications.pawpads.views.BaseListAdapter;
 
 public class ChannelsFragment extends Fragment implements BaseListAdapter.Callback<QBDialog> {
 
+    private static final int MAX_AMOUNT_OF_CREATED_CHANNELS = 3;
     FragmentChannelsBinding binding;
     ChatsAdapter adapter;
     int currentPage = 0;
     private int currentUserId;
+    int amountOfCreatedChannels;
 
     public ChannelsFragment() {
         // Required empty public constructor
@@ -67,6 +70,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
                 binding.swipelayout.setRefreshing(false);
             }
         });
+        checkAmountOfCreatedChannels();
         return view;
     }
 
@@ -115,6 +119,26 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
         });
     }
 
+    private void checkAmountOfCreatedChannels() {
+        QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+        requestBuilder.setLimit(100);
+
+        QBChatService.getChatDialogs(QBDialogType.PUBLIC_GROUP, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
+                if(dialogs.size() == 0) return;
+                for (QBDialog dialog : dialogs) {
+                    if(dialog.getUserId() == currentUserId) amountOfCreatedChannels++;
+                }
+            }
+
+            @Override
+            public void onError(QBResponseException errors) {
+                errors.printStackTrace();
+            }
+        });
+    }
+
     @Override
     public void onLoadMore() {
         loadData();
@@ -130,10 +154,16 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     }
 
     public void createNewPublicGroup() {
-        QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
-        if (groupChatManager == null) return;
-        Intent i = new Intent(getActivity(), ChatGroupActivity.class);
-        i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
-        startActivity(i);
+        if(amountOfCreatedChannels < MAX_AMOUNT_OF_CREATED_CHANNELS) {
+            QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+            if (groupChatManager == null) return;
+            Intent i = new Intent(getActivity(), ChatGroupActivity.class);
+            i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
+            i.putExtra(ChatGroupActivity.IS_FIRST_OPENED, true);
+            startActivity(i);
+            amountOfCreatedChannels++;
+        } else {
+            Toast.makeText(getActivity(), getActivity().getString(R.string.sorry_cannot_create_more_three_channels), Toast.LENGTH_LONG).show();
+        }
     }
 }
