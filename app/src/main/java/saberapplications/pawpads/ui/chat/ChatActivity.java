@@ -698,6 +698,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void onClickImoji() {
+        if(binding.getShowGiphy()) onClickGiphy();
         if (mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
             hideSoftKeyboard();
             mStickersContainer.addView(mStickersWidget);
