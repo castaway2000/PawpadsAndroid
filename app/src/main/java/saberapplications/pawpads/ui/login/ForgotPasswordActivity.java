@@ -55,7 +55,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 hideSoftKeyboard();
                 if (actionId== EditorInfo.IME_ACTION_DONE){
-                    recover();
+                    //recover();
                     return true;
                 }
                 return false;
