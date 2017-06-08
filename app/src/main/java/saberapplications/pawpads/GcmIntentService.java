@@ -106,6 +106,12 @@ public class GcmIntentService extends IntentService {
 
         String msg = extras.getString("message");
         String userId = extras.getString("user_id");
+        int currentUserId = PreferenceManager.getDefaultSharedPreferences(this).getInt(C.QB_USERID, 0);
+        try {
+            if (userId != null && currentUserId == Integer.parseInt(userId)) return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //Check blocked users
         boolean isBlocked = false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
