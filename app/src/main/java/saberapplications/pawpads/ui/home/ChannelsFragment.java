@@ -91,7 +91,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
                     loadData();
                 }
             }
-        }, 2000);
+        }, 700);
         adapter.notifyDataSetChanged();
     }
 

@@ -46,7 +46,11 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
         @Override
         public void showData(DataItem<QBDialog> data,int position) {
             QBDialog dialog=data.model.get();
-            binding.setLastMessage(data.model.get().getLastMessage());
+            String lastMessage = data.model.get().getLastMessage();
+            if(lastMessage != null && lastMessage.length() > 25) {
+                lastMessage = lastMessage.substring(0, 22) + "...";
+            }
+            binding.setLastMessage(lastMessage);
             binding.setUsername(data.model.get().getName());
             int userId=0;
             for(int uid:dialog.getOccupants()){

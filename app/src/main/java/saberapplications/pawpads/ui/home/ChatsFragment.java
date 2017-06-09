@@ -94,7 +94,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                         loadData();
                     }
             }
-        }, 5000);
+        }, 500);
         adapter.notifyDataSetChanged();
     }
 

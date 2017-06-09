@@ -125,6 +125,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         progressMessage.set(getString(R.string.obtaining_location));
         if (UserLocationService.getLastLocation()!=null){
             loadData();
+        } else {
+            adapter.disableLoadMore();
+            isBusy.set(false);
         }
         return view;
     }
