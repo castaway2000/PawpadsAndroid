@@ -118,6 +118,7 @@
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
             <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/unblock_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/list_item_bg"
@@ -192,7 +193,7 @@
                 android:id="@+id/user_blocked_header_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{activity.isBlockedByMe}"
+                android:visibility="invisible"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="55dp"
@@ -238,6 +239,7 @@
                     android:layout_centerInParent="true" />
 
                 <View
+                    android:id="@+id/add_to_friends_button_bg"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:background="@drawable/add_to_friend_btn_bg"
@@ -272,6 +274,7 @@
                     android:layout_centerInParent="true" />
 
                 <View
+                    android:id="@+id/open_chat_button_bg"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:background="@drawable/chat_button_bg"

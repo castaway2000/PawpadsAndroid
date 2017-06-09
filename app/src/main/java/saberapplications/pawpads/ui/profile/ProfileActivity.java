@@ -103,7 +103,10 @@ public class ProfileActivity extends BaseActivity {
         initChatRoster();
         setFriendsUI();
 
-        checkIsOwnProfile();
+        if(isOwnProfile()) {
+            isBlockedByMe.set(true);
+            hideFieldsInOwnProfile();
+        }
 
         //banner ad
         AdView adView = (AdView)findViewById(R.id.profileAdView);
@@ -111,14 +114,22 @@ public class ProfileActivity extends BaseActivity {
 
     }
 
-    private void checkIsOwnProfile() {
+    private boolean isOwnProfile() {
         if(qbUser != null && qbUser.getId() == preferences.getInt(C.QB_USERID, 0)) {
-            binding.blockUserView.setVisibility(View.GONE);
-            binding.blockUserView.setText("");
-            binding.blockUserView.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
-            binding.openChatButton.setVisibility(View.GONE);
-            binding.addToFriendsButton.setVisibility(View.GONE);
+            return true;
         }
+        return false;
+    }
+
+    private void hideFieldsInOwnProfile() {
+        binding.blockUserView.setVisibility(View.GONE);
+        binding.blockUserView.setText("");
+        binding.blockUserView.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+        binding.openChatButton.setVisibility(View.GONE);
+        binding.addToFriendsButton.setVisibility(View.GONE);
+        binding.openChatButtonBg.setVisibility(View.GONE);
+        binding.addToFriendsButtonBg.setVisibility(View.GONE);
+        binding.unblockButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -149,12 +160,12 @@ public class ProfileActivity extends BaseActivity {
                     requestBuilder.eq("source_user", currentQBUser.getId());
                     requestBuilder.eq("blocked_user", qbUser.getId());
                     ArrayList<QBCustomObject> blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByMe.set( blocks.size() > 0);
+                    if(!isOwnProfile()) isBlockedByMe.set( blocks.size() > 0);
                     requestBuilder = new QBRequestGetBuilder();
                     requestBuilder.eq("source_user", qbUser.getId());
                     requestBuilder.eq("blocked_user", currentQBUser.getId());
                     blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
-                    isBlockedByOther.set(blocks.size() > 0);
+                    if(!isOwnProfile()) isBlockedByOther.set(blocks.size() > 0);
 
 
 
@@ -212,10 +223,13 @@ public class ProfileActivity extends BaseActivity {
                 binding.age.invalidate();
 
                 setBlockedUI(isBlockedByMe.get());
-                if(isBlockedByMe.get()) binding.userBackground.setImageResource(R.color.blocked_red);
+                if(isBlockedByMe.get() && !isOwnProfile()) {
+                    binding.userBlockedHeaderInfo.setVisibility(View.VISIBLE);
+                    binding.userBackground.setImageResource(R.color.blocked_red);
+                }
 
                 setFriendsUI();
-                checkIsOwnProfile();
+                if(isOwnProfile()) hideFieldsInOwnProfile();
             }
         }.execute();
     }
@@ -551,6 +565,7 @@ public class ProfileActivity extends BaseActivity {
         dialog.show();
 
         TextView sendButton = (TextView) view.findViewById(R.id.send_friend_request);
+        sendButton.setText(getString(R.string.remove));
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
