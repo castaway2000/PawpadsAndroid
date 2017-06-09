@@ -507,26 +507,22 @@ public class GroupEditActivity extends BaseActivity {
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        boolean forceDelete = false;
+
         if(currentUserId == dialog.getUserId()) {
-            forceDelete = true;
+            groupChatManager.deleteDialog(dialog.getDialogId(), true, new QBEntityCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid, Bundle bundle) {
+                    isBusy.set(false);
+                    Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onError(QBResponseException e) {
+                    isBusy.set(false);
+                }
+            });
         }
-
-        groupChatManager.deleteDialog(dialog.getDialogId(), forceDelete, new QBEntityCallback<Void>() {
-            @Override
-            public void onSuccess(Void aVoid, Bundle bundle) {
-                isBusy.set(false);
-                Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-                isBusy.set(false);
-                if (getApplicationContext()==null) return;
-                Util.onError(e, getApplicationContext());
-            }
-        });
     }
 }
