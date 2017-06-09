@@ -130,6 +130,7 @@ public class GroupEditActivity extends BaseActivity {
         }
         if(dialog != null && currentUserId != dialog.getUserId()) {
             binding.groupAvatar.setEnabled(false);
+            binding.photoAvatarIcon.setEnabled(false);
             binding.groupTitleText.setEnabled(false);
             binding.groupTitleText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
         }

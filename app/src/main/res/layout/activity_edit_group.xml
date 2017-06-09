@@ -233,6 +233,7 @@
             app:riv_oval="true" />
 
         <ImageView
+            android:id="@+id/photo_avatar_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/groupAvatar"
