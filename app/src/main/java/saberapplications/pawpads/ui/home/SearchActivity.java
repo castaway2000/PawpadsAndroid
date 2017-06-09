@@ -64,15 +64,6 @@ public class SearchActivity extends BaseActivity implements BaseListAdapter.Call
         adapter.setCurrentUserId(currentUserId);
         binding.searchListView.setAdapter(adapter);
         adapter.setCallback(this);
-        binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                adapter.clear();
-                adapter.disableLoadMore();
-                binding.swipelayout.setRefreshing(false);
-                binding.emptySearchStateLayout.setVisibility(View.VISIBLE);
-            }
-        });
         adapter.setShowInitialLoad(false);
         adapter.disableLoadMore();
         initSearchPanel();
@@ -185,7 +176,6 @@ public class SearchActivity extends BaseActivity implements BaseListAdapter.Call
         if (users.size() == 0 || users.size() < 10) {
             adapter.disableLoadMore();
         }
-        binding.swipelayout.setRefreshing(false);
     }
 
     public void clearSearchQuery() {

@@ -103,7 +103,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                     loadData();
                 }
             }
-        }, 5000);
+        }, 50);
         adapter.notifyDataSetChanged();
     }
 
