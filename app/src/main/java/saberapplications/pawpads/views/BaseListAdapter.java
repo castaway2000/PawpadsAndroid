@@ -188,9 +188,6 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     @Override
     public int getItemCount() {
         if(items.size()==0) return 1;
-        if (isBusy && !showInitialLoad){
-            return 0;
-        }
         if (loadMoreEnabled) {
             return items.size() + 1;
         }else{
@@ -214,6 +211,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
             this.items.add(dataItem);
         }
         isBusy = false;
+        showInitialLoad=false;
         notifyItemRangeInserted(this.items.size(),items.size());
     }
 
