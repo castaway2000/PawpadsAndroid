@@ -37,6 +37,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -456,6 +457,7 @@ public class ChatActivity extends BaseActivity {
                 isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
+                    Crashlytics.logException(error);
                     return;
                 }
                 if(chatMessages == null) return;
@@ -571,6 +573,7 @@ public class ChatActivity extends BaseActivity {
                 }
             } catch (Exception e) {
                 Util.onError(e, ChatActivity.this);
+                Crashlytics.logException(e);
             }
             editText_chat_message.setText("");
         }
@@ -651,6 +654,7 @@ public class ChatActivity extends BaseActivity {
                 isBusy.set(false);
                 if (exception != null) {
                     Util.onError(exception, ChatActivity.this);
+                    Crashlytics.logException(exception);
                     return;
                 }
                 displayChatMessage(qbChatMessage);
@@ -691,6 +695,7 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(this, R.string.reconnect_message, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
+                Crashlytics.logException(e);
                 Util.onError(e, ChatActivity.this);
             }
         }
