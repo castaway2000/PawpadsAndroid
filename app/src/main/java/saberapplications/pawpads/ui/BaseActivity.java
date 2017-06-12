@@ -22,11 +22,15 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.location.LocationListener;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBGroupChatManagerListener;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.core.QBEntityCallback;
@@ -45,6 +49,7 @@ import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.chat.ChatGroupActivity;
 import saberapplications.pawpads.ui.home.SplashActivity;
 
 
@@ -74,6 +79,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
                     @Override
                     public void processMessage(final QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        if(isFinishing()) return;
                         BaseActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -86,11 +92,61 @@ public abstract class BaseActivity extends AppCompatActivity
 
                     @Override
                     public void processError(QBPrivateChat qbPrivateChat, QBChatException e, QBChatMessage qbChatMessage) {
+                        if(isFinishing()) return;
                         Util.onError(e, BaseActivity.this);
                     }
 
                 });
             }
+        }
+    };
+
+    protected QBGroupChatManagerListener groupChatListener = new QBGroupChatManagerListener() {
+        @Override
+        public void chatCreated(QBGroupChat qbGroupChat) {
+            qbGroupChat.addMessageListener(new QBMessageListener<QBGroupChat>() {
+                @Override
+                public void processMessage(final QBGroupChat qbGroupChat, final QBChatMessage qbChatMessage) {
+                    if(isFinishing()) return;
+                    BaseActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onGroupChatMessage(qbGroupChat, qbChatMessage);
+                            UserStatusHelper.setUserStatusByNewMessage(qbChatMessage.getSenderId());
+                        }
+                    });
+
+                }
+
+                @Override
+                public void processError(QBGroupChat qbGroupChat, QBChatException e, QBChatMessage qbChatMessage) {
+                    if(isFinishing()) return;
+                    Util.onError(e, BaseActivity.this);
+                }
+
+            });
+        }
+    };
+
+    private QBSystemMessagesManager systemMessagesManager;
+
+    private QBSystemMessageListener systemMessageListener = new QBSystemMessageListener() {
+        @Override
+        public void processMessage(final QBChatMessage qbChatMessage) {
+            if(isFinishing()) return;
+            BaseActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onChatMessage(null, qbChatMessage);
+                    UserStatusHelper.setUserStatusByNewMessage(qbChatMessage.getSenderId());
+                }
+            });
+        }
+
+        @Override
+        public void processError(QBChatException e, QBChatMessage qbChatMessage) {
+            if(isFinishing()) return;
+            Util.onError(e, BaseActivity.this);
         }
     };
 
@@ -169,6 +225,9 @@ public abstract class BaseActivity extends AppCompatActivity
             reconnectToChat();
         }else{
             QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+            QBChatService.getInstance().getGroupChatManager().addGroupChatManagerListener(groupChatListener);
+            systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+            systemMessagesManager.addSystemMessageListener(systemMessageListener);
         }
 
 
@@ -204,6 +263,7 @@ public abstract class BaseActivity extends AppCompatActivity
         decrementActivityCount();
         if (QBChatService.getInstance().getPrivateChatManager() != null) {
             QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+            QBChatService.getInstance().getGroupChatManager().addGroupChatManagerListener(groupChatListener);
         }
         isReopened = true;
     }
@@ -259,6 +319,9 @@ public abstract class BaseActivity extends AppCompatActivity
                 }
 
                 QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+                QBChatService.getInstance().getGroupChatManager().addGroupChatManagerListener(groupChatListener);
+                systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+                systemMessagesManager.addSystemMessageListener(systemMessageListener);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -356,6 +419,24 @@ public abstract class BaseActivity extends AppCompatActivity
                             Intent intent = new Intent(BaseActivity.this, ChatActivity.class);
                             intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
                             intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId());
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
+    }
+
+    public void onGroupChatMessage(QBGroupChat qbGroupChat, final QBChatMessage qbChatMessage) {
+        if (Util.IM_ALERT) {
+            new AlertDialog.Builder(BaseActivity.this)
+                    .setTitle(R.string.new_chat_message)
+                    .setMessage(qbChatMessage.getBody())
+                    .setPositiveButton("Open chat", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(BaseActivity.this, ChatGroupActivity.class);
+                            intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
                             startActivity(intent);
                         }
                     })
