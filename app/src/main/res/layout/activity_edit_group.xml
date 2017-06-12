@@ -127,6 +127,7 @@
                     />
 
                 <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/leave_and_delete_btn"
                     style="@style/group_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

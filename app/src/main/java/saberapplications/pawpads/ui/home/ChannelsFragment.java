@@ -41,12 +41,10 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     ChatsAdapter adapter;
     int currentPage = 0;
     private int currentUserId;
-    int amountOfCreatedChannels;
 
     public ChannelsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -126,14 +124,18 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     private void checkAmountOfCreatedChannels() {
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setLimit(100);
-
+        requestBuilder.sortDesc("last_message_date_sent");
         QBChatService.getChatDialogs(QBDialogType.PUBLIC_GROUP, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if(dialogs.size() == 0) return;
+                int amountOfCreatedChannels = 0;
                 for (QBDialog dialog : dialogs) {
-                    if(dialog.getUserId() == currentUserId) amountOfCreatedChannels++;
+                    if(dialog.getUserId() == currentUserId) {
+                        amountOfCreatedChannels++;
+                    }
                 }
+                Util.setCreatedChannelsCount(amountOfCreatedChannels);
             }
 
             @Override
@@ -158,14 +160,14 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     }
 
     public void createNewPublicGroup() {
-        if(amountOfCreatedChannels < MAX_AMOUNT_OF_CREATED_CHANNELS) {
+        if(Util.getCreatedChannelsCount() < MAX_AMOUNT_OF_CREATED_CHANNELS) {
             QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
             if (groupChatManager == null) return;
             Intent i = new Intent(getActivity(), ChatGroupActivity.class);
             i.putExtra(ChatGroupActivity.DIALOG_GROUP_TYPE, QBDialogType.PUBLIC_GROUP);
             i.putExtra(ChatGroupActivity.IS_FIRST_OPENED, true);
             startActivity(i);
-            amountOfCreatedChannels++;
+            Util.setCreatedChannelsCount(Util.getCreatedChannelsCount()+1);
         } else {
             Toast.makeText(getActivity(), getActivity().getString(R.string.sorry_cannot_create_more_three_channels), Toast.LENGTH_LONG).show();
         }

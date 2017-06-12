@@ -491,7 +491,7 @@ public class ChatGroupActivity extends BaseActivity {
                 getIntent().getBooleanExtra(IS_FIRST_OPENED, false)) {
             Intent intent = new Intent(ChatGroupActivity.this, GroupEditActivity.class);
             intent.putExtra(GroupEditActivity.DIALOG, dialog);
-            startActivity(intent);
+            startActivityForResult(intent, GROUP_SETTINGS_CHANGE);
         }
     }
 
