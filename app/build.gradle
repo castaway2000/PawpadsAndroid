@@ -79,9 +79,7 @@ android {
 }
 
 dependencies {
-    compile('com.twitter.sdk.android:twitter-core:2.0.0@aar') {
-        transitive = true;
-    }
+    compile 'com.twitter.sdk.android:twitter:3.0.0'
     compile 'com.quickblox:quickblox-android-sdk-core:2.6.1'
     compile 'com.quickblox:quickblox-android-sdk-chat:2.6.1'
     compile 'com.quickblox:quickblox-android-sdk-messages:2.6.1'

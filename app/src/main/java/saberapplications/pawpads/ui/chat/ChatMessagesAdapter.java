@@ -139,7 +139,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 attachment = null;
             }
             if (item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
-                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                 binding.setShowThumbNail(true);
                 binding.stickerProgressBar.setVisibility(View.VISIBLE);
 
@@ -244,7 +244,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 binding.setShowThumbNail(false);
             }
             if (item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
-                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(),android.R.color.transparent));
                 binding.setShowThumbNail(true);
                 binding.stickerProgressBar.setVisibility(View.VISIBLE);
 

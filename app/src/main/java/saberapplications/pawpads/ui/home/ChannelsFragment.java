@@ -62,10 +62,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(adapter.isShowInitialLoad()) {
-                    binding.swipelayout.setRefreshing(false);
-                    return;
-                }
+                adapter.setShowInitialLoad(true);
                 adapter.clear();
                 currentPage = 0;
                 loadData();
