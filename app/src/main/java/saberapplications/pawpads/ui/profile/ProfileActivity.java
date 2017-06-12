@@ -371,6 +371,7 @@ public class ProfileActivity extends BaseActivity {
                             }).show();
                 } else {
                     binding.userBackground.setImageResource(R.color.blocked_red);
+                    binding.userStatusInfo.setVisibility(View.GONE);
                     setBlockedUI(true);
                     Toast.makeText(ProfileActivity.this, R.string.user_added_to_block_list, Toast.LENGTH_LONG).show();
                 }
@@ -445,14 +446,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void initChatRoster() {
-        if(chatRoster == null) {
-            chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
-                @Override
-                public void subscriptionRequested(int userId) {
-                    // nothing to do
-                }
-            });
-        }
+        if(chatRoster == null) chatRoster = ChatRosterHelper.getChatRoster();
     }
 
     private void setFriendsUI() {
@@ -522,14 +516,12 @@ public class ProfileActivity extends BaseActivity {
         if (chatRoster.contains(userId)) {
             try {
                 chatRoster.subscribe(userId);
-                setFriendsUI();
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
             }
         } else {
             try {
                 chatRoster.createEntry(userId, null);
-                setFriendsUI();
             } catch (XMPPException e) {
                 e.printStackTrace();
             } catch (SmackException.NotLoggedInException e) {
@@ -540,6 +532,9 @@ public class ProfileActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+        binding.addToFriendsButton.setVisibility(View.GONE);
+        binding.deleteFromFriends.setVisibility(View.GONE);
+        binding.userStatusInfo.setVisibility(isBlockedByMe.get() ? View.GONE : View.VISIBLE);
     }
 
     public void removeUserFromFriends() {

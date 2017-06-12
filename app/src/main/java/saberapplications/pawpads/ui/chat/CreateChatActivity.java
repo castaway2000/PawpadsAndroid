@@ -150,11 +150,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
     }
 
     private void initChatRoster() {
-        chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
-            @Override
-            public void subscriptionRequested(int userId) {
-            }
-        });
+        if(chatRoster == null) chatRoster = ChatRosterHelper.getChatRoster();
     }
 
     private void initSearchPanel() {

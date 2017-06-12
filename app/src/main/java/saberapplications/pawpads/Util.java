@@ -84,11 +84,15 @@ public class Util {
     }
 
     private static void showAlert(Context context,String message){
-        new AlertDialog.Builder(context,R.style.AppAlertDialogTheme)
-                .setMessage(message)
-                .setTitle("Error")
-                .setPositiveButton("OK", null)
-                .show();
+        try {
+            new AlertDialog.Builder(context, R.style.AppAlertDialogTheme)
+                    .setMessage(message)
+                    .setTitle("Error")
+                    .setPositiveButton("OK", null)
+                    .show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean isEmailValid(CharSequence email) {

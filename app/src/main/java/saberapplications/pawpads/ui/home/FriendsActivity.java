@@ -17,8 +17,11 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRoster;
+import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
+import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -38,6 +41,8 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityFriendsBinding;
 import saberapplications.pawpads.ui.BaseActivity;
+import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.ChatRosterHelper;
@@ -51,6 +56,8 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
     private int currentUserId;
     QBRoster chatRoster;
     AlertDialog requestDialog;
+    private boolean isLoading;
+    private int newUserInviteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +84,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(adapter.isShowInitialLoad()) {
+                if(isLoading) {
                     binding.swipelayout.setRefreshing(false);
                     return;
                 }
@@ -87,12 +94,9 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 binding.swipelayout.setRefreshing(false);
             }
         });
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        initChatRoster();
+        chatRoster = getChatRoster();
+
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
@@ -103,18 +107,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                     loadData();
                 }
             }
-        }, 50);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void initChatRoster() {
-        chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
-            @Override
-            public void subscriptionRequested(int userId) {
-                Log.d(TAG, "subscriptionRequested " + userId);
-                loadDataAfterChanges();
-            }
-        });
+        }, 500);
     }
 
     private void showAddToFriendsRequestDialog(final QBUser user) {
@@ -166,7 +159,6 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
     }
 
     private void loadDataAfterChanges() {
-        initChatRoster();
         adapter.clear();
         currentPage = 0;
         loadData();
@@ -195,6 +187,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
                 chatRoster.removeEntry(chatRoster.getEntry(userId));
             }
+            if(newUserInviteId == userId) newUserInviteId = 0;
             loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
@@ -208,14 +201,21 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
     }
 
     public void loadData() {
+        isLoading = true;
         ArrayList<Integer> usersIds = new ArrayList<>();
         if(chatRoster != null) {
-            Collection<QBRosterEntry> entries = chatRoster.getEntries();
+            Collection<QBRosterEntry> entries;
+            if(chatRoster.getUnfiledEntries() != null && chatRoster.getUnfiledEntries().size()>0) {
+                entries = chatRoster.getUnfiledEntries();
+            } else {
+                entries = chatRoster.getEntries();
+            }
             Log.d(TAG, "Collection<QBRosterEntry> entries " + entries.toString());
             for(QBRosterEntry entry : entries) {
                 usersIds.add(entry.getUserId());
             }
         }
+        if(newUserInviteId != 0 && !usersIds.contains(newUserInviteId)) getUserById(newUserInviteId);
         if(usersIds.size() > 0) {
             QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
             pagedRequestBuilder.setPage(currentPage);
@@ -233,6 +233,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                         adapter.disableLoadMore();
                     }
                     binding.swipelayout.setRefreshing(false);
+                    isLoading = false;
                 }
 
                 @Override
@@ -240,11 +241,13 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                     if (getApplicationContext()==null) return;
                     adapter.disableLoadMore();
                     Util.onError(errors, getApplicationContext());
+                    isLoading = false;
                 }
             });
         } else {
             adapter.disableLoadMore();
             binding.swipelayout.setRefreshing(false);
+            isLoading = false;
         }
     }
 
@@ -272,5 +275,89 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 }
             }
         }, 50);
+    }
+
+    public QBRoster getChatRoster() {
+        QBSubscriptionListener subscriptionListener = new QBSubscriptionListener() {
+            @Override
+            public void subscriptionRequested(int userId) {
+                Log.d(TAG, "subscriptionRequested " + userId);
+                newUserInviteId = userId;
+                try {
+                    chatRoster.reload();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadDataAfterChanges();
+                        }
+                    });
+                } catch (SmackException.NotLoggedInException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        QBRosterListener rosterListener = new QBRosterListener() {
+            @Override
+            public void entriesDeleted(Collection<Integer> userIds) {
+                Log.d(TAG, "entriesDeleted " + userIds.toString());
+                if(chatRoster != null) {
+                    for (Integer userId : userIds) {
+                        try {
+                            if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
+                                chatRoster.removeEntry(chatRoster.getEntry(userId));
+                            }
+                        } catch (XMPPException e) {
+                            e.printStackTrace();
+                        } catch (SmackException.NotLoggedInException e) {
+                            e.printStackTrace();
+                        } catch (SmackException.NotConnectedException e) {
+                            e.printStackTrace();
+                        } catch (SmackException.NoResponseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void entriesAdded(Collection<Integer> userIds) {
+                Log.d(TAG, "entriesAdded " + userIds.toString());
+            }
+
+            @Override
+            public void entriesUpdated(Collection<Integer> userIds) {
+                Log.d(TAG, "entriesUpdated " + userIds.toString());
+            }
+
+            @Override
+            public void presenceChanged(QBPresence presence) {
+                Log.d(TAG, "presenceChanged " + presence.toString());
+            }
+        };
+
+        // Do this after success Chat login
+        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, subscriptionListener);
+        if(chatRoster == null) return null;
+        chatRoster.addRosterListener(rosterListener);
+
+        return chatRoster;
+    }
+
+    private void getUserById(int userId) {
+        QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser result, Bundle params) {
+                adapter.addItem(result);
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Util.onError(e, FriendsActivity.this);
+            }
+
+        });
     }
 }

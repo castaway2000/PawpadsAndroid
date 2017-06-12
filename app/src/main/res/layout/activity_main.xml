@@ -120,6 +120,12 @@
             android:padding="0dp"
             android:clickable="true">
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EFEFEF"
+                android:layout_marginTop="225dp"/>
+
             <ImageView
                 android:id="@+id/user_bg"
                 android:layout_width="match_parent"
@@ -175,9 +181,10 @@
                 app:columnCount="2">
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:layout_width="25dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/settings_icon"
+                    android:src="@drawable/friends"
+                    android:layout_marginTop="10dp"
                     app:layout_gravity="center"/>
 
                 <saberapplications.pawpads.views.FontTextView
@@ -186,12 +193,14 @@
                     android:text="@string/friends"
                     style="@style/navigation_item"
                     android:onClick="@{ () -> activity.openFriendsActivity()}"
+                    android:layout_marginTop="10dp"
                     />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/settings_icon"
+                    android:alpha="0.4"
                     app:layout_gravity="center"/>
 
                 <saberapplications.pawpads.views.FontTextView
@@ -206,6 +215,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/about_icon"
+                    android:alpha="0.4"
                     app:layout_gravity="center"/>
 
                 <saberapplications.pawpads.views.FontTextView
@@ -219,6 +229,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height ="wrap_content"
                     android:src="@drawable/logout_icon"
+                    android:alpha="0.4"
                     app:layout_gravity="center"
                     />
 

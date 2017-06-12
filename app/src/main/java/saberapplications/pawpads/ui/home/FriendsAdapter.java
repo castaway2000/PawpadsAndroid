@@ -14,6 +14,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import saberapplications.pawpads.R;
@@ -36,12 +37,7 @@ public class FriendsAdapter extends BaseListAdapter<QBUser> {
         private final int size;
         RowFriendsBinding binding;
         FriendsAdapter adapter;
-        QBRoster chatRoster = ChatRosterHelper.getChatRoster(new QBSubscriptionListener() {
-            @Override
-            public void subscriptionRequested(int userId) {
-                // nothing to do
-            }
-        });
+        QBRoster chatRoster = ChatRosterHelper.getChatRoster();
 
         public FriendsDialogHolder(View v, BaseListAdapter<QBUser> adapter) {
             super(v, adapter);
