@@ -2,6 +2,6 @@
     <style name="AppAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColorPrimary">@color/title</item>
         <item name="colorAccent">@color/primary</item>
-        <item name="android:windowBackground">@color/tw__transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>
