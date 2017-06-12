@@ -26,8 +26,18 @@ android {
             keyPassword 'RHe4bFgysjU'
             storeFile file('../pawpads_debug.jks')
             storePassword 'RHe4bFgysjU'
+            /*
+            Certificate fingerprints:
+         MD5:  CD:A2:FB:81:0A:16:E6:41:B7:EF:4A:D4:6C:E6:DC:8E
+         SHA1: 27:51:F6:17:6F:A8:86:EC:73:46:B6:58:D8:F8:73:84:ED:AF:F6:47
+         SHA256: 63:F9:79:84:56:9E:B8:C5:44:68:3A:CD:69:D8:46:71:50:34:66:B3:A7:6A:8A:D3:68:5E:C5:19:4E:3F:6D:8A
+         Signature algorithm name: SHA256withRSA
+         Version: 3
+         FB hash: J1H2F2+ohuxzRrZY2PhzhO2v9kc=
+             */
         }
     }
+
     compileSdkVersion 25
     buildToolsVersion '25.0.3'
     defaultConfig {
