@@ -207,13 +207,14 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     }
 
     public void addItems(List<T> items) {
+
         for (T item : items) {
             DataItem<T> dataItem = new DataItem<>();
             dataItem.model.set(item);
             this.items.add(dataItem);
         }
         isBusy = false;
-        notifyDataSetChanged();
+        notifyItemRangeInserted(this.items.size(),items.size());
     }
 
     public void addItem(T data) {
@@ -222,7 +223,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         this.items.add(item);
         isBusy = false;
         //Collections.sort(items, Collections.<Jogging>reverseOrder());
-        notifyDataSetChanged();
+        notifyItemChanged(this.items.size()-1);
 
     }
 

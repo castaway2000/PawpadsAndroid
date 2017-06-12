@@ -111,11 +111,8 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(adapter.isShowInitialLoad()) {
-                    binding.swipelayout.setRefreshing(false);
-                    return;
-                }
                 adapter.clear();
+                adapter.setShowInitialLoad(true);
                 currentPage=1;
                 loadData();
                 binding.swipelayout.setRefreshing(false);
@@ -233,6 +230,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                 }
 
                 binding.swipelayout.setRefreshing(false);
+
                 isBusy.set(false);
             }
         };
