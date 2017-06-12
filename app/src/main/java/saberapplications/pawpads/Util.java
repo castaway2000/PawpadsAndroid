@@ -126,4 +126,16 @@ public class Util {
 
         return user.getFullName()!=null ? user.getFullName() : user.getLogin();
     }
+
+    public static int getCreatedChannelsCount() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getInt(C.CREATED_CHANNELS_COUNT, 0);
+    }
+
+    public static void setCreatedChannelsCount(int channelsCount) {
+        if(channelsCount < 0) channelsCount = 0;
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putInt(C.CREATED_CHANNELS_COUNT, channelsCount);
+        editor.apply();
+    }
 }

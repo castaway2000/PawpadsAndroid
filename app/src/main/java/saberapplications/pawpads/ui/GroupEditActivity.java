@@ -16,14 +16,12 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -127,6 +125,7 @@ public class GroupEditActivity extends BaseActivity {
         }
         if(dialog != null && dialog.getType() == QBDialogType.PUBLIC_GROUP) {
             binding.participantsLayout.setVisibility(View.GONE);
+            if(currentUserId != dialog.getUserId()) binding.leaveAndDeleteBtn.setVisibility(View.GONE);
         }
         if(dialog != null && currentUserId != dialog.getUserId()) {
             binding.groupAvatar.setEnabled(false);
@@ -508,21 +507,24 @@ public class GroupEditActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+        boolean forceDelete = false;
         if(currentUserId == dialog.getUserId()) {
-            groupChatManager.deleteDialog(dialog.getDialogId(), true, new QBEntityCallback<Void>() {
-                @Override
-                public void onSuccess(Void aVoid, Bundle bundle) {
-                    isBusy.set(false);
-                    Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onError(QBResponseException e) {
-                    isBusy.set(false);
-                }
-            });
+            forceDelete = true;
         }
+        groupChatManager.deleteDialog(dialog.getDialogId(), forceDelete, new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                Util.setCreatedChannelsCount(Util.getCreatedChannelsCount()-1);
+                isBusy.set(false);
+                Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                isBusy.set(false);
+            }
+        });
     }
 }
