@@ -161,6 +161,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                         if (dialogList != null && dialogList.size() > 0) {
                             for (QBDialog dialog : dialogList) {
                                 try {
+                                    if (dialog.getOccupants()==null || dialog.getOccupants().size()==0) continue;
                                     int userId = dialog.getOccupants().get(0) == currentUserId ? dialog.getOccupants().get(1) : dialog.getOccupants().get(0);
                                     if (dialog.getLastMessageDateSent() > 0) {
                                         lastMessages.put(userId, dialog.getLastMessageDateSent());
