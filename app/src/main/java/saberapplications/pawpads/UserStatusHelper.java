@@ -51,6 +51,7 @@ public class UserStatusHelper {
     }
 
     private static int getUserStatusByLastRequestTime(QBUser user) {
+        if(user.getLastRequestAt() == null) return USER_OFFLINE;
         long currentTime = System.currentTimeMillis();
         long userLastRequestAtTime = user.getLastRequestAt().getTime();
         Log.d("UserStatusHelper", "getLastRequestAt = " + user.getLastRequestAt().getTime() +

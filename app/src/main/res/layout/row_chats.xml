@@ -71,22 +71,59 @@
             android:layout_toEndOf="@id/avatar"
             android:orientation="vertical">
 
-            <saberapplications.pawpads.views.FontTextView
-                android:id="@+id/username"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{username,default=USERNAME}"
-                android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
-                style="@style/list_title"/>
+                android:orientation="horizontal">
 
-            <saberapplications.pawpads.views.FontTextView
-                android:id="@+id/last_message"
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{username,default=USERNAME}"
+                    android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
+                    style="@style/list_title"/>
+
+                <ImageView
+                    android:id="@+id/private_group_chat_ic"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="2dp"
+                    android:layout_marginLeft="10dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/lock_grey"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text='@{lastMessage,default="28 AUG" }'
-                style="@style/list_details"
-                app:typefaceAsset="Proxima_Nova_Regular_Italic.otf"
-                />
+                android:orientation="horizontal">
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/avatar_last_message"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="10dp"
+                    android:scaleType="centerCrop"
+                    app:riv_border_color="#333333"
+                    app:riv_mutate_background="true"
+                    app:riv_oval="true"
+                    android:src="@drawable/user_placeholder"
+                    android:layout_centerVertical="true"/>
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/last_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:text='@{lastMessage,default="28 AUG" }'
+                    style="@style/list_details"
+                    app:typefaceAsset="Proxima_Nova_Regular_Italic.otf"
+                    />
+
+            </LinearLayout>
 
         </LinearLayout>
 

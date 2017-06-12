@@ -68,7 +68,11 @@ public class AvatarLoaderHelper {
         final File file = new File(CacheDir.getAbsolutePath() + "/" + fileId + ".jpg");
         // Trying get image from cache
         if (file.exists()) {
-            Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
+            try {
+                Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (callback != null) callback.imageLoaded();
         } else {
 

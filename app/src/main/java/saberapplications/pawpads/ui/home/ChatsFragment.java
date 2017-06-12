@@ -1,9 +1,11 @@
 package saberapplications.pawpads.ui.home;
 
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -12,9 +14,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
@@ -27,6 +33,8 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.FragmentChatsBinding;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.chat.ChatGroupActivity;
+import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
@@ -50,6 +58,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         binding = DataBindingUtil.bind(view);
+        binding.setFragment(this);
         adapter = new ChatsAdapter();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         currentUserId = prefs.getInt(C.QB_USERID, 0);
@@ -59,6 +68,10 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(adapter.isShowInitialLoad()) {
+                    binding.swipelayout.setRefreshing(false);
+                    return;
+                }
                 adapter.clear();
                 currentPage = 0;
                 loadData();
@@ -81,7 +94,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                         loadData();
                     }
             }
-        }, 5000);
+        }, 500);
         adapter.notifyDataSetChanged();
     }
 
@@ -95,7 +108,11 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (adapter==null) return;
                 if (dialogs.size() > 0) {
-                    adapter.addItems(dialogs);
+                    ArrayList<QBDialog> privateDialogs = new ArrayList<>();
+                    for(QBDialog dialog : dialogs) {
+                        if( !dialog.getType().equals(QBDialogType.PUBLIC_GROUP)) privateDialogs.add(dialog);
+                    }
+                    adapter.addItems(privateDialogs);
                     currentPage++;
                 }
 
@@ -103,7 +120,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                     adapter.disableLoadMore();
                 }
                 binding.swipelayout.setRefreshing(false);
-
             }
 
             @Override
@@ -112,8 +128,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                 Util.onError(e, getContext());
 
             }
-
-
         });
     }
 
@@ -124,15 +138,25 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     @Override
     public void onItemClick(final QBDialog dialog) {
+        if(dialog.getType() == QBDialogType.GROUP) {
+            ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
+            Intent intent = new Intent(getContext(), ChatGroupActivity.class);
+            intent.putExtra(ChatGroupActivity.DIALOG, dialog);
+            intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
+            startActivity(intent);
+        } else {
+            List<Integer> occupansts = dialog.getOccupants();
+            Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
 
+            Intent intent = new Intent(getContext(), ChatActivity.class);
+            intent.putExtra(ChatActivity.DIALOG, dialog);
+            intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
+            startActivity(intent);
+        }
+    }
 
-        List<Integer> occupansts = dialog.getOccupants();
-        Integer recipientId = occupansts.get(0) == currentUserId ? occupansts.get(1) : occupansts.get(0);
-
-        Intent intent = new Intent(getContext(), ChatActivity.class);
-        intent.putExtra(ChatActivity.DIALOG, dialog);
-        intent.putExtra(ChatActivity.RECIPIENT_ID, recipientId);
+    public void createNewChatOrGroup() {
+        Intent intent = new Intent(getContext(), CreateChatActivity.class);
         startActivity(intent);
-
     }
 }

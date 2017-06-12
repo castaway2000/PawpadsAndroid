@@ -111,6 +111,10 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(adapter.isShowInitialLoad()) {
+                    binding.swipelayout.setRefreshing(false);
+                    return;
+                }
                 adapter.clear();
                 currentPage=1;
                 loadData();
@@ -121,6 +125,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         progressMessage.set(getString(R.string.obtaining_location));
         if (UserLocationService.getLastLocation()!=null){
             loadData();
+        } else {
+            adapter.disableLoadMore();
+            isBusy.set(false);
         }
         return view;
     }
@@ -156,9 +163,13 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                         ArrayList<QBDialog> dialogList = QBChatService.getChatDialogs(null, requestBuilder, out);
                         if (dialogList != null && dialogList.size() > 0) {
                             for (QBDialog dialog : dialogList) {
-                                int userId = dialog.getOccupants().get(0) == currentUserId ? dialog.getOccupants().get(1) : dialog.getOccupants().get(0);
-                                if (dialog.getLastMessageDateSent() > 0) {
-                                    lastMessages.put(userId, dialog.getLastMessageDateSent());
+                                try {
+                                    int userId = dialog.getOccupants().get(0) == currentUserId ? dialog.getOccupants().get(1) : dialog.getOccupants().get(0);
+                                    if (dialog.getLastMessageDateSent() > 0) {
+                                        lastMessages.put(userId, dialog.getLastMessageDateSent());
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }

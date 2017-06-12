@@ -236,6 +236,7 @@ public class ChatActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                binding.recipientAvatar.setVisibility(View.VISIBLE);
                 if (recipient == null || userDeleted) return;
                 if (recipient.getFileId() != null) {
                     float d = getResources().getDisplayMetrics().density;
@@ -366,6 +367,31 @@ public class ChatActivity extends BaseActivity {
                             }
                         }
                     }
+
+                    if (dialog == null) {
+                        if (getIntent().hasExtra(DIALOG)) {
+                            dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
+                        }
+                        if (dialog == null && getIntent().hasExtra(DIALOG_ID)) {
+                            QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+                            requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
+                            //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
+
+                            Bundle bundle = new Bundle();
+                            ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(null, requestBuilder, bundle);
+                            dialog = dialogs.get(0);
+                        }
+                    }
+                    if (dialog != null && dialog.getType() != QBDialogType.PRIVATE) {
+                        ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
+                        Intent intent = new Intent(ChatActivity.this, ChatGroupActivity.class);
+                        intent.putExtra(ChatGroupActivity.DIALOG, dialog);
+                        intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
+                        startActivity(intent);
+                        finish();
+                        return null;
+                    }
+
                     if (!userDeleted) {
                         try {
                             privateChat = privateChatManager.getChat(recipient.getId());
@@ -381,21 +407,6 @@ public class ChatActivity extends BaseActivity {
 
                         init();
                     }
-                    if (dialog == null) {
-                        if (getIntent().hasExtra(DIALOG)) {
-                            dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
-                        }
-                        if (dialog == null && getIntent().hasExtra(DIALOG_ID)) {
-                            QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                            requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
-                            //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
-
-                            Bundle bundle = new Bundle();
-                            ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
-                            dialog = dialogs.get(0);
-                        }
-                    }
-
 
                     if (dialog == null) {
                         dialog = privateChatManager.createDialog(recipient.getId());
@@ -447,6 +458,7 @@ public class ChatActivity extends BaseActivity {
                     Util.onError(error, ChatActivity.this);
                     return;
                 }
+                if(chatMessages == null) return;
                 if (!isActivityReopened) {
                     chatAdapter.addItems(chatMessages);
                     if (chatMessages.size() < messagesPerPage) {
@@ -686,6 +698,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void onClickImoji() {
+        if(binding.getShowGiphy()) onClickGiphy();
         if (mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
             hideSoftKeyboard();
             mStickersContainer.addView(mStickersWidget);
