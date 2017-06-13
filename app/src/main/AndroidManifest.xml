@@ -126,11 +126,11 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".ui.home.SearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".ui.home.FriendsActivity"
+            android:name=".ui.friends.FriendsActivity"
             android:label="@string/friends"
             android:screenOrientation="portrait"/>
 

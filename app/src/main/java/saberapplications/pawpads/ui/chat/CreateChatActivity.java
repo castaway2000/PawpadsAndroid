@@ -1,11 +1,8 @@
 package saberapplications.pawpads.ui.chat;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,15 +16,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBRoster;
-import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBRosterEntry;
@@ -145,8 +139,13 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
                     loadData();
                 }
             }
-        }, 5000);
-        adapter.notifyDataSetChanged();
+        }, 500);
+    }
+
+    @Override
+    protected void onStop() {
+        adapter.clearSelectedUsersList();
+        super.onStop();
     }
 
     private void initChatRoster() {

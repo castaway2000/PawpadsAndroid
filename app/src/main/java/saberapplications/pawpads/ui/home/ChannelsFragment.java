@@ -80,7 +80,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(adapter.isShowInitialLoad()) {
+                if (adapter.getItemCount()<=1){
                     adapter.clear();
                     currentPage = 0;
                     loadData();
@@ -116,6 +116,14 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
                 Util.onError(e, getContext());
             }
         });
+    }
+
+    public void reloadData() {
+        adapter.setShowInitialLoad(true);
+        adapter.clear();
+        currentPage = 0;
+        loadData();
+        binding.swipelayout.setRefreshing(false);
     }
 
     private void checkAmountOfCreatedChannels() {

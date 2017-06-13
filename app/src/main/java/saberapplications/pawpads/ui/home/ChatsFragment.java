@@ -1,11 +1,9 @@
 package saberapplications.pawpads.ui.home;
 
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -14,11 +12,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
@@ -50,7 +45,6 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     public ChatsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,14 +79,13 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                    if(adapter.isShowInitialLoad()) {
-                        adapter.clear();
-                        currentPage = 0;
-                        loadData();
-                    }
+                if (adapter.getItemCount()<=1){
+                    currentPage = 0;
+                    adapter.clear();
+                    loadData();
+                }
             }
         }, 500);
-        adapter.notifyDataSetChanged();
     }
 
     public void loadData() {
@@ -103,11 +96,12 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
-                if (adapter==null) return;
+                if (adapter == null) return;
                 if (dialogs.size() > 0) {
                     ArrayList<QBDialog> privateDialogs = new ArrayList<>();
-                    for(QBDialog dialog : dialogs) {
-                        if( !dialog.getType().equals(QBDialogType.PUBLIC_GROUP)) privateDialogs.add(dialog);
+                    for (QBDialog dialog : dialogs) {
+                        if (!dialog.getType().equals(QBDialogType.PUBLIC_GROUP))
+                            privateDialogs.add(dialog);
                     }
                     adapter.addItems(privateDialogs);
                     currentPage++;
@@ -121,11 +115,21 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
             @Override
             public void onError(QBResponseException e) {
-                if (getContext()==null) return;
+                if (getContext() == null) return;
                 Util.onError(e, getContext());
+                adapter.disableLoadMore();
+                binding.swipelayout.setRefreshing(false);
 
             }
         });
+    }
+
+    public void reloadData() {
+        adapter.setShowInitialLoad(true);
+        adapter.clear();
+        currentPage = 0;
+        loadData();
+        binding.swipelayout.setRefreshing(false);
     }
 
     @Override
@@ -135,7 +139,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
 
     @Override
     public void onItemClick(final QBDialog dialog) {
-        if(dialog.getType() == QBDialogType.GROUP) {
+        if (dialog.getType() == QBDialogType.GROUP) {
             ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
             Intent intent = new Intent(getContext(), ChatGroupActivity.class);
             intent.putExtra(ChatGroupActivity.DIALOG, dialog);

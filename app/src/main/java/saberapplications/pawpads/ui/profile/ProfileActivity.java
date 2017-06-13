@@ -1,6 +1,7 @@
 package saberapplications.pawpads.ui.profile;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -516,25 +518,30 @@ public class ProfileActivity extends BaseActivity {
         if (chatRoster.contains(userId)) {
             try {
                 chatRoster.subscribe(userId);
+                Util.addFriendOutInviteToList(userId);
+                binding.addToFriendsButton.setVisibility(View.GONE);
+                binding.deleteFromFriends.setVisibility(View.GONE);
+                binding.userStatusInfo.setVisibility(isBlockedByMe.get() ? View.GONE : View.VISIBLE);
             } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
+                handleOnError(ProfileActivity.this, e, getString(R.string.reconnect_message));
             }
         } else {
             try {
                 chatRoster.createEntry(userId, null);
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotLoggedInException e) {
-                e.printStackTrace();
+                Util.addFriendOutInviteToList(userId);
+                binding.addToFriendsButton.setVisibility(View.GONE);
+                binding.deleteFromFriends.setVisibility(View.GONE);
+                binding.userStatusInfo.setVisibility(isBlockedByMe.get() ? View.GONE : View.VISIBLE);
             } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
+                handleOnError(ProfileActivity.this, e, getString(R.string.reconnect_message));
+            } catch (SmackException.NotLoggedInException e) {
+                handleOnError(ProfileActivity.this, e, getString(R.string.you_are_not_logged_in));
+            } catch (XMPPException e) {
+                handleOnError(ProfileActivity.this, e, getString(R.string.something_wrong_try_again_later));
             } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
+                handleOnError(ProfileActivity.this, e, getString(R.string.something_wrong_try_again_later));
             }
         }
-        binding.addToFriendsButton.setVisibility(View.GONE);
-        binding.deleteFromFriends.setVisibility(View.GONE);
-        binding.userStatusInfo.setVisibility(isBlockedByMe.get() ? View.GONE : View.VISIBLE);
     }
 
     public void removeUserFromFriends() {
@@ -584,16 +591,23 @@ public class ProfileActivity extends BaseActivity {
             chatRoster.unsubscribe(userId);
             if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
                 chatRoster.removeEntry(chatRoster.getEntry(userId));
+                Util.removeFriendOutInviteFromList(userId);
             }
             setFriendsUI();
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            e.printStackTrace();
+            handleOnError(ProfileActivity.this, e, getString(R.string.reconnect_message));
         } catch (SmackException.NotLoggedInException e) {
-            e.printStackTrace();
+            handleOnError(ProfileActivity.this, e, getString(R.string.you_are_not_logged_in));
+        } catch (XMPPException e) {
+            handleOnError(ProfileActivity.this, e, getString(R.string.something_wrong_try_again_later));
         } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
+            handleOnError(ProfileActivity.this, e, getString(R.string.something_wrong_try_again_later));
         }
+    }
+
+    public static void handleOnError(Context context, Exception e, String message) {
+        e.printStackTrace();
+        Crashlytics.logException(e);
+        Util.showAlert(context, message);
     }
 }

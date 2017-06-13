@@ -130,6 +130,8 @@
     <string name="add">Add</string>
     <string name="sorry_cannot_create_more_three_channels">Sorry, you cannot have more than 3 channels.</string>
     <string name="remove">Remove</string>
+    <string name="you_are_not_logged_in">You are not logged in</string>
+    <string name="something_wrong_try_again_later">Something went wrong, please try again later</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

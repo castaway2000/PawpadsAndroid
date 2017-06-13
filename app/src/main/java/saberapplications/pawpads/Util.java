@@ -10,7 +10,9 @@ import com.crashlytics.android.Crashlytics;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by blaze on 9/7/2015.
@@ -83,7 +85,7 @@ public class Util {
         showAlert(context,error);
     }
 
-    private static void showAlert(Context context,String message){
+    public static void showAlert(Context context,String message){
         try {
             new AlertDialog.Builder(context, R.style.AppAlertDialogTheme)
                     .setMessage(message)
@@ -142,6 +144,27 @@ public class Util {
         if(channelsCount < 0) channelsCount = 0;
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
         editor.putInt(C.CREATED_CHANNELS_COUNT, channelsCount);
+        editor.apply();
+    }
+
+    public static Set<String> getFriendOutInvitesList() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getStringSet(C.FRIEND_OUT_INVITES_LIST, new HashSet<String>());
+    }
+
+    public static void addFriendOutInviteToList(int userId) {
+        Set<String> outInvites = getFriendOutInvitesList();
+        outInvites.add(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_OUT_INVITES_LIST, outInvites);
+        editor.apply();
+    }
+
+    public static void removeFriendOutInviteFromList(int userId) {
+        Set<String> outInvites = getFriendOutInvitesList();
+        outInvites.remove(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_OUT_INVITES_LIST, outInvites);
         editor.apply();
     }
 }

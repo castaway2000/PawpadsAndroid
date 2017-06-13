@@ -101,7 +101,11 @@ public class AvatarLoaderHelper {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
+                            try {
+                                Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
+                            } finally {
+
+                            }
                             if (callback != null) callback.imageLoaded();
 
                         }

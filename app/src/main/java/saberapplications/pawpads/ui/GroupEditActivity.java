@@ -39,6 +39,7 @@ import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
@@ -55,6 +56,7 @@ import saberapplications.pawpads.databinding.ActivityEditGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
 import saberapplications.pawpads.databinding.RowParticipantsBinding;
+import saberapplications.pawpads.events.UpdateChatEvent;
 import saberapplications.pawpads.ui.chat.ChatGroupActivity;
 import saberapplications.pawpads.ui.chat.CreateChatActivity;
 import saberapplications.pawpads.ui.home.MainActivity;
@@ -339,6 +341,7 @@ public class GroupEditActivity extends BaseActivity {
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra(ChatGroupActivity.CHANGED_GROUP_NAME, dialog.getName());
                     setResult(RESULT_OK, resultIntent);
+                    EventBus.getDefault().post(new UpdateChatEvent());
                 } else {
                     Util.onError(e, GroupEditActivity.this);
                 }

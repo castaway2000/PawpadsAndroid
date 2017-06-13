@@ -132,4 +132,8 @@ public class CreateChatListAdapter extends BaseListAdapter<QBUser> {
     protected int getEmptyStateResId() {
         return R.layout.empty_state_create_chat;
     }
+
+    protected void clearSelectedUsersList() {
+        selectedUsers.clear();
+    }
 }

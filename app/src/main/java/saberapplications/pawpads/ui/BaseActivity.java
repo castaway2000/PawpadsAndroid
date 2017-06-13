@@ -38,6 +38,7 @@ import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
@@ -47,6 +48,7 @@ import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
+import saberapplications.pawpads.events.UpdateChatEvent;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.chat.ChatActivity;
 import saberapplications.pawpads.ui.chat.ChatGroupActivity;
@@ -263,6 +265,8 @@ public abstract class BaseActivity extends AppCompatActivity
         decrementActivityCount();
         if (QBChatService.getInstance().getPrivateChatManager() != null) {
             QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
+        }
+        if (QBChatService.getInstance().getGroupChatManager() != null) {
             QBChatService.getInstance().getGroupChatManager().addGroupChatManagerListener(groupChatListener);
         }
         isReopened = true;
@@ -409,6 +413,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public void onChatMessage(QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+        EventBus.getDefault().post(new UpdateChatEvent());
         if (Util.IM_ALERT) {
             new AlertDialog.Builder(BaseActivity.this)
                     .setTitle(R.string.new_chat_message)
@@ -428,6 +433,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     public void onGroupChatMessage(QBGroupChat qbGroupChat, final QBChatMessage qbChatMessage) {
+        EventBus.getDefault().post(new UpdateChatEvent());
         if (Util.IM_ALERT) {
             new AlertDialog.Builder(BaseActivity.this)
                     .setTitle(R.string.new_chat_message)

@@ -1,6 +1,7 @@
-package saberapplications.pawpads.ui.home;
+package saberapplications.pawpads.ui.friends;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBRosterListener;
@@ -35,17 +37,16 @@ import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityFriendsBinding;
 import saberapplications.pawpads.ui.BaseActivity;
-import saberapplications.pawpads.ui.chat.ChatActivity;
-import saberapplications.pawpads.ui.dialogs.DialogsListActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
-import saberapplications.pawpads.util.ChatRosterHelper;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 public class FriendsActivity extends BaseActivity implements BaseListAdapter.Callback<QBUser> {
@@ -88,6 +89,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                     binding.swipelayout.setRefreshing(false);
                     return;
                 }
+                adapter.setShowInitialLoad(true);
                 adapter.clear();
                 currentPage = 0;
                 loadData();
@@ -170,13 +172,13 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             chatRoster.confirmSubscription(userId);
             loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
         } catch (SmackException.NotLoggedInException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.you_are_not_logged_in));
         } catch (XMPPException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
         } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
         }
     }
 
@@ -190,13 +192,13 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             if(newUserInviteId == userId) newUserInviteId = 0;
             loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
         } catch (XMPPException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
         } catch (SmackException.NotLoggedInException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.you_are_not_logged_in));
         } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
+            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
         }
     }
 
@@ -215,6 +217,32 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 usersIds.add(entry.getUserId());
             }
         }
+
+        if(Util.getFriendOutInvitesList().contains(String.valueOf(newUserInviteId))) {
+            // user who you sent request, sent request to you at the same time
+            acceptRequest(newUserInviteId);
+            newUserInviteId = 0;
+        }
+        boolean isFindRejectedInvites = false;
+        List<String> rejectedInvites = new ArrayList<>();
+        for (String userId : Util.getFriendOutInvitesList()) {
+            int id = Integer.parseInt(userId);
+            if(usersIds.contains(id) && chatRoster.getEntry(id) != null &&
+                    chatRoster.getEntry(id).getType() == RosterPacket.ItemType.none &&
+                    chatRoster.getEntry(id).getStatus() == null) {
+                isFindRejectedInvites = true;
+                rejectedInvites.add(userId);
+            }
+        }
+        if(isFindRejectedInvites) {
+            for(String userId : rejectedInvites) {
+                int id = Integer.parseInt(userId);
+                rejectRequest(id);
+                Util.removeFriendOutInviteFromList(id);
+            }
+            rejectedInvites.clear();
+        }
+
         if(newUserInviteId != 0 && !usersIds.contains(newUserInviteId)) getUserById(newUserInviteId);
         if(usersIds.size() > 0) {
             QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
@@ -291,10 +319,10 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                             loadDataAfterChanges();
                         }
                     });
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
                 } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
+                    handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
+                } catch (SmackException.NotLoggedInException e) {
+                    handleOnError(FriendsActivity.this, e, getString(R.string.you_are_not_logged_in));
                 }
             }
         };
@@ -309,14 +337,14 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                             if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
                                 chatRoster.removeEntry(chatRoster.getEntry(userId));
                             }
-                        } catch (XMPPException e) {
-                            e.printStackTrace();
-                        } catch (SmackException.NotLoggedInException e) {
-                            e.printStackTrace();
                         } catch (SmackException.NotConnectedException e) {
-                            e.printStackTrace();
+                            handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
+                        } catch (SmackException.NotLoggedInException e) {
+                            handleOnError(FriendsActivity.this, e, getString(R.string.you_are_not_logged_in));
+                        } catch (XMPPException e) {
+                            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
                         } catch (SmackException.NoResponseException e) {
-                            e.printStackTrace();
+                            handleOnError(FriendsActivity.this, e, getString(R.string.something_wrong_try_again_later));
                         }
                     }
                 }
@@ -330,6 +358,19 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             @Override
             public void entriesUpdated(Collection<Integer> userIds) {
                 Log.d(TAG, "entriesUpdated " + userIds.toString());
+                try {
+                    chatRoster.reload();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadDataAfterChanges();
+                        }
+                    });
+                } catch (SmackException.NotConnectedException e) {
+                    handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
+                } catch (SmackException.NotLoggedInException e) {
+                    handleOnError(FriendsActivity.this, e, getString(R.string.you_are_not_logged_in));
+                }
             }
 
             @Override
@@ -339,7 +380,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         };
 
         // Do this after success Chat login
-        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, subscriptionListener);
+        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.manual, subscriptionListener);
         if(chatRoster == null) return null;
         chatRoster.addRosterListener(rosterListener);
 
@@ -359,5 +400,11 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             }
 
         });
+    }
+
+    public static void handleOnError(Context context, Exception e, String message) {
+        e.printStackTrace();
+        Crashlytics.logException(e);
+        Util.showAlert(context, message);
     }
 }
