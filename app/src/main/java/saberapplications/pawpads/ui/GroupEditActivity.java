@@ -500,6 +500,7 @@ public class GroupEditActivity extends BaseActivity {
     public void leaveAndDeleteGroup() {
         isBusy.set(true);
         QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
+        if(groupChatManager == null) return;
         QBGroupChat currentChatRoom = groupChatManager.getGroupChat(dialog.getRoomJid());
         try {
             currentChatRoom.leave();

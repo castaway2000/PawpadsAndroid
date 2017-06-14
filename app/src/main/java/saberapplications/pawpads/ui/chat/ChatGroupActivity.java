@@ -399,6 +399,7 @@ public class ChatGroupActivity extends BaseActivity {
 
                             Bundle bundle = new Bundle();
                             ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.GROUP, requestBuilder, bundle);
+                            if(dialogs.size() == 0) return null;
                             dialog = dialogs.get(0);
 
                             if(userIdsList == null && dialog != null && dialog.getOccupants() != null) {
@@ -469,6 +470,7 @@ public class ChatGroupActivity extends BaseActivity {
                     return;
                 }
                 if (!isActivityReopened) {
+                    if(chatMessages == null) chatMessages = new ArrayList<>();
                     chatAdapter.addItems(chatMessages);
                     if (chatMessages.size() < messagesPerPage) {
                         chatAdapter.disableLoadMore();

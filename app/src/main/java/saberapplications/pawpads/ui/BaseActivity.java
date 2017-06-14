@@ -422,7 +422,7 @@ public abstract class BaseActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = new Intent(BaseActivity.this, ChatActivity.class);
-                            intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
+                            intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId());
                             intent.putExtra(ChatActivity.RECIPIENT_ID, qbChatMessage.getSenderId());
                             startActivity(intent);
                         }
@@ -442,7 +442,13 @@ public abstract class BaseActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = new Intent(BaseActivity.this, ChatGroupActivity.class);
-                            intent.putExtra(ChatActivity.DIALOG_ID, qbChatMessage.getDialogId().toString());
+                            String dialogId;
+                            if(qbChatMessage.getDialogId() != null && !qbChatMessage.getDialogId().equals("null")) {
+                                dialogId = qbChatMessage.getDialogId();
+                            } else {
+                                dialogId = qbChatMessage.getProperty("_id").toString();
+                            }
+                            intent.putExtra(ChatActivity.DIALOG_ID, dialogId);
                             startActivity(intent);
                         }
                     })
