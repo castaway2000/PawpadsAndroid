@@ -522,6 +522,7 @@ public class GroupEditActivity extends BaseActivity {
                 Intent intent = new Intent(GroupEditActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+                EventBus.getDefault().post(new UpdateChatEvent());
             }
 
             @Override

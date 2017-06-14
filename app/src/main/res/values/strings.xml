@@ -123,7 +123,7 @@
     <string name="accept_invite">Accept invite</string>
     <string name="reject_invite">Reject invite</string>
     <string name="user">User</string>
-    <string name="wants_to_add_you_to_friendlist">wants to add your to friends list</string>
+    <string name="wants_to_add_you_to_friendlist">wants to add you to friends list</string>
     <string name="you_have_blocked_this_user">You have blocked this user</string>
     <string name="channels">Channels</string>
     <string name="chat_admin">Chat admin</string>

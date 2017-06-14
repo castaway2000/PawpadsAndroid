@@ -41,6 +41,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     ChatsAdapter adapter;
     int currentPage = 0;
     private int currentUserId;
+    private boolean isLoading;
 
     public ChannelsFragment() {
         // Required empty public constructor
@@ -62,6 +63,10 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(isLoading) {
+                    binding.swipelayout.setRefreshing(false);
+                    return;
+                }
                 adapter.setShowInitialLoad(true);
                 adapter.clear();
                 currentPage = 0;
@@ -91,6 +96,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     }
 
     public void loadData() {
+        isLoading = true;
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setLimit(10);
         requestBuilder.setSkip(currentPage * 10);
@@ -108,10 +114,14 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
                     adapter.disableLoadMore();
                 }
                 binding.swipelayout.setRefreshing(false);
+                isLoading = false;
             }
 
             @Override
             public void onError(QBResponseException e) {
+                adapter.disableLoadMore();
+                binding.swipelayout.setRefreshing(false);
+                isLoading = false;
                 if (getContext()==null) return;
                 Util.onError(e, getContext());
             }
@@ -119,6 +129,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
     }
 
     public void reloadData() {
+        if(isLoading) return;
         adapter.setShowInitialLoad(true);
         adapter.clear();
         currentPage = 0;

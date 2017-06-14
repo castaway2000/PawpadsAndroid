@@ -41,6 +41,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     ChatsAdapter adapter;
     int currentPage = 0;
     private int currentUserId;
+    private boolean isLoading;
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -62,6 +63,10 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(isLoading) {
+                    binding.swipelayout.setRefreshing(false);
+                    return;
+                }
                 adapter.setShowInitialLoad(true);
                 adapter.clear();
                 currentPage = 0;
@@ -89,6 +94,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     }
 
     public void loadData() {
+        isLoading = true;
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setLimit(10);
         requestBuilder.setSkip(currentPage * 10);
@@ -111,20 +117,23 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                     adapter.disableLoadMore();
                 }
                 binding.swipelayout.setRefreshing(false);
+                isLoading = false;
             }
 
             @Override
             public void onError(QBResponseException e) {
-                if (getContext() == null) return;
-                Util.onError(e, getContext());
                 adapter.disableLoadMore();
                 binding.swipelayout.setRefreshing(false);
+                isLoading = false;
+                if (getContext() == null) return;
+                Util.onError(e, getContext());
 
             }
         });
     }
 
     public void reloadData() {
+        if(isLoading) return;
         adapter.setShowInitialLoad(true);
         adapter.clear();
         currentPage = 0;
