@@ -134,6 +134,7 @@ public class GroupEditActivity extends BaseActivity {
             binding.photoAvatarIcon.setEnabled(false);
             binding.groupTitleText.setEnabled(false);
             binding.groupTitleText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+            binding.save.setVisibility(View.GONE);
         }
         loadData();
     }
