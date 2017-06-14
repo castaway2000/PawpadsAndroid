@@ -139,7 +139,7 @@ public abstract class BaseActivity extends AppCompatActivity
             BaseActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    onChatMessage(null, qbChatMessage);
+                    onGroupChatMessage(null, qbChatMessage);
                     UserStatusHelper.setUserStatusByNewMessage(qbChatMessage.getSenderId());
                 }
             });

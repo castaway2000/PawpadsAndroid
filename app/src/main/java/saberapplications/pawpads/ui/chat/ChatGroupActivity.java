@@ -248,7 +248,6 @@ public class ChatGroupActivity extends BaseActivity {
             @Override
             public void run() {
                 binding.setGroupName(dialog.getName());
-                binding.privateGroupChatIc.setVisibility(dialog.getType() == QBDialogType.GROUP ? View.VISIBLE : View.GONE);
                 binding.addGroupMember.setVisibility(dialog.getType() == QBDialogType.GROUP ? View.VISIBLE : View.GONE);
             }
         });

@@ -132,6 +132,10 @@
     <string name="remove">Remove</string>
     <string name="you_are_not_logged_in">You are not logged in</string>
     <string name="something_wrong_try_again_later">Something went wrong, please try again later</string>
+    <string name="add_participant">Add participant</string>
+    <string name="create_chat_or_group">Create chat or group</string>
+    <string name="done">Done</string>
+    <string name="search">Search</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>

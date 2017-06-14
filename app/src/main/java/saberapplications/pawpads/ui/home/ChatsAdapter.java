@@ -62,7 +62,6 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
             binding.avatar.setImageResource(R.drawable.user_placeholder);
             binding.avatarLastMessage.setImageResource(R.drawable.user_placeholder);
             binding.avatarLastMessage.setVisibility(View.GONE);
-            binding.privateGroupChatIc.setVisibility(View.GONE);
 
             if(dialog.getType() == QBDialogType.GROUP || dialog.getType() == QBDialogType.PUBLIC_GROUP) {
                 try {
@@ -81,9 +80,6 @@ public class ChatsAdapter extends BaseListAdapter<QBDialog> {
                 }
                 binding.setBindStatusVisibility(false);
 
-                if(dialog.getType() == QBDialogType.GROUP) {
-                    binding.privateGroupChatIc.setVisibility(View.VISIBLE);
-                }
             } else {
                 loadUserAvatar(userId, binding.avatar, size);
 

@@ -67,23 +67,8 @@
                         android:gravity="left"
                         android:text="@{groupName}"
                         android:maxLength="20"
-                        android:textSize="@{groupName.length >20 ? 20 : 25 }"
+                        android:textSize="@{groupName.length >12 ? 20 : 25 }"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
-
-                    <ImageView
-                        android:id="@+id/private_group_chat_ic"
-                        android:layout_width="20dp"
-                        android:layout_height="40dp"
-                        android:padding="3dp"
-                        android:layout_marginLeft="10dp"
-                        android:scaleType="fitCenter"
-                        app:srcCompat="@drawable/lock"
-                        android:visibility="gone"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="5dp"
-                        android:layout_toRightOf="@+id/toolbar_title"
-                        android:layout_toEndOf="@+id/toolbar_title"
-                        />
 
                     <ImageView
                         android:id="@+id/edit_group_settings_ic"
@@ -95,8 +80,8 @@
                         android:onClick="@{ () -> activity.editGroupSettings()}"
                         android:layout_alignParentBottom="true"
                         android:layout_marginBottom="5dp"
-                        android:layout_toRightOf="@+id/private_group_chat_ic"
-                        android:layout_toEndOf="@+id/private_group_chat_ic"
+                        android:layout_toRightOf="@+id/toolbar_title"
+                        android:layout_toEndOf="@+id/toolbar_title"
                         />
 
                     <ImageView

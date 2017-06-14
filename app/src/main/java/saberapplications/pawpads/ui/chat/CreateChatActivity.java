@@ -120,6 +120,7 @@ public class CreateChatActivity extends BaseActivity implements BaseListAdapter.
 
         if(getIntent().hasExtra(DIALOG_USERS_LIST)) {
             existDialogUserIds = getIntent().getIntegerArrayListExtra(DIALOG_USERS_LIST);
+            binding.toolbarTitle.setText(getString(R.string.add_participant));
         }
         initSearchPanel();
     }

@@ -71,30 +71,13 @@
             android:layout_toEndOf="@id/avatar"
             android:orientation="vertical">
 
-            <LinearLayout
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <saberapplications.pawpads.views.FontTextView
-                    android:id="@+id/username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{username,default=USERNAME}"
-                    android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
-                    style="@style/list_title"/>
-
-                <ImageView
-                    android:id="@+id/private_group_chat_ic"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:padding="2dp"
-                    android:layout_marginLeft="10dp"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/lock_grey"
-                    />
-
-            </LinearLayout>
+                android:text="@{username,default=USERNAME}"
+                android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
+                style="@style/list_title"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"

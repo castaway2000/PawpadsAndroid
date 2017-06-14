@@ -36,7 +36,7 @@
                         android:gravity="start"
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
-                        android:text="Create chat or group"
+                        android:text="@string/create_chat_or_group"
                         android:textSize="20sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
@@ -45,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:text="Done"
+                        android:text="@string/done"
                         android:textSize="16sp"
                         app:typefaceAsset="Proxima_Nova_Regular.otf"
                         android:onClick="@{() -> activity.createChatOrAddMember()}"
@@ -89,7 +89,7 @@
                 android:id="@+id/search_autocomplete_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Search"
+                android:hint="@string/search"
                 android:textColorHint="#C8C8C8"
                 android:textColor="@android:color/black"
                 android:inputType="text"
