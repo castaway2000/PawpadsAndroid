@@ -412,7 +412,7 @@ public class ChatGroupActivity extends BaseActivity {
 
                     if (dialog == null) {
                         QBDialog groupDialog = new QBDialog();
-                        groupDialog.setName("Group chat");
+                        groupDialog.setName(getString(R.string.default_channel_name));
                         if (getIntent().hasExtra(DIALOG_GROUP_TYPE) &&
                                 getIntent().getSerializableExtra(DIALOG_GROUP_TYPE) == QBDialogType.PUBLIC_GROUP) {
                             groupDialog.setType(QBDialogType.PUBLIC_GROUP);
