@@ -102,18 +102,8 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
 
         chatRoster = getChatRoster();
 
-        Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(adapter.isShowInitialLoad()) {
-                    adapter.clear();
-                    currentPage = 0;
-                    loadData();
-                }
-            }
-        }, 500);
         EventBus.getDefault().register(this);
+        loadData();
     }
 
     private void showAddToFriendsRequestDialog(final QBUser user) {
@@ -423,7 +413,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         ArrayList<BaseListAdapter.DataItem<QBUser>> items = adapter.getItems();
         for(int i=0;i<items.size();i++){
             BaseListAdapter.DataItem<QBUser> item=items.get(i);
-            if (item.model.get().getId()==event.getUser().getId()){
+            if (item.model.get().getId().intValue()==event.getUser().getId().intValue()){
                 items.remove(i);
                 adapter.notifyItemRemoved(i);
             }
