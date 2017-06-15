@@ -330,6 +330,7 @@ public class ChatGroupActivity extends BaseActivity {
                 case GROUP_SETTINGS_CHANGE:
                     if (data.hasExtra(CHANGED_GROUP_NAME)) {
                         binding.setGroupName(data.getStringExtra(CHANGED_GROUP_NAME));
+                        dialog.setName(data.getStringExtra(CHANGED_GROUP_NAME));
                     }
                     break;
             }

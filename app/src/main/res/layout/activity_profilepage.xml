@@ -48,6 +48,11 @@
                 android:text="@{profile.hobby,default=UI_UX_DESIGNER}"
                 android:textColor="@color/primary"
                 android:textSize="20sp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:gravity="center_horizontal"
                 app:layout_gravity="center_horizontal"
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 

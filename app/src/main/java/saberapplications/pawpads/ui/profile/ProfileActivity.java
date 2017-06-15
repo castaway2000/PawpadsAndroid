@@ -372,9 +372,10 @@ public class ProfileActivity extends BaseActivity {
                                 }
                             }).show();
                 } else {
+                    setBlockedUI(true);
                     binding.userBackground.setImageResource(R.color.blocked_red);
                     binding.userStatusInfo.setVisibility(View.GONE);
-                    setBlockedUI(true);
+                    binding.userBlockedHeaderInfo.setVisibility(View.VISIBLE);
                     Toast.makeText(ProfileActivity.this, R.string.user_added_to_block_list, Toast.LENGTH_LONG).show();
                 }
             }
@@ -435,8 +436,16 @@ public class ProfileActivity extends BaseActivity {
             protected void onPostExecute(Boolean result) {
                 isBusy.set(false);
                 if (result) {
-                    binding.userBackground.setImageResource(R.drawable.app_bar_bg);
                     setBlockedUI(false);
+                    binding.userBlockedHeaderInfo.setVisibility(View.GONE);
+                    float density=getResources().getDisplayMetrics().density;
+                    if (profile.getBackgroundId()>0){
+                        int height=Math.round(density*147);
+                        int width=getResources().getDisplayMetrics().widthPixels;
+                        AvatarLoaderHelper.loadImage(profile.getBackgroundId(), binding.userBackground, width,height);
+                    } else {
+                        binding.userBackground.setImageResource(R.drawable.app_bar_bg);
+                    }
                     Toast.makeText(ProfileActivity.this, R.string.user_removed_from_block_list, Toast.LENGTH_LONG).show();
                 } else {
 
