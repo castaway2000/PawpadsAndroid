@@ -31,19 +31,22 @@ import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityFriendsBinding;
+import saberapplications.pawpads.events.FriendRemovedEvent;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
@@ -110,6 +113,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 }
             }
         }, 500);
+        EventBus.getDefault().register(this);
     }
 
     private void showAddToFriendsRequestDialog(final QBUser user) {
@@ -406,5 +410,23 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         e.printStackTrace();
         Crashlytics.logException(e);
         Util.showAlert(context, message);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFriendRemoved(FriendRemovedEvent event) {
+        ArrayList<BaseListAdapter.DataItem<QBUser>> items = adapter.getItems();
+        for(int i=0;i<items.size();i++){
+            BaseListAdapter.DataItem<QBUser> item=items.get(i);
+            if (item.model.get().getId()==event.getUser().getId()){
+                items.remove(i);
+                adapter.notifyItemRemoved(i);
+            }
+        }
     }
 }

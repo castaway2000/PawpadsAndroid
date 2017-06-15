@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -15,13 +14,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +31,6 @@ import com.quickblox.chat.QBPrivacyListsManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.QBRoster;
-import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBPrivacyList;
 import com.quickblox.chat.model.QBPrivacyListItem;
@@ -46,6 +41,7 @@ import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
@@ -64,6 +60,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityProfilepageBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableString;
+import saberapplications.pawpads.events.FriendRemovedEvent;
 import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
@@ -603,6 +600,7 @@ public class ProfileActivity extends BaseActivity {
                 Util.removeFriendOutInviteFromList(userId);
             }
             setFriendsUI();
+            EventBus.getDefault().post(new FriendRemovedEvent(qbUser));
         } catch (SmackException.NotConnectedException e) {
             handleOnError(ProfileActivity.this, e, getString(R.string.reconnect_message));
         } catch (SmackException.NotLoggedInException e) {
