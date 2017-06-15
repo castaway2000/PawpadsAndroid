@@ -14,11 +14,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +68,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         binding.swipelayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(isLoading) {
+                if (isLoading) {
                     binding.swipelayout.setRefreshing(false);
                     return;
                 }
@@ -74,6 +79,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                 binding.swipelayout.setRefreshing(false);
             }
         });
+        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -84,7 +90,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (adapter.getItemCount()<=1){
+                if (adapter.getItemCount() <= 1) {
                     currentPage = 0;
                     adapter.clear();
                     loadData();
@@ -133,7 +139,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     }
 
     public void reloadData() {
-        if(isLoading) return;
+        if (isLoading) return;
         adapter.setShowInitialLoad(true);
         adapter.clear();
         currentPage = 0;
@@ -168,5 +174,28 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
     public void createNewChatOrGroup() {
         Intent intent = new Intent(getContext(), CreateChatActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(QBChatMessage msg) {
+        ArrayList<BaseListAdapter.DataItem<QBDialog>> items = adapter.getItems();
+        for(int i=0;i<items.size();i++){
+            BaseListAdapter.DataItem<QBDialog> item=items.get(i);
+            QBDialog dlg=item.model.get();
+            if (dlg.getDialogId().equals(msg.getDialogId())){
+                dlg.setLastMessageDateSent(msg.getDateSent());
+                dlg.setLastMessage(msg.getBody());
+                items.remove(i);
+                items.add(0,item);
+                adapter.notifyItemMoved(i,0);
+                binding.listView.scrollToPosition(0);
+            }
+        }
     }
 }

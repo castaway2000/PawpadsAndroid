@@ -61,6 +61,7 @@ import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
@@ -558,10 +559,10 @@ public class ChatActivity extends BaseActivity {
             msg.setDialogId(dialog.getDialogId());
             msg.setProperty("send_to_chat", "1");
 
-
             try {
                 privateChat.sendMessage(msg);
                 displayChatMessage(msg);
+                EventBus.getDefault().post(msg);
             } catch (SmackException.NotConnectedException e) {
                 if (!isNetworkAvailable()) {
                     Util.onError(getString(R.string.verify_internet_connection), this);

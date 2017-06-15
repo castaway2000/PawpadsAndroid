@@ -15,11 +15,16 @@ import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChatManager;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -75,6 +80,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
             }
         });
         checkAmountOfCreatedChannels();
+        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -186,6 +192,29 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
             Util.setCreatedChannelsCount(Util.getCreatedChannelsCount()+1);
         } else {
             Toast.makeText(getActivity(), getActivity().getString(R.string.sorry_cannot_create_more_three_channels), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(QBChatMessage msg) {
+        ArrayList<BaseListAdapter.DataItem<QBDialog>> items = adapter.getItems();
+        for(int i=0;i<items.size();i++){
+            BaseListAdapter.DataItem<QBDialog> item=items.get(i);
+            QBDialog dlg=item.model.get();
+            if (dlg.getDialogId().equals(msg.getDialogId())){
+                dlg.setLastMessageDateSent(msg.getDateSent());
+                dlg.setLastMessage(msg.getBody());
+                items.remove(i);
+                items.add(0,item);
+                adapter.notifyItemMoved(i,0);
+                binding.listView.scrollToPosition(0);
+            }
         }
     }
 }

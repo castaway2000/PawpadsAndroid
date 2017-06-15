@@ -60,6 +60,7 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
@@ -614,6 +615,7 @@ public class ChatGroupActivity extends BaseActivity {
             try {
                 groupChat.sendMessage(msg);
                 displayChatMessage(msg);
+                EventBus.getDefault().post(msg);
             } catch (SmackException.NotConnectedException e) {
                 if (!isNetworkAvailable()) {
                     Util.onError(getString(R.string.verify_internet_connection), this);
