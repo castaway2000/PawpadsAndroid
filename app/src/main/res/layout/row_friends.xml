@@ -90,16 +90,16 @@
             android:id="@+id/new_friend_request_indicator"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:visibility="gone"
-            android:scaleType="centerCrop"
-            android:background="@drawable/red_circle"
-            app:riv_mutate_background="true"
-            app:riv_oval="true"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="25dp"
             android:layout_marginRight="25dp"
-            android:layout_marginEnd="25dp" />
+            android:background="@drawable/red_circle"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:riv_mutate_background="true"
+            app:riv_oval="true" />
 
     </RelativeLayout>
 </layout>

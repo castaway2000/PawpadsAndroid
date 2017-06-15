@@ -210,9 +210,11 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
             if (dlg.getDialogId().equals(msg.getDialogId())){
                 dlg.setLastMessageDateSent(msg.getDateSent());
                 dlg.setLastMessage(msg.getBody());
+                dlg.setLastMessageUserId(msg.getSenderId());
                 items.remove(i);
                 items.add(0,item);
-                adapter.notifyItemMoved(i,0);
+                adapter.notifyItemChanged(i);
+                adapter.notifyItemChanged(0);
                 binding.listView.scrollToPosition(0);
             }
         }
