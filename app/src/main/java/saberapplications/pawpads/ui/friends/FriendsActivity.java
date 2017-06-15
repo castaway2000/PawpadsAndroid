@@ -197,6 +197,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
     }
 
     public void loadData() {
+        if (isLoading) return;
         isLoading = true;
         ArrayList<Integer> usersIds = new ArrayList<>();
         if(chatRoster != null) {
@@ -246,14 +247,14 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 @Override
                 public void onSuccess(ArrayList<QBUser> users, Bundle params) {
                     if (adapter==null) return;
+                    if (users.size() == 0 || users.size() < 10) {
+                        adapter.disableLoadMore();
+                    }
                     if (users.size() > 0) {
                         adapter.addItems(users);
                         currentPage++;
                     }
 
-                    if (users.size() == 0 || users.size() < 10) {
-                        adapter.disableLoadMore();
-                    }
                     binding.swipelayout.setRefreshing(false);
                     isLoading = false;
                 }
