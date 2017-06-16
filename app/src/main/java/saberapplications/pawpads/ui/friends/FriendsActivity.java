@@ -62,6 +62,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
     AlertDialog requestDialog;
     private boolean isLoading;
     private int newUserInviteId;
+    boolean skipNextUpdate=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,10 +162,9 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         binding.swipelayout.setRefreshing(false);
     }
 
-    private void acceptRequest(int userId) {
+    private void acceptRequest(final int userId) {
         try {
             chatRoster.confirmSubscription(userId);
-            loadDataAfterChanges();
         } catch (SmackException.NotConnectedException e) {
             handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
         } catch (SmackException.NotLoggedInException e) {
@@ -178,13 +178,21 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
 
     private void rejectRequest(int userId) {
         try {
+            skipNextUpdate=true;
             chatRoster.reject(userId);
             chatRoster.unsubscribe(userId);
             if (chatRoster.getEntry(userId) != null && chatRoster.contains(userId)) {
                 chatRoster.removeEntry(chatRoster.getEntry(userId));
             }
             if(newUserInviteId == userId) newUserInviteId = 0;
-            loadDataAfterChanges();
+            for(int i=0;i<adapter.getItems().size();i++){
+                BaseListAdapter.DataItem<QBUser> item=adapter.getItems().get(i);
+                if(item.model.get().getId().intValue()==userId){
+                    adapter.getItems().remove(i);
+                    adapter.notifyItemRemoved(i);
+                }
+            }
+
         } catch (SmackException.NotConnectedException e) {
             handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
         } catch (XMPPException e) {
@@ -351,14 +359,22 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             }
 
             @Override
-            public void entriesUpdated(Collection<Integer> userIds) {
+            public void entriesUpdated(final Collection<Integer> userIds) {
                 Log.d(TAG, "entriesUpdated " + userIds.toString());
                 try {
                     chatRoster.reload();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            loadDataAfterChanges();
+                            ArrayList<BaseListAdapter.DataItem<QBUser>> items = adapter.getItems();
+                            for (int i=0;i<items.size();i++){
+                                BaseListAdapter.DataItem<QBUser> item=items.get(i);
+                                for (Integer userId:userIds){
+                                    if (item.model.get().getId().intValue()==userId.intValue()){
+                                        adapter.notifyItemChanged(i);
+                                    }
+                                }
+                            }
                         }
                     });
                 } catch (SmackException.NotConnectedException e) {
@@ -417,7 +433,11 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             if (item.model.get().getId().intValue()==event.getUser().getId().intValue()){
                 items.remove(i);
                 adapter.notifyItemRemoved(i);
+                if (newUserInviteId==event.getUser().getId().intValue()){
+                    newUserInviteId=0;
+                }
             }
         }
+
     }
 }

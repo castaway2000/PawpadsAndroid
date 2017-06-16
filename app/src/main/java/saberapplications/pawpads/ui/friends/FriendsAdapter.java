@@ -59,6 +59,9 @@ public class FriendsAdapter extends BaseListAdapter<QBUser> {
                     chatRoster.getEntry(userId).getStatus() == null) {
                 binding.newFriendRequest.setVisibility(View.VISIBLE);
                 binding.newFriendRequestIndicator.setVisibility(View.VISIBLE);
+            }else if (chatRoster != null && !chatRoster.contains(userId)){
+                binding.newFriendRequest.setVisibility(View.VISIBLE);
+                binding.newFriendRequestIndicator.setVisibility(View.VISIBLE);
             }
 
             binding.avatar.setImageResource(R.drawable.user_placeholder);
