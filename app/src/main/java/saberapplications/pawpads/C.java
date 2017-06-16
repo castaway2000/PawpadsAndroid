@@ -33,4 +33,5 @@ public class C {
     public static final String CHAT_MSG_STICKER_PROPERTY = "STICKER";
     public static final String CREATED_CHANNELS_COUNT = "CREATED_CHANNELS_COUNT";
     public static final String FRIEND_OUT_INVITES_LIST = "FRIEND_OUT_INVITES_LIST";
+    public static final String FRIEND_ACCEPTED_LIST = "FRIEND_ACCEPTED_LIST";
 }

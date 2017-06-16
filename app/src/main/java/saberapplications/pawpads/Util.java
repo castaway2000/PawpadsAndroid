@@ -160,6 +160,27 @@ public class Util {
         editor.apply();
     }
 
+
+    public static Set<String> getFriendAcceptedList() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getStringSet(C.FRIEND_ACCEPTED_LIST, new HashSet<String>());
+    }
+
+    public static void addFriendAcceptedList(int userId) {
+        Set<String> outInvites = getFriendAcceptedList();
+        outInvites.add(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_ACCEPTED_LIST, outInvites);
+        editor.apply();
+    }
+    public static void removeFriendAcceptedList(int userId) {
+        Set<String> outInvites = getFriendAcceptedList();
+        outInvites.remove(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_ACCEPTED_LIST, outInvites);
+        editor.apply();
+    }
+
     public static void removeFriendOutInviteFromList(int userId) {
         Set<String> outInvites = getFriendOutInvitesList();
         outInvites.remove(String.valueOf(userId));
