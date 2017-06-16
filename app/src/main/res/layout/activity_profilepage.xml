@@ -70,6 +70,7 @@
                 app:typefaceAsset="Proxima_Nova_Regular.otf" />
 
             <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/about"
                 android:layout_width="wrap_content"
                 android:gravity="top|center_horizontal"
                 android:text="@{profile.about}"
@@ -81,7 +82,10 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginRight="15dp"
-                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:maxLines = "5"
+                android:scrollbars = "vertical"
+                />
 
             <saberapplications.pawpads.views.FontTextView
                 android:id="@+id/delete_from_friends"

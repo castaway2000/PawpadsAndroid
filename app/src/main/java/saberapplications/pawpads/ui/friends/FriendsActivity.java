@@ -375,7 +375,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         };
 
         // Do this after success Chat login
-        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.manual, subscriptionListener);
+        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, subscriptionListener);
         if(chatRoster == null) return null;
         chatRoster.addRosterListener(rosterListener);
 

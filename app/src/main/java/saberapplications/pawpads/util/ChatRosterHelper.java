@@ -8,9 +8,6 @@ import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBPresence;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-
 import java.util.Collection;
 
 /**
@@ -51,7 +48,7 @@ public class ChatRosterHelper {
         };
 
         // Do this after success Chat login
-        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.manual, subscriptionListener);
+        QBRoster chatRoster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, subscriptionListener);
         if(chatRoster == null) return null;
         chatRoster.addRosterListener(rosterListener);
         return chatRoster;
