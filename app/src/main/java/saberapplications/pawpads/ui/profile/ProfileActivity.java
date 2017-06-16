@@ -166,7 +166,7 @@ public class ProfileActivity extends BaseActivity {
                     requestBuilder.eq("blocked_user", currentQBUser.getId());
                     blocks = QBCustomObjects.getObjects("BlockList", requestBuilder, new Bundle());
                     if (!isOwnProfile()) isBlockedByOther.set(blocks.size() > 0);
-                    
+
                 } catch (QBResponseException e) {
                     e.printStackTrace();
                     this.e = e;
