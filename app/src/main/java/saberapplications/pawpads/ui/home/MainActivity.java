@@ -655,8 +655,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.POSTING)
     public void onChatMessageEvent(UpdateChatEvent event) {
-        if(chatsFragment.isVisible()) chatsFragment.reloadData();
-        if(channelsFragment.isVisible()) channelsFragment.reloadData();
+        //if(chatsFragment.isVisible()) chatsFragment.reloadData();
+        //if(channelsFragment.isVisible()) channelsFragment.reloadData();
     }
 }
 

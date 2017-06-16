@@ -608,9 +608,8 @@ public class ChatGroupActivity extends BaseActivity {
             //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
 
             msg.setProperty("save_to_history", "1");
+            msg.setProperty("send_to_chat","1");
             msg.setDialogId(dialog.getDialogId());
-            //msg.setProperty("send_to_chat", "1");
-
 
             try {
                 groupChat.sendMessage(msg);

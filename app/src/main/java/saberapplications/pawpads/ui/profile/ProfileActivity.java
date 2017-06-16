@@ -477,7 +477,6 @@ public class ProfileActivity extends BaseActivity {
             binding.deleteFromFriends.setVisibility(View.GONE);
             binding.userStatusInfo.setVisibility(View.GONE);
         }
-        binding.deleteFromFriends.setVisibility(View.VISIBLE);
         binding.gridLayout.requestLayout();
     }
 

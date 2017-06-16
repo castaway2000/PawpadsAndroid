@@ -81,6 +81,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 qbPrivateChat.addMessageListener(new QBMessageListener<QBPrivateChat>() {
                     @Override
                     public void processMessage(final QBPrivateChat qbPrivateChat, final QBChatMessage qbChatMessage) {
+                        EventBus.getDefault().post(qbChatMessage);
                         if(isFinishing()) return;
                         BaseActivity.this.runOnUiThread(new Runnable() {
                             @Override
@@ -110,6 +111,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 @Override
                 public void processMessage(final QBGroupChat qbGroupChat, final QBChatMessage qbChatMessage) {
                     if(isFinishing()) return;
+                    EventBus.getDefault().post(qbChatMessage);
                     BaseActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -314,6 +316,8 @@ public abstract class BaseActivity extends AppCompatActivity
                             list.setActiveList(true);
                         }
                     }
+                    QBChatService.getInstance().getPrivateChatManager().addPrivateChatManagerListener(chatListener);
+                    QBChatService.getInstance().getGroupChatManager().addGroupChatManagerListener(groupChatListener);
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 } catch (XMPPException.XMPPErrorException e) {
