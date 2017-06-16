@@ -221,8 +221,15 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
                 entries = chatRoster.getEntries();
             }
             Log.d(TAG, "Collection<QBRosterEntry> entries " + entries.toString());
+            Set<String> acceptedUsers = Util.getFriendAcceptedList();
             for(QBRosterEntry entry : entries) {
-                usersIds.add(entry.getUserId());
+                if (acceptedUsers.contains(entry.getUserId().toString())
+                        && entry.getType() == RosterPacket.ItemType.none
+                        && entry.getStatus() == null) {
+                    rejectRequest(entry.getUserId());
+                }else {
+                    usersIds.add(entry.getUserId());
+                }
             }
         }
 
