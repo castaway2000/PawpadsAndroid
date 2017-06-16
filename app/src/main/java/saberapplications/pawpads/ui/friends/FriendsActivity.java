@@ -169,6 +169,7 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
         try {
             chatRoster.confirmSubscription(userId);
             Util.addFriendAcceptedList(userId);
+            Util.removeFriendOutInviteFromList(userId);
         } catch (SmackException.NotConnectedException e) {
             handleOnError(FriendsActivity.this, e, getString(R.string.reconnect_message));
         } catch (SmackException.NotLoggedInException e) {
@@ -222,12 +223,19 @@ public class FriendsActivity extends BaseActivity implements BaseListAdapter.Cal
             }
             Log.d(TAG, "Collection<QBRosterEntry> entries " + entries.toString());
             Set<String> acceptedUsers = Util.getFriendAcceptedList();
+            Set<String> invites = Util.getFriendOutInvitesList();
             for(QBRosterEntry entry : entries) {
                 if (acceptedUsers.contains(entry.getUserId().toString())
                         && entry.getType() == RosterPacket.ItemType.none
                         && entry.getStatus() == null) {
                     rejectRequest(entry.getUserId());
-                }else {
+                } else if (invites.contains(entry.getUserId().toString())
+                        && entry.getStatus()!=null
+                        && entry.getStatus().name().equals("subscribe")
+                        ){
+                    acceptRequest(entry.getUserId());
+                    usersIds.add(entry.getUserId());
+                }else{
                     usersIds.add(entry.getUserId());
                 }
             }
