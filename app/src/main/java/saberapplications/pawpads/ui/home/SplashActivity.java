@@ -22,15 +22,17 @@ import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.ui.login.LoginActivity;
+import saberapplications.pawpads.views.NetworkStateChangedHelper;
 
 public class SplashActivity extends AppCompatActivity {
 
     boolean returnResult;
     private SharedPreferences prefs;
-
+    NetworkStateChangedHelper networkStateChangedHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        networkStateChangedHelper=new NetworkStateChangedHelper(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_splash);
         if (getIntent() != null) {
@@ -52,6 +54,10 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if (!networkStateChangedHelper.isConnected()){
+            networkStateChangedHelper.checkNeworkConnection();
+            return;
+        }
         QBAuth.createSession(new QBEntityCallback<QBSession>() {
             @Override
             public void onSuccess(QBSession qbSession, Bundle bundle) {
