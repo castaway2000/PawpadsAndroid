@@ -77,7 +77,10 @@ public class Util {
     public static void onError(QBResponseException e, Context context) {
         Crashlytics.getInstance().logException(e);
         String message =  e.getLocalizedMessage();
-        if(!message.contains("Subscription with such UDID already exists")){
+        if(message.contains("Subscription with such UDID already exists")) return;
+        if (e.getLocalizedMessage().contains("timeout")){
+            showAlert(context,context.getString(R.string.error_timeout));
+        }else {
             showAlert(context, e.getLocalizedMessage());
         }
     }

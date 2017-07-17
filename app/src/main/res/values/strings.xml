@@ -138,6 +138,7 @@
     <string name="search">Search</string>
     <string name="default_channel_name">Channel</string>
     <string name="interner_not_connecteed">Unable connect to server. Please check internet connection</string>
+    <string name="error_timeout">Unable connect to server. Please check your internet connection and try again.</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
