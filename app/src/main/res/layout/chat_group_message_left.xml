@@ -43,6 +43,7 @@
                 app:riv_mutate_background="true"
                 app:riv_oval="true"
                 android:src="@drawable/user_placeholder"
+                android:onClick="@{ ()-> holder.openUserProfile()}"
                 />
 
             <ImageView

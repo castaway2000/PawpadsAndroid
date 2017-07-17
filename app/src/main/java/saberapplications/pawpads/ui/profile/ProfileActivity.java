@@ -96,7 +96,7 @@ public class ProfileActivity extends BaseActivity {
 
         progressMessage.set(getString(R.string.loading));
         isBlockedView = (TextView) findViewById(R.id.is_blocked);
-        qbUser = (QBUser) getIntent().getSerializableExtra(C.QB_USER);
+        qbUser = (QBUser) getIntent().getSerializableExtra( C.QB_USER);
         binding.setUser(qbUser);
 
         initChatRoster();

@@ -1,6 +1,7 @@
 package saberapplications.pawpads.ui.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
 import com.quickblox.customobjects.model.QBCustomObject;
@@ -36,9 +38,11 @@ import java.util.Iterator;
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
 import saberapplications.pawpads.C;
 import saberapplications.pawpads.R;
+import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ChatGroupMessageLeftBinding;
 import saberapplications.pawpads.databinding.ChatGroupMessageRightBinding;
 import saberapplications.pawpads.service.FileDownloadService;
+import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.views.BaseChatAdapter;
 import saberapplications.pawpads.views.BaseListAdapter;
@@ -51,7 +55,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
     private Context mContext;
     private LayoutInflater mInflater;
     private static int currentUserId;
-    private ArrayMap<Integer,QBUser> userCache=new ArrayMap<>();
+    private ArrayMap<Integer, QBUser> userCache = new ArrayMap<>();
 
     public ChatGroupMessagesAdapter(Context context, int userId) {
         mContext = context;
@@ -119,7 +123,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
         }
 
         protected void checkIsUserBlocked(final int recipientId, final View view) {
-            if(view == null) return;
+            if (view == null) return;
             new AsyncTask<Void, Void, Boolean>() {
 
                 @Override
@@ -136,12 +140,14 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                     }
                     return (blocks != null && blocks.size() > 0);
                 }
+
                 @Override
                 protected void onPostExecute(Boolean result) {
-                    if(result) view.setVisibility(View.VISIBLE);
+                    if (result) view.setVisibility(View.VISIBLE);
                 }
             }.execute();
         }
+
     }
 
     public static class HolderRight extends ChatGroupMessagesAdapter.MessageHolder {
@@ -175,9 +181,9 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 binding.text.setBackgroundResource(R.drawable.message_right_last);
                 binding.setIsLast(true);
             }
-            if(binding.getIsLast()) {
+            if (binding.getIsLast()) {
                 int userId = item.getSenderId();
-                float d= view.getResources().getDisplayMetrics().density;
+                float d = view.getResources().getDisplayMetrics().density;
                 binding.avatarGroupUser.setVisibility(View.VISIBLE);
                 loadUserAvatar(userId, binding.avatarGroupUser, Math.round(25 * d));
                 checkIsUserBlocked(item.getSenderId(), binding.blockedStatus);
@@ -213,7 +219,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
 
                 String url = item.getProperty(C.CHAT_MSG_STICKER_PROPERTY).toString();
                 Glide.clear(binding.thumb);
-                if (url.matches("\\.gif")){
+                if (url.matches("\\.gif")) {
                     Glide.with(itemView.getContext())
                             .load(Uri.parse(url)).asGif()
                             .listener(new RequestListener<Uri, GifDrawable>() {
@@ -234,7 +240,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                                 }
                             })
                             .into(binding.thumb);
-                }else {
+                } else {
                     Glide.with(itemView.getContext())
                             .load(Uri.parse(url))
                             .listener(new RequestListener<Uri, GlideDrawable>() {
@@ -264,6 +270,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
     public static class HolderLeft extends ChatGroupMessagesAdapter.MessageHolder {
 
         ChatGroupMessageLeftBinding binding;
+        private QBChatMessage item;
 
         protected HolderLeft(View v, ChatGroupMessagesAdapter adapter) {
             super(v, adapter);
@@ -273,7 +280,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
 
         @Override
         public void showData(DataItem<QBChatMessage> model, int position) {
-            QBChatMessage item = model.model.get();
+            item = model.model.get();
             Date date = new Date(item.getDateSent() * 1000);
             binding.setDate(adapter.formatDate(date));
             binding.setMessage(item.getBody());
@@ -293,9 +300,9 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 binding.setIsLast(true);
 
             }
-            if(binding.getIsLast()) {
+            if (binding.getIsLast()) {
                 int userId = item.getSenderId();
-                float d= view.getResources().getDisplayMetrics().density;
+                float d = view.getResources().getDisplayMetrics().density;
                 binding.avatarGroupUser.setVisibility(View.VISIBLE);
                 loadUserAvatar(userId, binding.avatarGroupUser, Math.round(25 * d));
                 checkIsUserBlocked(item.getSenderId(), binding.blockedStatus);
@@ -350,6 +357,27 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                         })
                         .into(binding.thumb);
             }
+        }
+
+        public void openUserProfile() {
+            final int userId = item.getSenderId();
+            QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
+            pagedRequestBuilder.setPage(1);
+            pagedRequestBuilder.setPerPage(1);
+            QBUsers.getUsersByIDs(new ArrayList<Integer>() {{
+                add(userId);
+            }}, pagedRequestBuilder, new QBEntityCallback<ArrayList<QBUser>>() {
+                @Override
+                public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
+                    Intent intent=new Intent(itemView.getContext(), ProfileActivity.class);
+                    intent.putExtra(C.QB_USER,qbUsers.get(0));
+                    itemView.getContext().startActivity(intent);
+                }
+                @Override
+                public void onError(QBResponseException e) {
+                    Util.onError(e, itemView.getContext());
+                }
+            });
         }
     }
 
