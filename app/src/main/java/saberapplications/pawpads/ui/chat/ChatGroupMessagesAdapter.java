@@ -3,6 +3,7 @@ package saberapplications.pawpads.ui.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -42,8 +43,10 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ChatGroupMessageLeftBinding;
 import saberapplications.pawpads.databinding.ChatGroupMessageRightBinding;
 import saberapplications.pawpads.service.FileDownloadService;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.OtherUsersLocationsCache;
 import saberapplications.pawpads.views.BaseChatAdapter;
 import saberapplications.pawpads.views.BaseListAdapter;
 
@@ -79,6 +82,11 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
     public boolean getMessageSelf(int position) {
         QBChatMessage message = items.get(position).model.get();
         return message.getSenderId() == currentUserId;
+    }
+    public boolean groupWithPrevMessage(int position,QBChatMessage currentMessage){
+        QBChatMessage prevMessage = items.get(position).model.get();
+        long timeDiff=currentMessage.getDateSent()-prevMessage.getDateSent();
+        return prevMessage.getSenderId().equals(currentMessage.getSenderId()) && timeDiff<C.DAY;
     }
 
     public static class MessageHolder extends DataHolder<QBChatMessage> {
@@ -170,7 +178,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.avatarGroupUser.setVisibility(View.INVISIBLE);
             binding.blockedStatus.setVisibility(View.GONE);
             if (position > 0) {
-                if (adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_right);
                     binding.setIsLast(false);
                 } else {
@@ -288,7 +296,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.avatarGroupUser.setVisibility(View.INVISIBLE);
             binding.blockedStatus.setVisibility(View.GONE);
             if (position > 0) {
-                if (!adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_left);
                     binding.setIsLast(false);
                 } else {
@@ -329,6 +337,25 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 attachment = null;
                 binding.setShowThumbNail(false);
             }
+            final Location currentLocation= UserLocationService.getLastLocation();
+            if(item.getProperty(C.LATITUDE)!=null && currentLocation!=null){
+                Location messageLocation=new Location("");
+                messageLocation.setLatitude(Double.parseDouble((String) item.getProperty(C.LATITUDE)));
+                messageLocation.setLongitude(Double.parseDouble((String) item.getProperty(C.LONGITUDE)));
+                binding.setDistance(
+                        Util.formatDistance(currentLocation.distanceTo(messageLocation))
+                );
+            }else if(currentLocation!=null){
+                OtherUsersLocationsCache.get(item.getSenderId()).callback(new OtherUsersLocationsCache.Callback() {
+                    @Override
+                    public void location(Location location) {
+                        binding.setDistance(
+                            Util.formatDistance(currentLocation.distanceTo(location))
+                        );
+                    }
+                });
+            }
+
             if (item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
                 binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                 binding.setShowThumbNail(true);

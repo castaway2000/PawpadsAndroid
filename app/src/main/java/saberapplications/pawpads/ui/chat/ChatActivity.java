@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -89,6 +90,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
@@ -558,7 +560,10 @@ public class ChatActivity extends BaseActivity {
             msg.setRecipientId(recipient.getId());
             msg.setDialogId(dialog.getDialogId());
             msg.setProperty("send_to_chat", "1");
-
+            Location location=UserLocationService.getLastLocation();
+            if (location!=null){
+                msg.setProperty(C.LATITUDE, String.valueOf(location.getLatitude()));
+                msg.setProperty(C.LONGITUDE, String.valueOf(location.getLongitude()));            }
             try {
                 privateChat.sendMessage(msg);
                 displayChatMessage(msg);

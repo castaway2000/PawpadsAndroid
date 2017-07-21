@@ -18,6 +18,7 @@ import saberapplications.pawpads.UserStatusHelper;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.RowNearByBinding;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
+import saberapplications.pawpads.util.OtherUsersLocationsCache;
 import saberapplications.pawpads.views.BaseListAdapter;
 
 /**
@@ -103,6 +104,7 @@ public class NearByAdapter extends BaseListAdapter<NearByAdapter.NearByItem> {
             Location userLocation = new Location("");
             userLocation.setLatitude(qbLocation.getLatitude());
             userLocation.setLongitude(qbLocation.getLongitude());
+            OtherUsersLocationsCache.put(data.model.get().getLocation().getUserId(),userLocation);
             return Util.formatDistance(userLocation.distanceTo(adapter.getLocation()));
 
         }

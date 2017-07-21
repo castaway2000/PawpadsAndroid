@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -88,6 +89,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatGroupBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.GroupEditActivity;
 import saberapplications.pawpads.util.FileUtil;
@@ -151,7 +153,7 @@ public class ChatGroupActivity extends BaseActivity {
             ChatGroupActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(currentUserId != null && qbChatMessage.getSenderId().intValue() != currentUserId.intValue()) {
+                    if (currentUserId != null && qbChatMessage.getSenderId().intValue() != currentUserId.intValue()) {
                         displayChatMessage(qbChatMessage);
                     }
                 }
@@ -159,7 +161,7 @@ public class ChatGroupActivity extends BaseActivity {
         }
 
         @Override
-        public void processError(final QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage){
+        public void processError(final QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage) {
             Util.onError(error, ChatGroupActivity.this);
         }
     };
@@ -220,7 +222,7 @@ public class ChatGroupActivity extends BaseActivity {
             userIdsList = savedInstanceState.getIntegerArrayList(RECIPIENT_IDS_LIST);
             currentUserId = savedInstanceState.getInt(CURRENT_USER_ID, 0);
         }
-        if(dialog != null && dialog.getType() != null && dialog.getType() == QBDialogType.GROUP) {
+        if (dialog != null && dialog.getType() != null && dialog.getType() == QBDialogType.GROUP) {
             initForGroupChat();
         }
 
@@ -322,7 +324,7 @@ public class ChatGroupActivity extends BaseActivity {
                         sendSticker(imoji.getStandardFullSizeUri());
                     }
                     break;
-                case ADD_NEW_GROUP_MEMBER :
+                case ADD_NEW_GROUP_MEMBER:
                     if (data.hasExtra(NEW_ADDED_USERS_LIST)) {
                         selectedNewGroupUserList = data.getIntegerArrayListExtra(NEW_ADDED_USERS_LIST);
                         addNewMembers();
@@ -344,8 +346,8 @@ public class ChatGroupActivity extends BaseActivity {
     private void addNewMembers() {
         QBGroupChatManager groupChatManager = QBChatService.getInstance().getGroupChatManager();
         QBDialogRequestBuilder requestBuilder = new QBDialogRequestBuilder();
-        if(selectedNewGroupUserList != null) {
-            for(Integer id : selectedNewGroupUserList) {
+        if (selectedNewGroupUserList != null) {
+            for (Integer id : selectedNewGroupUserList) {
                 requestBuilder.addUsers(id);
             }
 
@@ -401,10 +403,10 @@ public class ChatGroupActivity extends BaseActivity {
 
                             Bundle bundle = new Bundle();
                             ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.GROUP, requestBuilder, bundle);
-                            if(dialogs.size() == 0) return null;
+                            if (dialogs.size() == 0) return null;
                             dialog = dialogs.get(0);
 
-                            if(userIdsList == null && dialog != null && dialog.getOccupants() != null) {
+                            if (userIdsList == null && dialog != null && dialog.getOccupants() != null) {
                                 userIdsList = (ArrayList<Integer>) dialog.getOccupants();
                             }
                         }
@@ -472,7 +474,7 @@ public class ChatGroupActivity extends BaseActivity {
                     return;
                 }
                 if (!isActivityReopened) {
-                    if(chatMessages == null) chatMessages = new ArrayList<>();
+                    if (chatMessages == null) chatMessages = new ArrayList<>();
                     chatAdapter.addItems(chatMessages);
                     if (chatMessages.size() < messagesPerPage) {
                         chatAdapter.disableLoadMore();
@@ -490,7 +492,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     private void checkIsOpenedFirst() {
-        if(getIntent().hasExtra(IS_FIRST_OPENED) &&
+        if (getIntent().hasExtra(IS_FIRST_OPENED) &&
                 getIntent().getBooleanExtra(IS_FIRST_OPENED, false)) {
             Intent intent = new Intent(ChatGroupActivity.this, GroupEditActivity.class);
             intent.putExtra(GroupEditActivity.DIALOG, dialog);
@@ -499,7 +501,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     private void notifyGroupUsers(List<Integer> list) {
-        if(list == null || list.size() == 0) return;
+        if (list == null || list.size() == 0) return;
         for (Integer userID : list) {
             QBChatMessage chatMessage = createChatNotificationForGroupChatCreation(dialog);
             chatMessage.setRecipientId(userID);
@@ -507,7 +509,7 @@ public class ChatGroupActivity extends BaseActivity {
                 systemMessagesManager.sendSystemMessage(chatMessage);
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
-            } catch (IllegalStateException ee){
+            } catch (IllegalStateException ee) {
                 ee.printStackTrace();
             }
         }
@@ -608,8 +610,13 @@ public class ChatGroupActivity extends BaseActivity {
             //msg.setProperty("date_sent",String.valueOf(sdf.format(new Date()))+"");
 
             msg.setProperty("save_to_history", "1");
-            msg.setProperty("send_to_chat","1");
+            msg.setProperty("send_to_chat", "1");
             msg.setDialogId(dialog.getDialogId());
+            Location location = UserLocationService.getLastLocation();
+            if (location != null) {
+                msg.setProperty(C.LATITUDE, String.valueOf(location.getLatitude()));
+                msg.setProperty(C.LONGITUDE, String.valueOf(location.getLongitude()));
+            }
 
             try {
                 groupChat.sendMessage(msg);
@@ -752,7 +759,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     public void onClickImoji() {
-        if(binding.getShowGiphy()) onClickGiphy();
+        if (binding.getShowGiphy()) onClickGiphy();
         if (mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
             hideSoftKeyboard();
             mStickersContainer.addView(mStickersWidget);
@@ -836,7 +843,7 @@ public class ChatGroupActivity extends BaseActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"),code);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), code);
     }
 
     public void loadData() {
@@ -957,18 +964,18 @@ public class ChatGroupActivity extends BaseActivity {
     public void openStickerEditor(Uri uri) {
         isExternalDialogOpened = true;
         final String path = FileUtil.getPath(this, uri);
-        Bitmap bitmap=null;
+        Bitmap bitmap = null;
         if (path == null) {
             try {
-                bitmap=MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else {
-            bitmap=BitmapFactory.decodeFile(path);
+        } else {
+            bitmap = BitmapFactory.decodeFile(path);
         }
 
-        if (bitmap==null){
+        if (bitmap == null) {
             Util.onError(getString(R.string.unable_to_get_file), this);
             isSendingMessage.set(false);
         }
@@ -978,7 +985,7 @@ public class ChatGroupActivity extends BaseActivity {
     }
 
     private void getUsers(List<Integer> userIdsList) {
-        if(userIdsList == null || userIdsList.size() == 0) return;
+        if (userIdsList == null || userIdsList.size() == 0) return;
 
         QBPagedRequestBuilder pagedRequestBuilder = new QBPagedRequestBuilder();
         QBUsers.getUsersByIDs(userIdsList, pagedRequestBuilder, new QBEntityCallback<ArrayList<QBUser>>() {
@@ -991,7 +998,7 @@ public class ChatGroupActivity extends BaseActivity {
 
             @Override
             public void onError(QBResponseException errors) {
-                if (getApplicationContext()==null) return;
+                if (getApplicationContext() == null) return;
                 Util.onError(errors, getApplicationContext());
             }
         });

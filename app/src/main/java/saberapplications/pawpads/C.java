@@ -34,4 +34,7 @@ public class C {
     public static final String CREATED_CHANNELS_COUNT = "CREATED_CHANNELS_COUNT";
     public static final String FRIEND_OUT_INVITES_LIST = "FRIEND_OUT_INVITES_LIST";
     public static final String FRIEND_ACCEPTED_LIST = "FRIEND_ACCEPTED_LIST";
+    public static final String LATITUDE="latitude";
+    public static final String LONGITUDE="longitude";
+    public static final long DAY = 24 * 3600;
 }

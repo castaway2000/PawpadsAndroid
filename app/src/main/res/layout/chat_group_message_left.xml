@@ -10,6 +10,9 @@
             name="date"
             type="String" />
         <variable
+            name="distance"
+            type="String" />
+        <variable
             name="isLast"
             type="boolean"/>
         <variable
@@ -104,16 +107,32 @@
 
         </LinearLayout>
         <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/time_text"
             android:layout_below="@id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typefaceAsset="Proxima_Nova_Regular.otf"
             android:textColor="#88393939"
-            android:text="@{date}"
+            android:text='@{date,default="12/10/2017"}'
             android:textSize="13sp"
             android:layout_marginLeft="22dp"
             android:layout_marginTop="-2dp"
             android:visibility="@{isLast}"
-            android:id="@+id/time_text" />
+            />
+
+        <saberapplications.pawpads.views.FontTextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:textColor="#88393939"
+            android:text='@{distance, default="103_feet" }'
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/time_text"
+            android:visibility="@{isLast}"
+            android:id="@+id/distance"
+
+            />
     </RelativeLayout>
 </layout>

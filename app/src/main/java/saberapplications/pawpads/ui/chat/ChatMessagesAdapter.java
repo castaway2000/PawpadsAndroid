@@ -104,7 +104,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.setMessage(item.getBody());
             binding.setDate(adapter.formatDate(date));
             if (position > 0) {
-                if (adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_right);
                     binding.setIsLast(false);
                 } else {
@@ -210,7 +210,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.setDate(adapter.formatDate(date));
             binding.setMessage(item.getBody());
             if (position > 0) {
-                if (!adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_left);
                     binding.setIsLast(false);
                 } else {
@@ -290,5 +290,10 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
         }
 
 
+    }
+    public boolean groupWithPrevMessage(int position,QBChatMessage currentMessage){
+        QBChatMessage prevMessage = items.get(position).model.get();
+        long timeDiff=currentMessage.getDateSent()-prevMessage.getDateSent();
+        return prevMessage.getSenderId().equals(currentMessage.getSenderId()) && timeDiff<C.DAY;
     }
 }
