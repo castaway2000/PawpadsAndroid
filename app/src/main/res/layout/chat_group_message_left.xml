@@ -132,6 +132,7 @@
             android:layout_alignBottom="@id/time_text"
             android:visibility="@{isLast}"
             android:id="@+id/distance"
+            android:layout_marginRight="10dp"
 
             />
     </RelativeLayout>
