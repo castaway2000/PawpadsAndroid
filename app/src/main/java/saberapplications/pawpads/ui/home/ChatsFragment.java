@@ -104,11 +104,16 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
         requestBuilder.setLimit(10);
         requestBuilder.setSkip(currentPage * 10);
+        requestBuilder.in("type","2","3");
         requestBuilder.sortDesc("last_message_date_sent");
+
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallback<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (adapter == null) return;
+                if (dialogs.size() == 0 || dialogs.size() < 10) {
+                    adapter.disableLoadMore();
+                }
                 if (dialogs.size() > 0) {
                     ArrayList<QBDialog> privateDialogs = new ArrayList<>();
                     for (QBDialog dialog : dialogs) {
@@ -119,9 +124,7 @@ public class ChatsFragment extends Fragment implements BaseListAdapter.Callback<
                     currentPage++;
                 }
 
-                if (dialogs.size() == 0 || dialogs.size() < 10) {
-                    adapter.disableLoadMore();
-                }
+
                 binding.swipelayout.setRefreshing(false);
                 isLoading = false;
             }
