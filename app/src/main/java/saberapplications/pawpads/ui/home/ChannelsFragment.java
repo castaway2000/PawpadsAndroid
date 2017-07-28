@@ -125,7 +125,7 @@ public class ChannelsFragment extends Fragment implements BaseListAdapter.Callba
 
             @Override
             public void onError(QBResponseException e) {
-                adapter.disableLoadMore();
+                if (adapter!=null) adapter.disableLoadMore();
                 binding.swipelayout.setRefreshing(false);
                 isLoading = false;
                 if (getContext()==null) return;

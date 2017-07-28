@@ -109,14 +109,16 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             }
         }
 
-        protected void loadUserAvatar(int userId, final ImageView avatar, final int avatarSize) {
+        protected void loadUserAvatar(final int userId, final ImageView avatar, final int avatarSize) {
             Glide.clear(avatar);
             Glide.with(avatar.getContext()).load(R.drawable.user_placeholder).into(avatar);
+            avatar.setTag(R.id.user_id,userId);
             if (!adapter.userCache.containsKey(userId)) {
                 QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser qbUser, Bundle bundle) {
-                        if (qbUser.getFileId() != null) {
+                        int storedId= (int) avatar.getTag(R.id.user_id);
+                        if (qbUser.getFileId() != null && storedId==userId) {
                             adapter.userCache.put(qbUser.getId(), qbUser);
                         }
                     }

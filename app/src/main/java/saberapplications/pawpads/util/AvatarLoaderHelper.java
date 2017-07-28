@@ -1,10 +1,13 @@
 package saberapplications.pawpads.util;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -106,7 +109,19 @@ public class AvatarLoaderHelper {
                                 protected void onPostExecute(Boolean res) {
                                     if (!res) return;
                                     try {
+                                        if (imageView.getContext() instanceof AppCompatActivity){
+                                            Activity activity=(AppCompatActivity)imageView.getContext();
+                                            if (activity.isFinishing() ) return;
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                                                if ( activity.isDestroyed()){
+                                                    return;
+                                                }
+                                            }
+                                        }
                                         Glide.with(imageView.getContext()).load(file).centerCrop().override(width, height).into(imageView);
+                                    }
+                                    catch(Exception ex){
+
                                     } finally {
 
                                     }

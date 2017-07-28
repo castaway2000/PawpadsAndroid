@@ -144,5 +144,5 @@
         <item>Female</item>
         <item>Not set</item>
     </array>
-
+    <item type="id" name="user_id" />
 </resources>
