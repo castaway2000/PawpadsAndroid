@@ -27,6 +27,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <saberapplications.pawpads.views.FontTextView
+            android:id="@+id/left_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="username"
+            android:textColor="#88393939"
+            android:textSize="13sp"
+            android:visibility="@{isLast}"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:layout_below="@+id/text"
+            android:layout_alignLeft="@+id/relativeLayout2"
+            android:layout_alignStart="@+id/relativeLayout2" />
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +48,8 @@
             android:layout_alignParentStart="true"
             android:layout_marginBottom="15dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp">
+            android:layout_marginStart="10dp"
+            android:id="@+id/relativeLayout2">
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/avatar_group_user"
@@ -108,32 +122,29 @@
         </LinearLayout>
         <saberapplications.pawpads.views.FontTextView
             android:id="@+id/time_text"
-            android:layout_below="@id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typefaceAsset="Proxima_Nova_Regular.otf"
             android:textColor="#88393939"
             android:text='@{date,default="12/10/2017"}'
             android:textSize="13sp"
-            android:layout_marginLeft="22dp"
-            android:layout_marginTop="-2dp"
             android:visibility="@{isLast}"
-            />
+            android:layout_below="@+id/left_username"
+            android:layout_alignLeft="@+id/left_username"
+            android:layout_alignStart="@+id/left_username" />
 
         <saberapplications.pawpads.views.FontTextView
 
+            android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:typefaceAsset="Proxima_Nova_Regular.otf"
-            android:textColor="#88393939"
-            android:text='@{distance, default="103_feet" }'
-            android:textSize="13sp"
-            android:layout_alignParentRight="true"
-            android:layout_alignBottom="@id/time_text"
-            android:visibility="@{isLast}"
-            android:id="@+id/distance"
-            android:layout_marginRight="10dp"
 
-            />
+            android:text='@{distance, default="60000_miles" }'
+            android:textColor="#88393939"
+            android:textSize="13sp"
+            android:visibility="@{isLast}"
+            app:typefaceAsset="Proxima_Nova_Regular.otf"
+            android:layout_below="@+id/text"
+            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 </layout>

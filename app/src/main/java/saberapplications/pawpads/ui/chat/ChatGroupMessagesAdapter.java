@@ -8,10 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.ArrayMap;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -49,6 +51,7 @@ import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.OtherUsersLocationsCache;
 import saberapplications.pawpads.views.BaseChatAdapter;
 import saberapplications.pawpads.views.BaseListAdapter;
+
 
 /**
  * Created by developer on 31.05.17.
@@ -131,6 +134,24 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             } else {
                 AvatarLoaderHelper.loadImage(adapter.userCache.get(userId).getFileId(), avatar, avatarSize, avatarSize);
             }
+        }
+
+
+
+        protected void loadUsername(final int userId, final TextView username){
+            QBUsers.getUser(userId, new QBEntityCallback<QBUser>() {
+                @Override
+                public void onSuccess(QBUser qbUser, Bundle bundle) {
+                    if (qbUser.getFullName() != null) {
+                        username.setText(qbUser.getFullName());
+                    }
+                }
+
+                @Override
+                public void onError(QBResponseException e) {
+
+                }
+            });
         }
 
         protected void checkIsUserBlocked(final int recipientId, final View view) {
@@ -295,6 +316,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             Date date = new Date(item.getDateSent() * 1000);
             binding.setDate(adapter.formatDate(date));
             binding.setMessage(item.getBody());
+
             binding.avatarGroupUser.setImageResource(R.drawable.user_placeholder);
             binding.avatarGroupUser.setVisibility(View.INVISIBLE);
             binding.blockedStatus.setVisibility(View.GONE);
@@ -316,6 +338,7 @@ public class ChatGroupMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 float d = view.getResources().getDisplayMetrics().density;
                 binding.avatarGroupUser.setVisibility(View.VISIBLE);
                 loadUserAvatar(userId, binding.avatarGroupUser, Math.round(25 * d));
+                loadUsername(userId, binding.leftUsername);
                 checkIsUserBlocked(item.getSenderId(), binding.blockedStatus);
             }
 
