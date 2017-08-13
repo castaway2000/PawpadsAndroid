@@ -31,4 +31,10 @@ public class C {
     public static final String UPDATE_CHAT = "update_chat";
     public static final long LOCATION_PUSH_INTERVAL = 120000;
     public static final String CHAT_MSG_STICKER_PROPERTY = "STICKER";
+    public static final String CREATED_CHANNELS_COUNT = "CREATED_CHANNELS_COUNT";
+    public static final String FRIEND_OUT_INVITES_LIST = "FRIEND_OUT_INVITES_LIST";
+    public static final String FRIEND_ACCEPTED_LIST = "FRIEND_ACCEPTED_LIST";
+    public static final String LATITUDE="latitude";
+    public static final String LONGITUDE="longitude";
+    public static final long DAY = 24 * 3600;
 }

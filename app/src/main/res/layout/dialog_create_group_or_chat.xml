@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp"
+    android:background="@android:color/transparent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/transparent"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/dialog"
+            >
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Choose wich type of chat do you want to create"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:textColor="@color/title"
+                android:textSize="20sp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="50dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#bcbcbc"/>
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/public_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Public group"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:textSize="18sp"
+                android:textColor="#e54d57"
+                android:clickable="true"
+                android:padding="12dp"
+                android:background="@drawable/delete_account_dialog_button"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#bcbcbc"/>
+
+            <saberapplications.pawpads.views.FontButton
+                android:id="@+id/private_group_or_chat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Private group or chat"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:clickable="true"
+                android:textColor="#e54d57"
+                android:background="@drawable/delete_account_dialog_button"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:gravity="center"
+                android:padding="12dp"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

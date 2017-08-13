@@ -17,6 +17,7 @@
             android:layout_alignParentTop="true"
             android:clickable="true"
             app:layoutManager="LinearLayoutManager"
+            android:layout_marginBottom="100dp"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
 

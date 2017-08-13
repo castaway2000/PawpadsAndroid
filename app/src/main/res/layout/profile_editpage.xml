@@ -67,7 +67,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/write_something_about_you"
                     android:inputType="textMultiLine"
-                    app:binding2way="@{activity.about}" />
+                    app:binding2way="@{activity.about}"
+                    android:maxLines="3"/>
 
 
             </LinearLayout>

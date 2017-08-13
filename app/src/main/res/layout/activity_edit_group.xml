@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.GroupEditActivity" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="160dp"
+                android:paddingBottom="10dp"
+                android:orientation="vertical">
+
+                <saberapplications.pawpads.views.FontEditText
+                    android:id="@+id/group_title_text"
+                    style="@style/profile_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Group chat name"
+                    android:inputType="textCapWords"
+                    app:binding2way="@{activity.groupName}" />
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/group_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Private group"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:textColor="#393939"
+                    app:binding2way="@{activity.groupType}"
+                    android:maxLength="30"/>
+
+                <saberapplications.pawpads.views.FontEditText
+                    style="@style/group_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chat_admin"
+                    android:enabled="false"
+                    android:inputType="text"
+                    android:textColor="#393939" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginLeft="16dp"
+                    >
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/admin_avatar"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="centerCrop"
+                        app:riv_border_color="#333333"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true"
+                        android:src="@drawable/user_placeholder"
+                        android:layout_centerVertical="true"/>
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/admin_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{activity.adminName,default=USERNAME}"
+                        style="@style/list_title"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/admin_avatar"
+                        android:layout_toEndOf="@+id/admin_avatar"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/participants_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <saberapplications.pawpads.views.FontEditText
+                        style="@style/group_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Participants (2)"
+                        android:enabled="false"
+                        android:inputType="text"
+                        android:textColor="#393939"
+                        app:binding2way="@{activity.groupParticipants}" />
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/add_group_member_tv"
+                        style="@style/group_edit_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusableInTouchMode="false"
+                        android:text="@string/add"
+                        android:background="@android:color/transparent"
+                        android:onClick="@{ () -> activity.addGroupMember()}"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:textSize="18sp"
+                        android:textColor="#28A7BB" />
+
+                </RelativeLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/participantsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    app:layoutManager="LinearLayoutManager"
+                    android:layout_marginBottom="10dp"
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/leave_and_delete_btn"
+                    style="@style/group_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:focusableInTouchMode="false"
+                    android:text="Leave and delete"
+                    android:onClick="@{ () -> activity.leaveAndDeleteGroup()}"
+                    android:layout_gravity="center"
+                    android:textColor="#EA5734" />
+
+
+            </LinearLayout>
+
+
+        </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88ffffff"
+            android:visibility="@{activity.isBusy}"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    />
+
+                <saberapplications.pawpads.views.FontTextView
+                    android:id="@+id/textView"
+                    style="@style/list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:indeterminate="true"
+                    android:text="@{activity.progressMessage}"
+                    android:textColor="@color/title" />
+            </LinearLayout>
+        </RelativeLayout>
+        <!-- Header !-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+            <ImageView
+                android:id="@+id/userBackground"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/app_bar_bg" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/userBackground"
+                android:background="@drawable/shadow_gradient"
+                />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:onClick="@{ () -> activity.save()}"
+                android:padding="16dp"
+                android:text="@string/save"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+        </RelativeLayout>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/groupAvatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:onClick="@{ () -> activity.changeGroupPicture()}"
+            android:scaleType="centerCrop"
+            android:src="@drawable/user_placeholder"
+            app:borderWidth="0dp"
+            app:riv_mutate_background="true"
+            app:riv_oval="true" />
+
+        <ImageView
+            android:id="@+id/photo_avatar_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/groupAvatar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-5dp"
+            android:clickable="true"
+            android:onClick="@{ () -> activity.changeGroupPicture()}"
+            android:src="@drawable/camera_grey_icon"
+            />
+
+    </RelativeLayout>
+
+</layout>

@@ -112,6 +112,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
             @Override
             public void onRefresh() {
                 adapter.clear();
+                adapter.setShowInitialLoad(true);
                 currentPage=1;
                 loadData();
                 binding.swipelayout.setRefreshing(false);
@@ -121,6 +122,9 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
         progressMessage.set(getString(R.string.obtaining_location));
         if (UserLocationService.getLastLocation()!=null){
             loadData();
+        } else {
+            adapter.disableLoadMore();
+            isBusy.set(false);
         }
         return view;
     }
@@ -156,9 +160,14 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                         ArrayList<QBDialog> dialogList = QBChatService.getChatDialogs(null, requestBuilder, out);
                         if (dialogList != null && dialogList.size() > 0) {
                             for (QBDialog dialog : dialogList) {
-                                int userId = dialog.getOccupants().get(0) == currentUserId ? dialog.getOccupants().get(1) : dialog.getOccupants().get(0);
-                                if (dialog.getLastMessageDateSent() > 0) {
-                                    lastMessages.put(userId, dialog.getLastMessageDateSent());
+                                try {
+                                    if (dialog.getOccupants()==null || dialog.getOccupants().size()==0) continue;
+                                    int userId = dialog.getOccupants().get(0) == currentUserId ? dialog.getOccupants().get(1) : dialog.getOccupants().get(0);
+                                    if (dialog.getLastMessageDateSent() > 0) {
+                                        lastMessages.put(userId, dialog.getLastMessageDateSent());
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -222,6 +231,7 @@ public class NearByFragment extends Fragment implements Callback<NearByAdapter.N
                 }
 
                 binding.swipelayout.setRefreshing(false);
+
                 isBusy.set(false);
             }
         };

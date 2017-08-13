@@ -49,6 +49,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityLoginBinding;
 import saberapplications.pawpads.ui.home.MainActivity;
 import saberapplications.pawpads.ui.register.RegisterActivity;
+import saberapplications.pawpads.views.NetworkStateChangedHelper;
 
 /**
  * Created by blaze on 10/21/2015.
@@ -64,10 +65,11 @@ public class LoginActivity extends AppCompatActivity {
     private TwitterAuthClient twitterAuthClient;
     public final ObservableBoolean isBusy = new ObservableBoolean(false);
     ActivityLoginBinding binding;
-
+    NetworkStateChangedHelper networkStateChangedHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        networkStateChangedHelper=new NetworkStateChangedHelper(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.setActivity(this);
         setTitle("PawPads | Login");
@@ -82,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
 
         forgotpasswordLink = (TextView) findViewById(R.id.tvForgottenPassLink);
         userLocalStore = new UserLocalStore(this);
-
 
 //FB setup
         callbackManager = CallbackManager.Factory.create();
@@ -205,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                         try {
 
                             QBAuth.createSession();
-                            QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.TWITTER, sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
+                            QBUser user = QBUsers.signInUsingSocialProvider(QBProvider.TWITTER,sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
                             onSuccessLogin(user, null, sessionData.getAuthToken().token, sessionData.getAuthToken().secret);
 
                         } catch (QBResponseException e) {

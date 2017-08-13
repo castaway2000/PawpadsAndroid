@@ -1,0 +1,147 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.chat.CreateChatActivity">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.chat.CreateChatActivity" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/create_chat_or_group"
+                        android:textSize="20sp"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/done_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="@string/done"
+                        android:textSize="16sp"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf"
+                        android:onClick="@{() -> activity.createChatOrAddMember()}"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginEnd="10dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/selectedAvatarsList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="10dp"
+                        app:layoutManager="LinearLayoutManager"
+                        android:orientation="horizontal"
+                        android:layout_below="@+id/toolbar_title"
+                        />
+                </RelativeLayout>
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:id="@+id/search_panel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/appbar" >
+
+            <ImageView
+                android:id="@+id/searchImg"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:padding="14dp"
+                android:src="@drawable/search_grey" />
+
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/search_autocomplete_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/search"
+                android:textColorHint="#C8C8C8"
+                android:textColor="@android:color/black"
+                android:inputType="text"
+                android:padding="10dp"
+                android:layout_marginTop="5dp"
+                android:imeOptions="actionSearch"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginEnd="40dp"
+                />
+
+            <ImageView
+                android:id="@+id/voiceSearch"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:padding="15dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/mic_grey" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="3dp"
+                android:layout_below="@+id/search_autocomplete_text"/>
+
+        </RelativeLayout>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/search_panel">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:clickable="true"
+                app:layoutManager="LinearLayoutManager"
+                />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
+</layout>

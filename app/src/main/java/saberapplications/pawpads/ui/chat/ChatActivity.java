@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivacyListsManager;
@@ -60,6 +62,7 @@ import com.quickblox.customobjects.model.QBCustomObject;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jivesoftware.smack.SmackException;
 
 import java.io.File;
@@ -87,6 +90,7 @@ import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityChatBinding;
 import saberapplications.pawpads.databinding.BindableBoolean;
 import saberapplications.pawpads.databinding.BindableInteger;
+import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
@@ -236,6 +240,7 @@ public class ChatActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                binding.recipientAvatar.setVisibility(View.VISIBLE);
                 if (recipient == null || userDeleted) return;
                 if (recipient.getFileId() != null) {
                     float d = getResources().getDisplayMetrics().density;
@@ -366,6 +371,31 @@ public class ChatActivity extends BaseActivity {
                             }
                         }
                     }
+
+                    if (dialog == null) {
+                        if (getIntent().hasExtra(DIALOG)) {
+                            dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
+                        }
+                        if (dialog == null && getIntent().hasExtra(DIALOG_ID)) {
+                            QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+                            requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
+                            //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
+
+                            Bundle bundle = new Bundle();
+                            ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(null, requestBuilder, bundle);
+                            dialog = dialogs.get(0);
+                        }
+                    }
+                    if (dialog != null && dialog.getType() != QBDialogType.PRIVATE) {
+                        ArrayList<Integer> occupansts = (ArrayList<Integer>) dialog.getOccupants();
+                        Intent intent = new Intent(ChatActivity.this, ChatGroupActivity.class);
+                        intent.putExtra(ChatGroupActivity.DIALOG, dialog);
+                        intent.putExtra(ChatGroupActivity.RECIPIENT_IDS_LIST, occupansts);
+                        startActivity(intent);
+                        finish();
+                        return null;
+                    }
+
                     if (!userDeleted) {
                         try {
                             privateChat = privateChatManager.getChat(recipient.getId());
@@ -381,21 +411,6 @@ public class ChatActivity extends BaseActivity {
 
                         init();
                     }
-                    if (dialog == null) {
-                        if (getIntent().hasExtra(DIALOG)) {
-                            dialog = (QBDialog) getIntent().getSerializableExtra(DIALOG);
-                        }
-                        if (dialog == null && getIntent().hasExtra(DIALOG_ID)) {
-                            QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-                            requestBuilder.eq("_id", getIntent().getStringExtra(DIALOG_ID));
-                            //requestBuilder.eq("date_sent", getIntent().getStringExtra(DIALOG_ID));
-
-                            Bundle bundle = new Bundle();
-                            ArrayList<QBDialog> dialogs = QBChatService.getChatDialogs(QBDialogType.PRIVATE, requestBuilder, bundle);
-                            dialog = dialogs.get(0);
-                        }
-                    }
-
 
                     if (dialog == null) {
                         dialog = privateChatManager.createDialog(recipient.getId());
@@ -445,8 +460,10 @@ public class ChatActivity extends BaseActivity {
                 isBusy.set(false);
                 if (error != null) {
                     Util.onError(error, ChatActivity.this);
+                    Crashlytics.logException(error);
                     return;
                 }
+                if(chatMessages == null) return;
                 if (!isActivityReopened) {
                     chatAdapter.addItems(chatMessages);
                     if (chatMessages.size() < messagesPerPage) {
@@ -543,11 +560,14 @@ public class ChatActivity extends BaseActivity {
             msg.setRecipientId(recipient.getId());
             msg.setDialogId(dialog.getDialogId());
             msg.setProperty("send_to_chat", "1");
-
-
+            Location location=UserLocationService.getLastLocation();
+            if (location!=null){
+                msg.setProperty(C.LATITUDE, String.valueOf(location.getLatitude()));
+                msg.setProperty(C.LONGITUDE, String.valueOf(location.getLongitude()));            }
             try {
                 privateChat.sendMessage(msg);
                 displayChatMessage(msg);
+                EventBus.getDefault().post(msg);
             } catch (SmackException.NotConnectedException e) {
                 if (!isNetworkAvailable()) {
                     Util.onError(getString(R.string.verify_internet_connection), this);
@@ -559,6 +579,7 @@ public class ChatActivity extends BaseActivity {
                 }
             } catch (Exception e) {
                 Util.onError(e, ChatActivity.this);
+                Crashlytics.logException(e);
             }
             editText_chat_message.setText("");
         }
@@ -639,6 +660,7 @@ public class ChatActivity extends BaseActivity {
                 isBusy.set(false);
                 if (exception != null) {
                     Util.onError(exception, ChatActivity.this);
+                    Crashlytics.logException(exception);
                     return;
                 }
                 displayChatMessage(qbChatMessage);
@@ -679,6 +701,7 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(this, R.string.reconnect_message, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
+                Crashlytics.logException(e);
                 Util.onError(e, ChatActivity.this);
             }
         }
@@ -686,6 +709,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void onClickImoji() {
+        if(binding.getShowGiphy()) onClickGiphy();
         if (mStickersContainer != null && mStickersContainer.getChildCount() == 0) {
             hideSoftKeyboard();
             mStickersContainer.addView(mStickersWidget);

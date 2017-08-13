@@ -104,7 +104,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.setMessage(item.getBody());
             binding.setDate(adapter.formatDate(date));
             if (position > 0) {
-                if (adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_right);
                     binding.setIsLast(false);
                 } else {
@@ -139,7 +139,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 attachment = null;
             }
             if (item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
-                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                 binding.setShowThumbNail(true);
                 binding.stickerProgressBar.setVisibility(View.VISIBLE);
 
@@ -210,7 +210,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
             binding.setDate(adapter.formatDate(date));
             binding.setMessage(item.getBody());
             if (position > 0) {
-                if (!adapter.getMessageSelf(position - 1)) {
+                if (adapter.groupWithPrevMessage(position - 1,item)) {
                     binding.text.setBackgroundResource(R.drawable.message_left);
                     binding.setIsLast(false);
                 } else {
@@ -244,7 +244,7 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
                 binding.setShowThumbNail(false);
             }
             if (item.getProperty(C.CHAT_MSG_STICKER_PROPERTY) != null) {
-                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.tw__transparent));
+                binding.text.setBackgroundColor(ContextCompat.getColor(itemView.getContext(),android.R.color.transparent));
                 binding.setShowThumbNail(true);
                 binding.stickerProgressBar.setVisibility(View.VISIBLE);
 
@@ -290,5 +290,10 @@ public class ChatMessagesAdapter extends BaseChatAdapter<QBChatMessage> {
         }
 
 
+    }
+    public boolean groupWithPrevMessage(int position,QBChatMessage currentMessage){
+        QBChatMessage prevMessage = items.get(position).model.get();
+        long timeDiff=currentMessage.getDateSent()-prevMessage.getDateSent();
+        return prevMessage.getSenderId().equals(currentMessage.getSenderId()) && timeDiff<C.DAY;
     }
 }

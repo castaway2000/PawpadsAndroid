@@ -1,0 +1,291 @@
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.chat.ChatGroupActivity" />
+
+        <variable
+            name="username"
+            type="String" />
+
+        <variable
+            name="isBlockedByMe"
+            type="boolean" />
+
+        <variable
+            name="isBlockedByOther"
+            type="boolean" />
+        <variable
+            name="isDeleted"
+            type="boolean" />
+
+        <variable
+            name="bindStatusVisibility"
+            type="boolean">
+        </variable>
+
+        <import type="saberapplications.pawpads.R" />
+
+        <variable
+            name="showGiphy"
+            type="boolean" />
+
+        <variable
+            name="groupName"
+            type="String" />
+
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/grour_header"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:gravity="left"
+                        android:text="@{groupName}"
+                        android:maxLength="20"
+                        android:textSize="@{groupName.length >12 ? 20 : 25 }"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+                    <ImageView
+                        android:id="@+id/edit_group_settings_ic"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/edit_white"
+                        android:onClick="@{ () -> activity.editGroupSettings()}"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="5dp"
+                        android:layout_toRightOf="@+id/toolbar_title"
+                        android:layout_toEndOf="@+id/toolbar_title"
+                        />
+
+                    <ImageView
+                        android:id="@+id/add_group_member"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/add_participant"
+                        android:onClick="@{ () -> activity.addGroupMember()}"
+                        android:layout_marginRight="10dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="5dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        />
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+            <!-- Footer !-->
+            <LinearLayout
+                android:id="@+id/footer_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+                <saberapplications.pawpads.views.giphyselector.GiphySelector
+                    android:id="@+id/giphy_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="115dp"
+                    android:visibility="@{showGiphy}"
+                    />
+                <!-- Stickers !-->
+
+                <FrameLayout
+                    android:id="@+id/stickers_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <!-- send message !-->
+                <!-- Blocked !-->
+                <android.support.v7.widget.GridLayout
+                    android:id="@+id/message_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#EFEFEF"
+                    app:orientation="horizontal"
+                    android:paddingBottom="14dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="14dp"
+                    app:columnCount="6"
+                    android:visibility="@{!isBlockedByOther &amp;&amp; !isBlockedByMe &amp;&amp; !isDeleted}">
+
+                    <saberapplications.pawpads.views.FontEditText
+                        app:layout_column="0"
+                        app:layout_row="0"
+                        app:layout_columnSpan="5"
+                        android:id="@+id/editText_chat_message"
+                        style="@style/Widget.AppCompat.EditText"
+                        app:layout_gravity="fill_horizontal"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:background="@drawable/chat_field_bg"
+                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:hint="@string/message"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:textColor="@color/title"
+                        android:textColorHint="@color/hint"
+                        android:textSize="20sp"
+                        android:inputType="textMultiLine"
+                        android:maxLength="500"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf" />
+
+                    <saberapplications.pawpads.views.FontButton
+                        android:id="@+id/button_send_chat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/chat_send_button"
+                        android:enabled="@{!activity.isSendingMessage.value &amp;&amp; !activity.isBusy.value}"
+                        android:onClick="@{ () -> activity.sendChatMessage()}"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingTop="5dp"
+                        android:text=":3"
+                        android:textSize="20sp"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf" />
+                    <ImageView
+                        android:id="@+id/imageViewSendFile"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        app:layout_column="0"
+                        android:layout_marginRight="10dp"
+                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:onClick="@{() -> activity.selectFile() }"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/paper_clip" />
+
+                    <ImageView
+                        android:id="@+id/imageViewSendImoji"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:layout_marginRight="10dp"
+                        android:onClick="@{() -> activity.onClickImoji() }"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_smile_emotion_face" />
+                    <ImageView
+                        android:id="@+id/imageViewSendGiphy"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:onClick="@{() -> activity.onClickGiphy() }"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/giphy" />
+
+                    <ImageView
+                        android:id="@+id/createSticker"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:layout_row="1"
+                        android:layout_marginLeft="10dp"
+                        android:enabled="@{!activity.isSendingMessage.value}"
+                        android:onClick="@{() -> activity.onCLickCreateSticker() }"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/add_imoji" />
+                </android.support.v7.widget.GridLayout>
+
+                <FrameLayout
+                    android:id="@+id/block_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary"
+                    android:orientation="horizontal"
+                    android:visibility="@{isBlockedByOther || isBlockedByMe }">
+
+                    <TextView
+                        android:id="@+id/text_view_block_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="You are blocked"
+                        android:textSize="16sp"
+                        android:visibility="@{isBlockedByOther}" />
+
+                </FrameLayout>
+                <!-- Deleted !-->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary"
+                    android:padding="15dp"
+                    android:visibility="@{isDeleted}">
+
+                    <saberapplications.pawpads.views.FontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/user_account_was_deleted"
+                        android:textColor="@color/accent"
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        />
+                </RelativeLayout>
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:max="100"
+                    android:progress="@{activity.uploadProgress}"
+                    android:visibility="@{activity.isSendingMessage}" />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listView_chat_messages"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/footer_container"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:scrollbars="none"
+                android:stackFromBottom="true"
+                android:transcriptMode="alwaysScroll"
+                app:layoutManager="LinearLayoutManager"
+                app:reverseLayout="true" />
+
+        </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

@@ -8,8 +8,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.quickblox.core.QBSettings;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.Twitter;
 
 import java.util.UUID;
 
@@ -32,11 +31,9 @@ public class PawPadsApplication extends Application {
         QBSettings.getInstance().setAccountKey(Util.QB_ACCOUNT_KEY);
         FontManager.init(getAssets());
 //      StickersManager.initialize(Util.STICKERS_API_KEY, this);
-        TwitterAuthConfig authConfig =
-                new TwitterAuthConfig("Consumer Key (API Key)", "Consumer Secret (API Secret)");
-        Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
 
-
+        Fabric.with(this, new Crashlytics());
+        Twitter.initialize(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 

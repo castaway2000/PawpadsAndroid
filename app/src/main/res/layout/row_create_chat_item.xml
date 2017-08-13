@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="username"
+            type="String" />
+
+        <import type="android.view.View" alias="View"/>
+
+        <variable
+            name="bindStatusVisibility"
+            type="boolean">
+        </variable>
+
+        <import type="saberapplications.pawpads.R" />
+
+        <variable
+            name="onlineStatus"
+            type="int" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:background="@drawable/list_item_bg"
+        >
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:scaleType="centerCrop"
+            app:riv_border_color="#333333"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            android:layout_toRightOf="@+id/checkbox_layout"
+            android:src="@drawable/user_placeholder"
+            android:layout_centerVertical="true"/>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/online_status"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:scaleType="centerCrop"
+            android:visibility="@{bindStatusVisibility}"
+            app:backgroundResource="@{onlineStatus==1 ? R.color.user_offline_status_color : (onlineStatus==2 ? R.color.user_away_status_color : R.color.user_online_status_color)}"
+            app:riv_border_width="2dp"
+            app:riv_border_color="@color/accent"
+            app:riv_mutate_background="true"
+            app:riv_oval="true"
+            android:layout_alignBottom="@+id/avatar"
+            android:layout_alignRight="@+id/avatar"
+            android:layout_alignEnd="@+id/avatar" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_toEndOf="@id/avatar"
+            android:orientation="vertical">
+
+            <saberapplications.pawpads.views.FontTextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{username,default=USERNAME}"
+                android:textSize="@{username.length &gt;  30 ? 16 : 19 }"
+                style="@style/list_title"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/checkbox_layout"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:minHeight="60dp"
+            android:minWidth="40dp"
+            android:clickable="true"
+            android:paddingRight="6dp"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true">
+            <RelativeLayout
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_checkbox_bg">
+
+                <CheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    android:padding="10dp"
+                    android:clickable="false"
+                    android:layout_centerInParent="true"
+                    android:button="@drawable/rounded_checkbox"
+                    android:foregroundGravity="center"
+                    />
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+</layout>

@@ -45,6 +45,7 @@
     <string name="recover">Recover</string>
     <string name="near_by">Near by</string>
     <string name="chats">Chats</string>
+    <string name="friends">Friends</string>
     <string name="open">open</string>
     <string name="close">close</string>
 
@@ -111,10 +112,37 @@
     <string name="dialog_get_from_gallery">Choose from gallery</string>
     <string name="dialog_send_file_title">Send file</string>
     <string name="please_enter_any_worlds_to_start_search">Please enter any worlds to start search</string>
+    <string name="remove_from_friends">Remove from friends</string>
+    <string name="send_request">Send request</string>
+    <string name="dialog_add_friend_add">You are about to add</string>
+    <string name="dialog_add_to_friend">to friends</string>
+    <string name="dialog_remove_friend">You are about to remove</string>
+    <string name="dialog_remove_from_friend">from friends</string>
+    <string name="friend_request">friend request</string>
+    <string name="you_have_sent_friend_request">You have sent a friend request</string>
+    <string name="accept_invite">Accept invite</string>
+    <string name="reject_invite">Reject invite</string>
+    <string name="user">User</string>
+    <string name="wants_to_add_you_to_friendlist">wants to add you to friends list</string>
+    <string name="you_have_blocked_this_user">You have blocked this user</string>
+    <string name="channels">Channels</string>
+    <string name="chat_admin">Chat admin</string>
+    <string name="add">Add</string>
+    <string name="sorry_cannot_create_more_three_channels">Sorry, you cannot have more than 3 channels.</string>
+    <string name="remove">Remove</string>
+    <string name="you_are_not_logged_in">You are not logged in</string>
+    <string name="something_wrong_try_again_later">Something went wrong, please try again later</string>
+    <string name="add_participant">Add participant</string>
+    <string name="create_chat_or_group">Create chat or group</string>
+    <string name="done">Done</string>
+    <string name="search">Search</string>
+    <string name="default_channel_name">Channel</string>
+    <string name="interner_not_connecteed">Unable connect to server. Please check internet connection</string>
+    <string name="error_timeout">Unable connect to server. Please check your internet connection and try again.</string>
     <array name="genders">
         <item>Male</item>
         <item>Female</item>
         <item>Not set</item>
     </array>
-
+    <item type="id" name="user_id" />
 </resources>

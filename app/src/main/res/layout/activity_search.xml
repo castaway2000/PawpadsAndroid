@@ -1,0 +1,105 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.chat.CreateChatActivity">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="saberapplications.pawpads.ui.search.SearchActivity" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <android.support.v7.widget.AppCompatAutoCompleteTextView
+                        android:id="@+id/toolbar_search_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Search"
+                        android:textColorHint="#89c8c8c8"
+                        android:textColor="@android:color/white"
+                        android:textColorHighlight="@android:color/transparent"
+                        android:inputType="text"
+                        android:padding="10dp"
+                        android:gravity="start"
+                        android:textCursorDrawable="@drawable/edittext_cursor"
+                        android:imeOptions="actionSearch"
+                        android:layout_marginRight="40dp"
+                        android:layout_marginEnd="40dp"
+                        app:typefaceAsset="Proxima_Nova_Regular.otf"
+                        />
+
+                    <ImageView
+                        android:id="@+id/clear_search_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="5dp"
+                        android:visibility="invisible"
+                        android:onClick="@{() -> activity.clearSearchQuery()}"
+                        android:src="@drawable/x_white" />
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/searchListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:clickable="true"
+            app:layoutManager="LinearLayoutManager"
+            android:layout_below="@+id/appbar"
+            />
+
+        <LinearLayout
+            android:id="@+id/empty_search_state_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:layout_below="@+id/appbar"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <saberapplications.pawpads.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Nothing to show"
+                android:textColor="#515151"
+                app:typefaceAsset="Proxima_Nova_Regular.otf"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</layout>

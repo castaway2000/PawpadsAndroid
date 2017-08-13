@@ -188,9 +188,6 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     @Override
     public int getItemCount() {
         if(items.size()==0) return 1;
-        if (isBusy && !showInitialLoad){
-            return 0;
-        }
         if (loadMoreEnabled) {
             return items.size() + 1;
         }else{
@@ -207,13 +204,15 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     }
 
     public void addItems(List<T> items) {
+
         for (T item : items) {
             DataItem<T> dataItem = new DataItem<>();
             dataItem.model.set(item);
             this.items.add(dataItem);
         }
         isBusy = false;
-        notifyDataSetChanged();
+        showInitialLoad=false;
+        notifyItemRangeInserted(this.items.size(),items.size());
     }
 
     public void addItem(T data) {
@@ -222,7 +221,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         this.items.add(item);
         isBusy = false;
         //Collections.sort(items, Collections.<Jogging>reverseOrder());
-        notifyDataSetChanged();
+        notifyItemChanged(this.items.size()-1);
 
     }
 
@@ -271,7 +270,10 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     public void setShowInitialLoad(boolean showInitialLoad) {
         this.showInitialLoad = showInitialLoad;
     }
-    public List<T> getItems(){
+    public ArrayList<DataItem<T>> getItems(){
+        return  items;
+    }
+    public List<T> getDataItems(){
         ArrayList<T> out=new ArrayList<>();
         for (DataItem<T> item:items
         ){

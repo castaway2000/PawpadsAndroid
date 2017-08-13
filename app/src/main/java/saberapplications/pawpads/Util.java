@@ -10,7 +10,9 @@ import com.crashlytics.android.Crashlytics;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by blaze on 9/7/2015.
@@ -80,7 +82,10 @@ public class Util {
     public static void onError(QBResponseException e, Context context) {
         Crashlytics.getInstance().logException(e);
         String message =  e.getLocalizedMessage();
-        if(!message.contains("Subscription with such UDID already exists")){
+        if(message.contains("Subscription with such UDID already exists")) return;
+        if (e.getLocalizedMessage().contains("timeout")){
+            showAlert(context,context.getString(R.string.error_timeout));
+        }else {
             showAlert(context, e.getLocalizedMessage());
         }
     }
@@ -88,12 +93,16 @@ public class Util {
         showAlert(context,error);
     }
 
-    private static void showAlert(Context context,String message){
-        new AlertDialog.Builder(context,R.style.AppAlertDialogTheme)
-                .setMessage(message)
-                .setTitle("Error")
-                .setPositiveButton("OK", null)
-                .show();
+    public static void showAlert(Context context,String message){
+        try {
+            new AlertDialog.Builder(context, R.style.AppAlertDialogTheme)
+                    .setMessage(message)
+                    .setTitle("Error")
+                    .setPositiveButton("OK", null)
+                    .show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean isEmailValid(CharSequence email) {
@@ -132,5 +141,59 @@ public class Util {
     public static String getUserName(QBUser user) {
 
         return user.getFullName()!=null ? user.getFullName() : user.getLogin();
+    }
+
+    public static int getCreatedChannelsCount() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getInt(C.CREATED_CHANNELS_COUNT, 0);
+    }
+
+    public static void setCreatedChannelsCount(int channelsCount) {
+        if(channelsCount < 0) channelsCount = 0;
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putInt(C.CREATED_CHANNELS_COUNT, channelsCount);
+        editor.apply();
+    }
+
+    public static Set<String> getFriendOutInvitesList() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getStringSet(C.FRIEND_OUT_INVITES_LIST, new HashSet<String>());
+    }
+
+    public static void addFriendOutInviteToList(int userId) {
+        Set<String> outInvites = getFriendOutInvitesList();
+        outInvites.add(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_OUT_INVITES_LIST, outInvites);
+        editor.apply();
+    }
+
+
+    public static Set<String> getFriendAcceptedList() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance());
+        return defaultSharedPreferences.getStringSet(C.FRIEND_ACCEPTED_LIST, new HashSet<String>());
+    }
+
+    public static void addFriendAcceptedList(int userId) {
+        Set<String> outInvites = getFriendAcceptedList();
+        outInvites.add(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_ACCEPTED_LIST, outInvites);
+        editor.apply();
+    }
+    public static void removeFriendAcceptedList(int userId) {
+        Set<String> outInvites = getFriendAcceptedList();
+        outInvites.remove(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_ACCEPTED_LIST, outInvites);
+        editor.apply();
+    }
+
+    public static void removeFriendOutInviteFromList(int userId) {
+        Set<String> outInvites = getFriendOutInvitesList();
+        outInvites.remove(String.valueOf(userId));
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(PawPadsApplication.getInstance()).edit();
+        editor.putStringSet(C.FRIEND_OUT_INVITES_LIST, outInvites);
+        editor.apply();
     }
 }

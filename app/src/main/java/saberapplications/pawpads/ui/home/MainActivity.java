@@ -48,6 +48,10 @@ import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -56,14 +60,17 @@ import saberapplications.pawpads.R;
 import saberapplications.pawpads.UserLocalStore;
 import saberapplications.pawpads.Util;
 import saberapplications.pawpads.databinding.ActivityMainBinding;
+import saberapplications.pawpads.events.UpdateChatEvent;
 import saberapplications.pawpads.model.UserProfile;
 import saberapplications.pawpads.service.UserLocationService;
 import saberapplications.pawpads.ui.AboutActivity;
 import saberapplications.pawpads.ui.BaseActivity;
 import saberapplications.pawpads.ui.chat.ChatActivity;
+import saberapplications.pawpads.ui.friends.FriendsActivity;
 import saberapplications.pawpads.ui.login.LoginActivity;
 import saberapplications.pawpads.ui.profile.ProfileActivity;
 import saberapplications.pawpads.ui.profile.ProfileEditActivity;
+import saberapplications.pawpads.ui.search.SearchActivity;
 import saberapplications.pawpads.ui.settings.PrefrenceActivity;
 import saberapplications.pawpads.util.AvatarLoaderHelper;
 import saberapplications.pawpads.util.LocationServiceHelper;
@@ -82,6 +89,7 @@ public class MainActivity extends BaseActivity {
     ActivityMainBinding binding;
     NearByFragment nearByFragment;
     ChatsFragment chatsFragment;
+    ChannelsFragment channelsFragment;
     UserLocalStore userLocalStore;
     private UserListAdapter adapter;
     private Location lastListUpdatedLocation;
@@ -145,6 +153,7 @@ public class MainActivity extends BaseActivity {
 
         nearByFragment = new NearByFragment();
         chatsFragment = new ChatsFragment();
+        channelsFragment = new ChannelsFragment();
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -162,7 +171,15 @@ public class MainActivity extends BaseActivity {
                             chatsFragment.loadData();
                         }
                     },50);
-
+                }
+                if (position == 2 && (channelsFragment.adapter==null || channelsFragment.adapter.getItemCount()==0)) {
+                    Handler handler=new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            channelsFragment.loadData();
+                        }
+                    },50);
                 }
             }
 
@@ -172,6 +189,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.viewPager.setOffscreenPageLimit(2);
         binding.tabLayout.setupWithViewPager(binding.viewPager);
 
         //banner ad
@@ -183,6 +201,7 @@ public class MainActivity extends BaseActivity {
         if (checkPermissions()){
             LocationServiceHelper.checkService(this);
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -309,12 +328,16 @@ public class MainActivity extends BaseActivity {
             if (QBChatService.getInstance() != null && QBChatService.getInstance().getPrivateChatManager() != null && chatListener != null) {
                 QBChatService.getInstance().getPrivateChatManager().removePrivateChatManagerListener(chatListener);
             }
+            if (QBChatService.getInstance() != null && QBChatService.getInstance().getGroupChatManager() != null && groupChatListener != null) {
+                QBChatService.getInstance().getGroupChatManager().removeGroupChatManagerListener(groupChatListener);
+            }
         }
 
     }
 
     @Override
     protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChanged);
     }
@@ -530,15 +553,16 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return nearByFragment;
-            } else {
+            } else if(position == 1){
                 return chatsFragment;
+            } else {
+                return channelsFragment;
             }
-
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
 
@@ -546,30 +570,50 @@ public class MainActivity extends BaseActivity {
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
                 return getString(R.string.near_by);
-            } else {
+            } else if(position == 1) {
                 return getString(R.string.chats);
+            } else {
+                return getString(R.string.channels);
             }
         }
 
     }
 
+    public void openProfile() {
+        if(currentQBUser == null) return;
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra(C.QB_USERID, currentQBUser.getId());
+        intent.putExtra(C.QB_USER, currentQBUser);
+        startActivity(intent);
+
+        animateActivityStarting();
+    }
 
     public void editProfile() {
-        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         Intent intent = new Intent(this, ProfileEditActivity.class);
         startActivity(intent);
 
+        animateActivityStarting();
     }
 
     public void openSettings() {
-        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         startActivity(new Intent(this, PrefrenceActivity.class));
+        animateActivityStarting();
     }
 
     public void openAbout() {
-        binding.navigationDrawer.closeDrawer(Gravity.LEFT);
         startActivity(new Intent(this, AboutActivity.class));
+        animateActivityStarting();
+    }
 
+    private void animateActivityStarting() {
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.navigationDrawer.closeDrawer(Gravity.LEFT);
+            }
+        }, 300);
     }
 
     public void logout() {
@@ -594,12 +638,26 @@ public class MainActivity extends BaseActivity {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST);
                 return false;
             }
-
         }
         return true;
     }
 
+    public void search() {
+        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+        startActivity(intent);
+    }
 
+    public void openFriendsActivity() {
+        Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
+        startActivity(intent);
+        animateActivityStarting();
+    }
+
+    @Subscribe(threadMode = ThreadMode.POSTING)
+    public void onChatMessageEvent(UpdateChatEvent event) {
+        //if(chatsFragment.isVisible()) chatsFragment.reloadData();
+        //if(channelsFragment.isVisible()) channelsFragment.reloadData();
+    }
 }
 
 
