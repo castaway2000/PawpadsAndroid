@@ -27,20 +27,25 @@ public class Util {
     public static final String USER_LOCATION_LONG = "user_location_long";
     public static final String AD_UNIT_ID = "ca-app-pub-5883625079032168/5482181931";
 
+    //google play services
     public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    public final static String SENDER_ID = "325095426674";
+    public final static String SENDER_ID = "PUT GOOGLE PLAY ID HERE";
     public static String GCMREGID = "nothing yet";
+    //quickblox ID
+    public static final String QB_APPID = "PUT YOURS HERE";
+    public static final String QB_AUTH_KEY = "PUT YOURS HERE";
+    public static final String QB_AUTH_SECRET = "PUT YOURS HERE";
+    public static final String QB_ACCOUNT_KEY = "PUT YOURS HERE";
 
-    public static final String QB_APPID = "35252";
-    public static final String QB_AUTH_KEY = "gb4f7kN3FLgap9A";
-    public static final String QB_AUTH_SECRET = "sszVLheuYags2ZQ";
-    public static final String QB_ACCOUNT_KEY = "S6mqpsBsKxfbSqZxGY4X";
+    //quickblox ID
+    public static final String QB_APPID = "PUT YOURS HERE";
+    public static final String QB_AUTH_KEY = "PUT YOURS HERE";
+    public static final String QB_AUTH_SECRET = "PUT YOURS HERE";
+    public static final String QB_ACCOUNT_KEY = "PUT YOURS HERE";
 
-
-    public static final String STICKERS_API_KEY = "94c58fc501b259bc84282c44cd278fdf";
-
-    public static final String IMOJI_SDK_CLIENT_ID = "e517f2aa-0ca8-496d-bd22-18cd63edf3e0";
-    public static final String IMOJI_SDK_API_TOKEN = "U2FsdGVkX1/vLM8AKeuOd1AgWow8+d7WThPxuO+VeUHZ4AiqoBv/4FxWE7kGpfsd";
+    public static final String STICKERS_API_KEY = "PUT YOUR IMOJI KEY HERE";
+    public static final String IMOJI_SDK_CLIENT_ID = "PUT YOUR IMOJI CLIENT ID HERE";
+    public static final String IMOJI_SDK_API_TOKEN = "PUT YOUR IMOJI API TOKEN HERE";
 
     public static String ACCURACY;
     public static int RANGE;
