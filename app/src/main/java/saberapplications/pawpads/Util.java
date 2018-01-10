@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by blaze on 9/7/2015.
+ * Created by blaze on 9/7/2015.\
+ * Code is now depricated.
  */
 public class Util {
     public static final String PROPERTY_REG_ID = "registration_id";
